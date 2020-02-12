@@ -1,16 +1,8 @@
 <template>
 <b-row class="h-100">
-    <b-colxx xxs="12" md="10" class="mx-auto my-auto">
+    <b-colxx xxs="12" lg="6" md="12" class="mx-auto my-auto">
         <b-card class="auth-card" no-body>
-            <div class="position-relative image-side">
-                <p class="text-white h2">{{ $t('dashboards.magic-is-in-the-details') }}</p>
-                <p class="white mb-0">
-                    Please use your credentials to login.
-                    <br />If you are not a member, please
-                    <router-link tag="a" to="/user/register" class="white">register</router-link>.
-                </p>
-            </div>
-            <div class="form-side">
+            <div class="form-side w-100">
                 <router-link tag="a" to="/">
                     <span class="logo-single" />
                 </router-link>
@@ -24,13 +16,13 @@
                         <b-form-invalid-feedback v-else-if="!$v.form.email.minLength">Your email must be minimum 4 characters</b-form-invalid-feedback>
                     </b-form-group>
 
-                    <b-form-group :label="$t('user.password')" class="has-float-label mb-4">
+                    <b-form-group label="Senha" class="has-float-label mb-4">
                         <b-form-input type="password" v-model="$v.form.password.$model" :state="!$v.form.password.$error" />
                         <b-form-invalid-feedback v-if="!$v.form.password.required">Please enter your password</b-form-invalid-feedback>
                         <b-form-invalid-feedback v-else-if="!$v.form.password.minLength || !$v.form.password.maxLength">Your password must be between 4 and 16 characters</b-form-invalid-feedback>
                     </b-form-group>
                     <div class="d-flex justify-content-between align-items-center">
-                        <router-link tag="a" to="/user/forgot-password">{{ $t('user.forgot-password-question')}}</router-link>
+                        <router-link tag="a" to="/user/forgot-password">Esqueceu sua senha?</router-link>
                         <b-button type="submit" variant="primary" size="lg" :disabled="processing" :class="{'btn-multiple-state btn-shadow': true,
                     'show-spinner': processing,
                     'show-success': !processing && loginError===false,
@@ -116,9 +108,9 @@ export default {
     watch: {
         currentUser(val) {
             if (val && val.uid && val.uid.length > 0) {
-                setTimeout(() => {
-                    this.$router.push("/");
-                }, 200);
+                // setTimeout(() => {
+                //     }, 200);
+                this.$router.push("/");
             }
         },
         loginError(val) {

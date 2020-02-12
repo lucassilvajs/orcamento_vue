@@ -6,11 +6,36 @@ Vue.use(VueRouter);
 
 const routes = [
   {
+    path: "app/blank-page",
+    component: () =>
+      import(/* webpackChunkName: "blank-page" */ "./views/app/blank-page")
+  },
+  {
     path: "/",
     component: () => import(/* webpackChunkName: "app" */ "./views/app"),
     redirect: "/app/dashboards",
     beforeEnter: AuthRequired,
     children: [
+      {
+        path: "/order",
+        component: () => 
+          import("./views/order/Information")
+      },
+      {
+        path: "/order/products",
+        component: () => 
+          import("./views/order/Products")
+      },
+      {
+        path: "/order/face",
+        component: () => 
+          import("./views/order/Face")
+      },
+      {
+        path: "/order/recipe",
+        component: () => 
+          import("./views/order/Recipe")
+      },
       {
         path: "app/dashboards",
         component: () =>
