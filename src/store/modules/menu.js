@@ -96,8 +96,8 @@ const mutations = {
     state.menuType = nextClasses
   },
   changeSideMenuForMobile(state, strCurrentClasses) {
-
     const currentClasses = strCurrentClasses ? strCurrentClasses.split(' ').filter(x => x !== '' && x !== 'sub-show-temporary') : '';
+    console.log(currentClasses);
     let nextClasses = '';
     if (currentClasses.includes('main-show-temporary')) {
       nextClasses = (currentClasses.filter(x => x !== 'main-show-temporary')).join(' ');

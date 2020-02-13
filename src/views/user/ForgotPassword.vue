@@ -1,20 +1,12 @@
 <template>
 <b-row class="h-100">
-    <b-colxx xxs="12" md="10" class="mx-auto my-auto">
+    <b-colxx xxs="12" md="6" class="mx-auto my-auto">
         <b-card class="auth-card" no-body>
-            <div class="position-relative image-side">
-                <p class="text-white h2">{{ $t('dashboards.magic-is-in-the-details') }}</p>
-                <p class="white mb-0">
-                    Please use your e-mail to reset your password.
-                    <br />If you are not a member, please
-                    <router-link tag="a" to="/user/register" class="white">register</router-link>.
-                </p>
-            </div>
-            <div class="form-side">
+            <div class="form-side w-100">
                 <router-link tag="a" to="/">
                     <span class="logo-single" />
                 </router-link>
-                <h6 class="mb-4">{{ $t('user.forgot-password')}}</h6>
+                <h6 class="mb-4">Recuperar senha</h6>
                 <b-form @submit.prevent="formSubmit" class="av-tooltip tooltip-label-bottom">
                     <b-form-group :label="$t('user.email')" class="has-float-label mb-4">
                         <b-form-input type="text" v-model="$v.form.email.$model" :state="!$v.form.email.$error" />
@@ -22,8 +14,7 @@
                         <b-form-invalid-feedback v-else-if="!$v.form.email.email">Please enter a valid email address</b-form-invalid-feedback>
                         <b-form-invalid-feedback v-else-if="!$v.form.email.minLength">Your email must be minimum 4 characters</b-form-invalid-feedback>
                     </b-form-group>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <router-link tag="a" to="/user/forgot-password">{{ $t('user.forgot-password-question')}}</router-link>
+                    <div class="d-flex justify-content-end align-items-center">
                         <b-button type="submit" variant="primary" size="lg" :disabled="processing" :class="{'btn-multiple-state btn-shadow': true,
                     'show-spinner': processing,
                     'show-success': !processing && loginError===false,
@@ -39,7 +30,7 @@
                             <span class="icon fail">
                                 <i class="simple-icon-exclamation"></i>
                             </span>
-                            <span class="label">{{ $t('user.reset-password-button') }}</span>
+                            <span class="label">RECUPERAR</span>
                         </b-button>
                     </div>
                 </b-form>

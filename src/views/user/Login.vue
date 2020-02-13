@@ -110,7 +110,7 @@ export default {
             if (val && val.uid && val.uid.length > 0) {
                 // setTimeout(() => {
                 //     }, 200);
-                this.$router.push("/");
+                this.$router.push("/order/information");
             }
         },
         loginError(val) {

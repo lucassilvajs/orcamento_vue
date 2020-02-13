@@ -33,7 +33,7 @@ $shadowBlursBottom: 3 6 6 5 6;
 $shadowOpacitiesBottom: 0.04 0.1 0.2 0.22 0.22;
 
 $logoPath: "https://dp.idsafety.com.br/assets/img/logo.png";
-$logoPathMobile: "https://dp.idsafety.com.br/assets/img/logo.png";
+$logoPathMobile: "../../../img/logo.png";
 
 @import "../_mixins.scss";
 @import "../_piaf.style.scss";

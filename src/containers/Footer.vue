@@ -3,21 +3,10 @@
     <div class="footer-content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-12 col-sm-6">
-                    <p class="mb-0 text-muted">ColoredStrategies 2019</p>
-                </div>
-                <div class="col-sm-6 d-none d-sm-block">
-                    <ul class="breadcrumb pt-0 pr-0 float-right">
-                        <li class="breadcrumb-item mb-0">
-                            <a href="#" class="btn-link">Review</a>
-                        </li>
-                        <li class="breadcrumb-item mb-0">
-                            <a href="#" class="btn-link">Purchase</a>
-                        </li>
-                        <li class="breadcrumb-item mb-0">
-                            <a href="#" class="btn-link">Docs</a>
-                        </li>
-                    </ul>
+                <div class="col-12 text-center">
+                    <p class="mb-0 text-muted">Eye Measure © IDSafety 2020</p>
+                    <img class="mx-2" style="width:160px;" src="https://dp.idsafety.com.br/assets/img/eye-measure.png" alt="">
+                    <img class="mx-2" style="width:100px;" src="https://dp.idsafety.com.br/assets/img/logo.png" alt="">
                 </div>
             </div>
         </div>

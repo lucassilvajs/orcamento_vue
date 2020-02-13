@@ -8,16 +8,16 @@
                         <i :class="item.icon" />
                         {{ $t(item.label) }}
                     </a>
-                    <a v-else-if="item.subs && item.subs.length>0" @click.prevent="openSubMenu($event,item)" :href="`#${item.to}`"><i :class="item.icon" />
-                        {{ $t(item.label) }}</a>
-                    <router-link v-else @click.native="changeSelectedParentHasNoSubmenu(item.id)" :to="item.to"><i :class="item.icon" />
+                    <!-- <a v-else-if="item.subs && item.subs.length>0" @click.prevent="openSubMenu($event,item)" :href="`#${item.to}`"><i :class="item.icon" />
+                        {{ $t(item.label) }}</a> -->
+                    <router-link @click.native="changeSelectedParentHasNoSubmenu(item.id)" :to="item.to"><i :class="item.icon" />
                         {{ $t(item.label) }}</router-link>
                 </li>
             </ul>
         </vue-perfect-scrollbar>
     </div>
 
-    <div class="sub-menu">
+    <!-- <div class="sub-menu">
         <vue-perfect-scrollbar class="scroll" :settings="{ suppressScrollX: true, wheelPropagation: false }">
             <ul v-for="(item,itemIndex) in menuItems" :class="{'list-unstyled':true, 'd-block' : (selectedParentMenu === item.id && viewingParentMenu === '') || viewingParentMenu === item.id }" :data-parent="item.id" :key="`sub_${item.id}`">
                 <li v-for="(sub,subIndex) in item.subs" :class="{'has-sub-item' : sub.subs && sub.subs.length > 0 , 'active' : $route.path.indexOf(sub.to)>-1}" :key="subIndex">
@@ -51,7 +51,7 @@
                 </li>
             </ul>
         </vue-perfect-scrollbar>
-    </div>
+    </div> -->
 </div>
 </template>
 

@@ -8,6 +8,6 @@ export default (to, from, next) => {
     next()
   } else {
     localStorage.removeItem('user')
-    next('/user/login')
+    next('/login')
   }
 }

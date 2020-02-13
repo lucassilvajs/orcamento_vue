@@ -18,6 +18,7 @@ module.exports = {
     overlay: { warnings: false, errors: true },
     publicPath: '/',
     quiet: true,
+    https: true,
     watchOptions: {
       poll: false,
       ignored: /node_modules/
