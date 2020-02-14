@@ -52,17 +52,17 @@ export const colors = [
 
 import axios from "axios";
 
-const url = "https://ranekapi.origamid.dev/wp-json";
+const url = "http://localhost/orcamento_api";
 
 const axiosInstance = axios.create({
-  baseURL: url + "/api"
+  baseURL: url + ""
 });
 
 axiosInstance.interceptors.request.use(
   function(config) {
     const token = window.localStorage.token;
     if (token) {
-      config.headers.Authorization = token;
+      config.headers['x-auth-token'] = token;
     }
     return config;
   },

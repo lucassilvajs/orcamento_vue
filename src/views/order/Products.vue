@@ -4,17 +4,33 @@
      <b-row>
       <b-colxx xxs="12">
         <b-card class="mb-4" title="Selecione o item">
-			<b-row>
-				<b-colxx v-for="i in [1,2,3,4]" :key="i">
-					<b-card md="3" class="mb-4" style="border:1px solid rgba(100,100,100,.5); border-radius:6px" no-body>
+			<b-row v-if="products">
+				<b-colxx md="4" lg="3" v-for="(pro, i) in products.data" :key="i">
+					<b-card class="mb-4" style="border:1px solid rgba(100,100,100,.5); border-radius:6px" no-body>
 						<div class="position-relative">
-							<img src="https://dp.idsafety.com.br/upload/product/mg9aJbaMVYbTgFhXFQef.jpg" class="card-img-top" />
+							<img v-if="pro.colorSelected" :src="`https://dp.idsafety.com.br/upload/product/${pro.color.filter(color => color.color == pro.colorSelected)[0].image}`" class="card-img-top" />
+							<img v-else :src="`https://dp.idsafety.com.br/upload/product/${pro.image}`" class="card-img-top" />
 						</div>
 						<b-card-body>
-							<P class="mb-2 card-subtitle">ID 101 B - CA 39018</P>
-							<p>SKU: 1</p>
-							<div class="separator mb-3"></div>
-							<button @click="setProduct(i)" class="btn btn-outline-success float-right">Adicionar</button>
+							<form @submit.prevent="setProduct(i)">
+								<p class="mb-2 card-subtitle">{{pro.name}}</p>
+								<p>SKU: {{pro.sku}}</p>
+								<div class="separator mb-2"></div>
+									<select v-model="pro.sizeSelected" name="" id="" class="form-control mb-2">
+										<option value="">Selecione o tamanho</option>
+										<option v-for="(s, ci) in pro.size" :key="ci">
+											{{s}} MM
+										</option>
+									</select>
+									<select v-model="pro.colorSelected" name="" id="" class="form-control">
+										<option value="">Selecione a cor</option>
+										<option v-for="(color, ci) in pro.color" :key="ci">
+											{{color.color | capitalize}}
+										</option>
+									</select>
+								<div class="separator my-2"></div>
+								<button class="btn btn-outline-success float-right w-100">Adicionar</button>
+							</form>
 						</b-card-body>
 					</b-card>
 				</b-colxx>
@@ -27,23 +43,42 @@
 
 <script>
 import myBreadCrumb from '@/components/breadcrumb';
+import {api} from '@/constants/config';
 export default {
+	data() {
+		return {
+			products: null,
+		}
+	},
     components: {
         'my-breadcrumb': myBreadCrumb
-		},
-		methods: {
-			setProduct: function (item) {
-				let order = window.localStorage.getItem('order');
-				if(order){
-					order = JSON.parse(order);
-				}else{
-					order = {};
-				}
-				order.product = item;
-				window.localStorage.setItem('order',JSON.stringify(order));
-				this.$router.push("/order/face");
+	},
+	methods: {
+		setProduct: function (index) {
+			let order = window.localStorage.getItem('order');
+			if(order){
+				order = JSON.parse(order);
+			}else{
+				order = {};
 			}
+			order.product = {
+				model: this.products.data[index].id,
+				color: this.products.data[index].colorSelected,
+				size: this.products.data[index].sizeSelected,
+			};
+			window.localStorage.setItem('order',JSON.stringify(order));
+			this.$router.push("/order/face");
+		},
+
+		getProducts: async function()
+		{
+			const products = await api.get("/products");
+			this.products = products.data	
 		}
+	},
+	created() {
+		this.getProducts();
+	}
 }
 </script>
 

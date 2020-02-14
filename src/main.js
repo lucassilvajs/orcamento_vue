@@ -73,6 +73,22 @@ firebase.initializeApp(firebaseConfig);
 
 Vue.config.productionTip = false
 
+Vue.filter("numeroPreco", valor => {
+  valor = Number(valor);
+  if (!isNaN(valor)) {
+    return valor.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+  } else {
+    return "";
+  }
+});
+
+Vue.filter("capitalize", valor => {
+  return valor.substring(0,1).toUpperCase().concat(valor.toLowerCase().substring(1));
+});
+
 export default new Vue({
   i18n,
   router,
