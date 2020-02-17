@@ -93,11 +93,10 @@ export default {
     methods: {
         ...mapActions(["login"]),
         formSubmit() {
-            this.$v.$touch();
-            this.form.email = "piaf-vue@coloredstrategies.com";
-            this.form.password = "piaf123";
-            this.$v.form.$touch();
+            // this.$v.$touch();
+            // this.$v.form.$touch();
            // if (!this.$v.form.$anyError) {
+               console.log('Olls')
                 this.login({
                     email: this.form.email,
                     password: this.form.password
@@ -107,7 +106,7 @@ export default {
     },
     watch: {
         currentUser(val) {
-            if (val && val.uid && val.uid.length > 0) {
+            if (val && val.token && val.token.length > 0) {
                 // setTimeout(() => {
                 //     }, 200);
                 this.$router.push("/order/information");

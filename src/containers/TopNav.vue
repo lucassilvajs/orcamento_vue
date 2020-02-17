@@ -17,9 +17,9 @@
         <div class="user d-inline-block">
             <b-dropdown class="dropdown-menu-right" right variant="empty" toggle-class="p-0" menu-class="mt-3" no-caret>
                 <template slot="button-content">
-                    <span class="name mr-1">{{currentUser.title}} - Coca cola do Brasil LTDA</span>
+                    <span class="name mr-1">{{currentUser.user.company_name}}</span>
                     <span>
-                        <img :alt="currentUser.title" :src="currentUser.img" />
+                        <img :alt="currentUser.user.title" :src="`https://dp.idsafety.com.br/upload/company/${currentUser.user.logo}`" />
                     </span>
                 </template>
                 <!-- <b-dropdown-item>Account</b-dropdown-item>

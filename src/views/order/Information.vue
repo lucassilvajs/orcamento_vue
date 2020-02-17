@@ -5,44 +5,18 @@
         <b-colxx xxs="12">
             <b-card class="mb-4" title="Dados do colaborador">
                 <form @submit.prevent="formStepOne" class="form">
-                    <b-row>
+                    <b-row v-if="fields">
                         <b-colxx lg="4">
                             <b-form-group label="Nome do colaborador" class="has-float-label mb-4">
-                                <b-form-input type="text" v-model="form.name" />
+                                <b-form-input type="text" v-model="values[0]" />
                                 <b-form-invalid-feedback v-if="false">Please enter your email address</b-form-invalid-feedback>
                                 <b-form-invalid-feedback v-else-if="false">Please enter a valid email address</b-form-invalid-feedback>
                                 <b-form-invalid-feedback v-else-if="false">Your email must be minimum 4 characters</b-form-invalid-feedback>
                             </b-form-group>
                         </b-colxx>
-                        <b-colxx lg="4">
-                            <b-form-group label="Solicitante" class="has-float-label mb-4">
-                                <b-form-input type="text" v-model="form.requester" />
-                                <b-form-invalid-feedback v-if="false">Please enter your email address</b-form-invalid-feedback>
-                                <b-form-invalid-feedback v-else-if="false">Please enter a valid email address</b-form-invalid-feedback>
-                                <b-form-invalid-feedback v-else-if="false">Your email must be minimum 4 characters</b-form-invalid-feedback>
-                            </b-form-group>
-                        </b-colxx>
-                        <b-colxx lg="4">
-                            <b-form-group label="Empresa" class="has-float-label mb-4">
-                                <b-form-input type="text" v-model="form.company" />
-                                <b-form-invalid-feedback v-if="false">Please enter your email address</b-form-invalid-feedback>
-                                <b-form-invalid-feedback v-else-if="false">Please enter a valid email address</b-form-invalid-feedback>
-                                <b-form-invalid-feedback v-else-if="false">Your email must be minimum 4 characters</b-form-invalid-feedback>
-                            </b-form-group>
-                        </b-colxx>
-                        <b-colxx lg="4">
-                            <b-form-group label="Tipo da lente" class="has-float-label mb-4">
-                                <b-form-input type="text" v-model="form.optical" />
-                                <b-form-invalid-feedback v-if="false">Please enter your email address</b-form-invalid-feedback>
-                                <b-form-invalid-feedback v-else-if="false">Please enter a valid email address</b-form-invalid-feedback>
-                                <b-form-invalid-feedback v-else-if="false">Your email must be minimum 4 characters</b-form-invalid-feedback>
-                            </b-form-group>
-                        </b-colxx>
-                    <!-- </b-row>
-                    <b-row> -->
-                        <b-colxx lg="4">
-                            <b-form-group label="Observação" class="has-float-label mb-4">
-                                <b-form-input type="text" v-model="form.observation" />
+                        <b-colxx lg="4" v-for="(field, index) in fields" :key="index">
+                            <b-form-group :label="field" class="has-float-label mb-4">
+                                <b-form-input type="text" v-model="values[index+1]" />
                                 <b-form-invalid-feedback v-if="false">Please enter your email address</b-form-invalid-feedback>
                                 <b-form-invalid-feedback v-else-if="false">Please enter a valid email address</b-form-invalid-feedback>
                                 <b-form-invalid-feedback v-else-if="false">Your email must be minimum 4 characters</b-form-invalid-feedback>
@@ -60,12 +34,9 @@
 </template>
 
 <script>
-import {
-    mapGetters,
-    mapActions
-} from "vuex";
 
 import myBreadCrumb from '@/components/breadcrumb';
+import {api} from '@/constants/config'; 
 export default {
     components: {
         'my-breadcrumb': myBreadCrumb
@@ -78,27 +49,49 @@ export default {
                 company: '',
                 optical: '',
                 observation: ''
-            }
+            },
+            fields: null,
+            values: []
         }
     },
 
     computed: {
-        ...mapGetters(["currentOrder", "processing", "loginError"])
     },
     methods: {
-        ...mapActions(["setInfoOrder"]),
         formStepOne: function(){
-            this.setInfoOrder(this.form);
+            let form = {};
+            form['name'] = this.values[0];
+            this.fields.forEach((el, index) => {
+                form[el.replace(':', '')] = this.values[index+1]
+            });
+
+            let order = window.localStorage.getItem('order');
+            if(order){
+                order = JSON.parse(order);
+            }else{
+                order = {}
+            }
+
+            order.info = form;
+            window.localStorage.setItem('order', JSON.stringify(order));
+            this.$router.push("/order/products");    
+        },
+        getItemsAdd: async function() {
+            const itemsFields = await api.get('company/fields');
+            this.fields = itemsFields.data.data
+            this.values.push('');
+            this.fields.forEach((el) => {
+                this.values.push('');
+            })
+
         }
     },
 
     watch: {
-        currentOrder: function(val){
-            console.log(val)
-            if(val) {
-                this.$router.push("/order/products");
-            }
-        }
+    },
+
+    created() {
+        this.getItemsAdd();
     }
 }
 </script>

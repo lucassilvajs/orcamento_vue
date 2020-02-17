@@ -63,8 +63,10 @@ export default {
 			}
 			order.product = {
 				model: this.products.data[index].id,
+				name: this.products.data[index].name,
 				color: this.products.data[index].colorSelected,
 				size: this.products.data[index].sizeSelected,
+				image: this.products.data[index].color.filter(color => color.color == this.products.data[index].colorSelected)[0].image
 			};
 			window.localStorage.setItem('order',JSON.stringify(order));
 			this.$router.push("/order/face");

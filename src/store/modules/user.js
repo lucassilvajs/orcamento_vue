@@ -1,7 +1,7 @@
 import firebase from 'firebase/app'
 import 'firebase/auth'
 import { currentUser } from '../../constants/config'
-
+import {api} from '@/constants/config';
 export default {
   state: {
     currentUser: localStorage.getItem('user') != null ? JSON.parse(localStorage.getItem('user')) : null,
@@ -54,26 +54,40 @@ export default {
     }
   },
   actions: {
-    login({ commit }, payload) {
+    async login({ commit }, payload) {
       commit('clearError')
       commit('setProcessing', true)
-      firebase
-        .auth()
-        .signInWithEmailAndPassword(payload.email, payload.password)
-        .then(
-          user => {
-            const item = { uid: user.user.uid, ...currentUser }
-            localStorage.setItem('user', JSON.stringify(item))
-            commit('setUser', { uid: user.user.uid, ...currentUser })
-          },
-          err => {
-            localStorage.removeItem('user')
-            commit('setError', err.message)
-            setTimeout(() => {
-              commit('clearError')
-            }, 3000)
-          }
-        )
+      console.log(payload)
+      const dados = await api.post("/login", payload)
+      console.log(dados)
+      if(dados.data.status == 'success'){
+        const item = dados.data.data;
+        localStorage.setItem('user', JSON.stringify(item))
+        commit('setUser', {...dados.data.data})
+      }else{
+        localStorage.removeItem('user')
+        commit('setError', dados.data.message)
+        setTimeout(() => {
+          commit('clearError')
+        }, 3000)
+      }
+      // firebase
+      //   .auth()
+      //   .signInWithEmailAndPassword(payload.email, payload.password)
+      //   .then(
+      //     user => {
+      //       const item = { uid: user.user.uid, ...currentUser }
+      //       localStorage.setItem('user', JSON.stringify(item))
+      //       commit('setUser', { uid: user.user.uid, ...currentUser })
+      //     },
+      //     err => {
+      //       localStorage.removeItem('user')
+      //       commit('setError', err.message)
+      //       setTimeout(() => {
+      //         commit('clearError')
+      //       }, 3000)
+      //     }
+      //   )
     },
     forgotPassword({ commit }, payload) {
       commit('clearError')

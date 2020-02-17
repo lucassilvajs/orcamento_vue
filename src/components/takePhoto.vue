@@ -1,36 +1,153 @@
 <template>
-    <div class="target-foto">			
-        <vue-web-cam />
-		<!-- <div class="controlls">
-            <div>
-                <button class="btn btn-outline-dark btn-sm mr-1"> - </button>
-                <button class="btn btn-outline-dark btn-sm"> + </button>
-            </div>
-            <button class="btn btn-outline-light mr-2">
-                <div class="glyph-icon simple-icon-camera"></div>
-            </button>
-            <button class="btn btn-outline-light ml-2">
-                <div class="glyph-icon simple-icon-paper-clip"></div>
-            </button>
-        </div> -->
-    </div>
+	<div style="width:100%">
+		<select  v-if="devices.length > 0" v-model="deviceId" name="" id="" class="d-none">
+			<option v-for="device in devices" :value="device.deviceId" :key="device.deviceId">{{device.label.indexOf('front') >= 0 ? 'Camera Frontal' : 'Camera Traseira'}}</option>
+		</select>
+			<div class="target-foto">
+			<img v-if="img" :src="img" alt="" style="width:100%;">
+			<!-- <button class="btn btn-light btn-sm changeCam" @click="changeCamera" style="z-index:10;">
+				<div class="glyph-icon iconsminds-arrow-around"></div>
+			</button> -->
+			<vue-web-cam v-if="!img" ref="web"
+				:device-id="deviceId"
+				@started="onStarted"
+				@stopped="onStopped"
+				@error="onError"
+				@cameras="onCameras"
+				@camera-change="onCameraChange"
+			/>
+			<div class="controlls">
+				<div class="checkPicture" v-if="img">
+					<button class="btn btn-danger mr-2" @click="img = false">
+						<div class="d-inline glyph-icon simple-icon-dislike"></div>
+						Tirar Outra
+					</button>
+					<button class="btn btn-success mr-2" @click="sendImage">
+						Gostei
+						<div class="d-inline glyph-icon simple-icon-like"></div>
+					</button>
+				</div>			
+				<button class="btn btn-outline-light" @click="changeCamera" style="z-index:10;">
+					<div class="glyph-icon iconsminds-arrow-around"></div>
+				</button>
+				<button v-if="img" class="btn btn-outline-light mr-2" @click="img = false">
+					<div class="glyph-icon simple-icon-trash"></div>
+				</button>
+				<button v-else class="btn btn-outline-light mr-2" @click="showCam">
+					<div class="glyph-icon simple-icon-camera"></div>
+				</button>
+				<label class="btn btn-outline-light ml-2">
+					<input type="file" @change="showPhoto" class="d-none">
+					<div class="glyph-icon simple-icon-paper-clip"></div>
+				</label>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
-import WebCam from 'vue-web-cam';
-
+import { WebCam } from 'vue-web-cam';
+import Compress from 'compress.js';
+import {api} from '@/constants/config';
 export default {
+	data(){
+		return {
+			img: null,
+            camera: null,
+            deviceId: null,
+            devices: []
+			
+		}
+	},
+	props: ["target"],
 	components: {
     	'vue-web-cam': WebCam
 	},
-    name: 'take-photo',
+	name: 'take-photo',
+	computed: {
+        device: function() {
+            return this.devices.find(n => n.deviceId === this.deviceId);
+        }
+    },
+	methods: {
+		showCam: function() {
+			this.img = this.$refs.web.capture();
+		},
+		onCapture() {
+            this.img = this.$refs.webcam.capture();
+        },
+        onStarted(stream) {
+            console.log("On Started Event", stream);
+        },
+        onStopped(stream) {
+            console.log("On Stopped Event", stream);
+        },
+        onStop() {
+            this.$refs.webcam.stop();
+        },
+        onStart() {
+            this.$refs.webcam.start();
+        },
+        onError(error) {
+            console.log("On Error Event", error);
+        },
+        onCameras(cameras) {
+            this.devices = cameras;
+            console.log("On Cameras Event", cameras);
+        },
+        onCameraChange(deviceId) {
+            this.deviceId = deviceId;
+            this.camera = deviceId;
+            console.log("On Camera Change Event", deviceId);
+		},
+		changeCamera() {
+			this.deviceId = this.devices.filter(r => r.deviceId != this.deviceId)[0].deviceId;
+		},
+		showPhoto(e){
+			var file = new FileReader();
+            file.onload = (el) => {
+				this.img = el.target.result
+			};
+            file.readAsDataURL(e.target.files[0]);
+		},
+		async sendImage() {
+			const file = await api.post(`saveFile/${this.target}`, {
+				image: this.img
+			});
+
+			if(file.data.status == 'success') {
+				let order = window.localStorage.getItem('order');
+				if(order) {
+					order = JSON.parse(order)
+				}else{
+					order = {};
+				}
+
+				order[this.target] = file.data.data;
+
+				window.localStorage.setItem('order', JSON.stringify(order));
+				// window.localStorage.setItem()
+			}
+		}
+	},
+	watch: {
+        camera: function(id) {
+            this.deviceId = id;
+        },
+        devices: function() {
+            const [first, ...tail] = this.devices;
+            if (first) {
+                this.camera = first.deviceId;
+                this.deviceId = first.deviceId;
+            }
+        }
+    }
 }
 </script>
 
 <style scoped>
 	.target-foto {
-		width:500px;
-		height:500px;
+		max-width:500px;
 		display: block;
 		margin: 0 auto;
 		background: #333;
@@ -49,5 +166,17 @@ export default {
 		display: flex;
 		justify-content: space-around;
 		align-items: center
+	}
+
+	.checkPicture{
+		position: absolute;
+		bottom:100px;
+	}
+
+	.changeCam {
+		position: absolute;
+		font-size: 1.125em;
+		right:15px;
+		top:15px;
 	}
 </style>

@@ -7,18 +7,20 @@
                 <b-row>
                     <b-colxx md="3" lg="3" class="">
                         <h5 class="mb-2 mt-4 card-title">Dados do colaborador</h5>
-                        <div>
-                            <p><b>Nome: </b>Lucas de Jesus dos Santos Soares da Silva</p>
-                            <p><b>Solicitante: </b>Lucas de Jesus dos Santos Soares da Silva</p>
-                            <p><b>Empresa: </b>Lucas de Jesus dos Santos Soares da Silva</p>
-                            <p><b>Lente: </b>Lucas de Jesus dos Santos Soares da Silva</p>
-                            <p><b>Observação: </b>Lucas de Jesus dos Santos Soares da Silva</p>
+                        <div v-if="order">
+                            <p v-for="(field, index) in order.info" :key="index"><b>{{index == 'name' ? 'Nome': index}}: </b>{{field}}</p>
                         </div>
                     </b-colxx>
                     <b-colxx md="3" lg="3" class="">
                         <h5 class="mb-2 mt-4 card-title">Produto Selecionado</h5>
-                        <div>
-                            <img class="w-100" src="http://via.placeholder.com/500" alt="">
+                        <div v-if="order.product">
+                            <p><b>Nome: </b>{{order.product.name}}</p>
+                            <p><b>Tamanho: </b>{{order.product.size}}</p>
+                            <p><b>Cor: </b>{{order.product.color}}</p>
+                            <img class="w-100" :src="`https://dp.idsafety.com.br/upload/product/${order.product.image}`" alt="">
+                        </div>
+                        <div v-else>
+                            <div class="alert alert-warning">Você ainda não selecionou o óculos</div>
                         </div>
                     </b-colxx>
                     <b-colxx md="3" lg="3" class="">
@@ -58,7 +60,7 @@ export default {
     },
     data() {
         return {
-            
+            order: null
         }
     },
 
@@ -66,7 +68,7 @@ export default {
         ...mapGetters(["currentOrder", "processing", "loginError"]),
         valido: function(){
             return false;
-        }
+        },
     },
     methods: {
         ...mapActions(["setInfoOrder"]),
@@ -80,9 +82,14 @@ export default {
                     permanent: false
                 });
             }
+        },
+        infoOrder: function() {
+            this.order = JSON.parse(window.localStorage.getItem('order'));
         }
     },
-
+    created() {
+        this.infoOrder();
+    },
     watch: {
         currentOrder: function(val){
             console.log(val)
@@ -93,3 +100,9 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+    p{
+        margin-bottom: 5px!important;
+    }
+</style>

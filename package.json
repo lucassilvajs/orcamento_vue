@@ -13,6 +13,7 @@
     "axios": "^0.18.1",
     "bootstrap-vue": "^2.0.4",
     "chart.js": "2.7.2",
+    "compress.js": "^1.1.2",
     "core-js": "^3.3.2",
     "firebase": "^7.4.0",
     "v-calendar": "^0.9.7",
