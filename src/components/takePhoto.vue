@@ -126,7 +126,12 @@ export default {
 				order[this.target] = file.data.data;
 
 				window.localStorage.setItem('order', JSON.stringify(order));
-				// window.localStorage.setItem()
+				const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
+				this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
+                    duration: 3000,
+                    permanent: false
+                });
+				this.$router.push(`/order/${redirect}`);
 			}
 		}
 	},

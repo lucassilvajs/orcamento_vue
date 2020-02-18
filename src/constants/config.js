@@ -52,7 +52,7 @@ export const colors = [
 
 import axios from "axios";
 
-const url = "http://localhost/orcamento_api";
+const url = "http://192.168.0.95/orcamento_api";
 
 const axiosInstance = axios.create({
   baseURL: url + ""

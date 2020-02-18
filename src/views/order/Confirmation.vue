@@ -26,13 +26,13 @@
                     <b-colxx md="3" lg="3" class="">
                         <h5 class="mb-2 mt-4 card-title">Captura da face</h5>
                         <div>
-                            <img class="w-100" src="http://via.placeholder.com/500" alt="">
+                            <img class="w-100" :src="`http://localhost/orcamento_api/${order.face}`" alt="">
                         </div>
                     </b-colxx>
                     <b-colxx md="3" lg="3" class="">
                         <h5 class="mb-2 mt-4 card-title">Captura da receita</h5>
                         <div>
-                            <img class="w-100" src="http://via.placeholder.com/500" alt="">
+                            <img class="w-100" :src="`http://localhost/orcamento_api/${order.recipe}`" alt="">
                         </div>
                     </b-colxx>
                 </b-row>
@@ -60,7 +60,7 @@ export default {
     },
     data() {
         return {
-            order: null
+            order: null,
         }
     },
 
@@ -71,10 +71,6 @@ export default {
         },
     },
     methods: {
-        ...mapActions(["setInfoOrder"]),
-        formStepOne: function(){
-            this.setInfoOrder(this.form);
-        },
         sendInfo: function(){
             if(!this.valido) {
                 this.$notify("error", "Faltam algumas coisas", "- Nome do solicitante<br />- Imagem do atestado", {
@@ -85,6 +81,7 @@ export default {
         },
         infoOrder: function() {
             this.order = JSON.parse(window.localStorage.getItem('order'));
+
         }
     },
     created() {

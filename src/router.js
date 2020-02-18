@@ -36,6 +36,11 @@ const routes = [
         component: () => 
           import("./views/order/Confirmation")
       },
+      {
+        path: "/logout",
+        component: () => 
+          import("./views/order/Confirmation")
+      },
       // {
       //   path: "app/dashboards",
       //   component: () =>

@@ -57,12 +57,11 @@ export default {
     async login({ commit }, payload) {
       commit('clearError')
       commit('setProcessing', true)
-      console.log(payload)
       const dados = await api.post("/login", payload)
-      console.log(dados)
       if(dados.data.status == 'success'){
         const item = dados.data.data;
         localStorage.setItem('user', JSON.stringify(item))
+        localStorage.setItem('token', dados.data.data.token)
         commit('setUser', {...dados.data.data})
       }else{
         localStorage.removeItem('user')
@@ -71,23 +70,6 @@ export default {
           commit('clearError')
         }, 3000)
       }
-      // firebase
-      //   .auth()
-      //   .signInWithEmailAndPassword(payload.email, payload.password)
-      //   .then(
-      //     user => {
-      //       const item = { uid: user.user.uid, ...currentUser }
-      //       localStorage.setItem('user', JSON.stringify(item))
-      //       commit('setUser', { uid: user.user.uid, ...currentUser })
-      //     },
-      //     err => {
-      //       localStorage.removeItem('user')
-      //       commit('setError', err.message)
-      //       setTimeout(() => {
-      //         commit('clearError')
-      //       }, 3000)
-      //     }
-      //   )
     },
     forgotPassword({ commit }, payload) {
       commit('clearError')
