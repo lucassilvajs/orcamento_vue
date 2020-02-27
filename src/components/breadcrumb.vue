@@ -31,6 +31,10 @@ export default {
                     link: '/order/products'
                 },
                 {
+                    text: 'Selecionar tratamento',
+                    link: '/order/lens'
+                },
+                {
                     text: 'Capturar face',
                     link: '/order/face'
                 },

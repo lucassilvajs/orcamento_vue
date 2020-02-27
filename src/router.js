@@ -22,6 +22,11 @@ const routes = [
           import("./views/order/Products")
       },
       {
+        path: "/order/lens",
+        component: () => 
+          import("./views/order/Lens")
+      },
+      {
         path: "/order/face",
         component: () => 
           import("./views/order/Face")
@@ -35,6 +40,16 @@ const routes = [
         path: "/order/confirmation",
         component: () => 
           import("./views/order/Confirmation")
+      },
+      {
+        path: "/order/orders",
+        component: () => 
+          import("./views/order/Orders")
+      },
+      {
+        path: "/sac/new",
+        component: () => 
+          import("./views/sac/New")
       },
       {
         path: "/logout",

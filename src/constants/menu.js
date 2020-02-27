@@ -10,7 +10,13 @@ const data = [
   id: "history",
   icon: "simple-icon-clock",
   label: "Histórico",
-  to: "/order/information"
+  to: "/order/orders"
+},
+{
+  id: "sac",
+  icon: "iconsminds-headset",
+  label: "SAC",
+  to: "/sac/new"
 },
 // {
 //   id: "dashboards",

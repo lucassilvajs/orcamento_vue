@@ -9,17 +9,11 @@
                         <b-colxx lg="4">
                             <b-form-group label="Nome do colaborador" class="has-float-label mb-4">
                                 <b-form-input type="text" v-model="values[0]" />
-                                <b-form-invalid-feedback v-if="false">Please enter your email address</b-form-invalid-feedback>
-                                <b-form-invalid-feedback v-else-if="false">Please enter a valid email address</b-form-invalid-feedback>
-                                <b-form-invalid-feedback v-else-if="false">Your email must be minimum 4 characters</b-form-invalid-feedback>
                             </b-form-group>
                         </b-colxx>
                         <b-colxx lg="4" v-for="(field, index) in fields" :key="index">
                             <b-form-group :label="field" class="has-float-label mb-4">
                                 <b-form-input type="text" v-model="values[index+1]" />
-                                <b-form-invalid-feedback v-if="false">Please enter your email address</b-form-invalid-feedback>
-                                <b-form-invalid-feedback v-else-if="false">Please enter a valid email address</b-form-invalid-feedback>
-                                <b-form-invalid-feedback v-else-if="false">Your email must be minimum 4 characters</b-form-invalid-feedback>
                             </b-form-group>
                         </b-colxx>
                         <b-colxx lg="4">
@@ -82,7 +76,17 @@ export default {
             this.values.push('');
             this.fields.forEach((el) => {
                 this.values.push('');
-            })
+            });
+
+            let info = window.localStorage.getItem('order');
+            if(info) {
+                info = JSON.parse(info).info;
+                let ind = 0;
+                for(let i in info) {
+                    this.values[ind] = info[i]
+                    ind++;
+                }
+            }
 
         }
     },

@@ -59,7 +59,7 @@ export default {
 			
 		}
 	},
-	props: ["target"],
+	props: ["target", "sac"],
 	components: {
     	'vue-web-cam': WebCam
 	},
@@ -111,27 +111,48 @@ export default {
             file.readAsDataURL(e.target.files[0]);
 		},
 		async sendImage() {
-			const file = await api.post(`saveFile/${this.target}`, {
-				image: this.img
-			});
+			if(this.img.length > 100){
+				const file = await api.post(`saveFile/${this.target}`, {
+					image: this.img
+				});
 
-			if(file.data.status == 'success') {
-				let order = window.localStorage.getItem('order');
-				if(order) {
-					order = JSON.parse(order)
-				}else{
-					order = {};
+				if(!this.sac){
+					if(file.data.status == 'success') {
+						let order = window.localStorage.getItem('order');
+						if(order) {
+							order = JSON.parse(order)
+						}else{
+							order = {};
+						}
+		
+						order[this.target] = file.data.data;
+		
+						window.localStorage.setItem('order', JSON.stringify(order));
+					}
 				}
+	
+			}
 
-				order[this.target] = file.data.data;
-
-				window.localStorage.setItem('order', JSON.stringify(order));
+			if(!this.sac) {
 				const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
 				this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-                    duration: 3000,
-                    permanent: false
-                });
+					duration: 3000,
+					permanent: false
+				});
 				this.$router.push(`/order/${redirect}`);
+			}
+
+			if(this.sac) {
+				window.localStorage.setItem('sac', file.data.data);
+			}
+		},
+		checkImg() {
+			let order = window.localStorage.getItem('order');
+			if(order){
+				order = JSON.parse(order);
+				if(order[this.target]) {
+					this.img = 'http://localhost/orcamento_api/'+order[this.target]
+				}
 			}
 		}
 	},
@@ -146,7 +167,10 @@ export default {
                 this.deviceId = first.deviceId;
             }
         }
-    }
+	},
+	created() {
+		this.checkImg()
+	}
 }
 </script>
 

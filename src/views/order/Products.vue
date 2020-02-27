@@ -29,6 +29,7 @@
 										</option>
 									</select>
 								<div class="separator my-2"></div>
+								<div class="separator my-2"></div>
 								<button class="btn btn-outline-success float-right w-100">Adicionar</button>
 							</form>
 						</b-card-body>
@@ -69,7 +70,7 @@ export default {
 				image: this.products.data[index].color.filter(color => color.color == this.products.data[index].colorSelected)[0].image
 			};
 			window.localStorage.setItem('order',JSON.stringify(order));
-			this.$router.push("/order/face");
+			this.$router.push("/order/lens");
 		},
 
 		getProducts: async function()
@@ -85,5 +86,10 @@ export default {
 </script>
 
 <style>
-
+.circle-color {
+	width:25px;
+	height: 25px;
+	border-radius: 50%;
+	background: #a00
+}
 </style>
