@@ -47,9 +47,19 @@ const routes = [
           import("./views/order/Orders")
       },
       {
+        path: "/sac/view",
+        component: () => 
+          import("./views/sac/Show")
+      },
+      {
         path: "/sac/new",
         component: () => 
           import("./views/sac/New")
+      },
+      {
+        path: "/bi/analytics",
+        component: () => 
+          import("./views/bi/Analytics")
       },
       {
         path: "/logout",
@@ -400,6 +410,18 @@ const routes = [
     ]
   },
   {
+    path: "/",
+    component: () => import(/* webpackChunkName: "app" */ "./views/proposal"),
+    redirect: "/login",
+    children: [
+      {
+        path: "proposta/:hash/:response",
+        component: () =>
+          import(/* webpackChunkName: "user" */ "./views/order/ResponseOrder")
+      },
+    ]
+  },
+  {
     path: "/error",
     component: () => import(/* webpackChunkName: "error" */ "./views/Error")
   },
@@ -428,7 +450,6 @@ const routes = [
         component: () =>
           import(/* webpackChunkName: "user" */ "./views/user/ResetPassword")
       },
-
     ]
   },
   {

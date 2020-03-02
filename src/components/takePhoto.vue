@@ -5,7 +5,7 @@
 		</select>
 			<div class="target-foto">
 			<img v-if="img" :src="img" alt="" style="width:100%;">
-			<!-- <button class="btn btn-light btn-sm changeCam" @click="changeCamera" style="z-index:10;">
+			<!-- <button type="button" class="btn btn-light btn-sm changeCam" @click="changeCamera" style="z-index:10;">
 				<div class="glyph-icon iconsminds-arrow-around"></div>
 			</button> -->
 			<vue-web-cam v-if="!img" ref="web"
@@ -18,22 +18,22 @@
 			/>
 			<div class="controlls">
 				<div class="checkPicture" v-if="img">
-					<button class="btn btn-danger mr-2" @click="img = false">
+					<button type="button" class="btn btn-danger mr-2" @click="img = false">
 						<div class="d-inline glyph-icon simple-icon-dislike"></div>
 						Tirar Outra
 					</button>
-					<button class="btn btn-success mr-2" @click="sendImage">
+					<button type="button" class="btn btn-success mr-2" @click="sendImage">
 						Gostei
 						<div class="d-inline glyph-icon simple-icon-like"></div>
 					</button>
 				</div>			
-				<button class="btn btn-outline-light" @click="changeCamera" style="z-index:10;">
+				<button type="button" class="btn btn-outline-light" @click="changeCamera" style="z-index:10;">
 					<div class="glyph-icon iconsminds-arrow-around"></div>
 				</button>
-				<button v-if="img" class="btn btn-outline-light mr-2" @click="img = false">
+				<button type="button" v-if="img" class="btn btn-outline-light mr-2" @click="img = false">
 					<div class="glyph-icon simple-icon-trash"></div>
 				</button>
-				<button v-else class="btn btn-outline-light mr-2" @click="showCam">
+				<button type="button" v-else class="btn btn-outline-light mr-2" @click="showCam">
 					<div class="glyph-icon simple-icon-camera"></div>
 				</button>
 				<label class="btn btn-outline-light ml-2">
@@ -131,20 +131,26 @@ export default {
 					}
 				}
 	
+				if(!this.sac) {
+					const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
+					this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
+						duration: 3000,
+						permanent: false
+					});
+					this.$router.push(`/order/${redirect}`);
+				}
+
+				if(this.sac) {
+					console.log(file);
+					this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
+						duration: 3000,
+						permanent: false
+					});
+
+					window.localStorage.setItem('sac', file.data.data);
+				}
 			}
 
-			if(!this.sac) {
-				const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
-				this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-					duration: 3000,
-					permanent: false
-				});
-				this.$router.push(`/order/${redirect}`);
-			}
-
-			if(this.sac) {
-				window.localStorage.setItem('sac', file.data.data);
-			}
 		},
 		checkImg() {
 			let order = window.localStorage.getItem('order');

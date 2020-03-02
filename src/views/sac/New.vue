@@ -3,21 +3,26 @@
     <b-row>
       <b-colxx xxs="12">
         <b-card class="mb-4" title="SAC">
-          <form>
+          <form @submit="addSac">
             <b-row>
               <b-colxx md="6" class="mb-3">
                 <b-row>
                   <b-colxx md="12">
                     <label for="">Nome do colaborador</label>
-                    <input type="text" class="form-control" placeholder="Nome do colaborador">
+                    <input v-model="form.colaborador" type="text" class="form-control mb-3" placeholder="Nome do colaborador">
                   </b-colxx>
                   <b-colxx md="12">
                     <label for="">Número da nota fiscal</label>
-                    <input type="text" class="form-control" placeholder="Número da nota fiscal">
+                    <input v-model="form.nota" type="text" class="form-control mb-3" placeholder="Número da nota fiscal">
                   </b-colxx>
-                  <b-colxx md="12" class="mt-3">
+                  <b-colxx md="12">
                     <label for="">Conte-nos o que aconteceu</label>
-                    <textarea rows="4" class="form-control"></textarea>
+                    <textarea v-model="form.sobre" placeholder="Conte-nos o que aconteceu" rows="4" class="form-control mb-3"></textarea>
+                  </b-colxx>
+                </b-row>
+                <b-row>
+                  <b-colxx>
+                    <button class="btn btn-success float-right">Solicitar atendimento</button>
                   </b-colxx>
                 </b-row>
               </b-colxx>
@@ -41,9 +46,25 @@ export default {
 	},
   data () {
     return {
+      form: {
+        colaborador: '',
+        nota: '',
+        sobre: ''
+      }
     }
   },
   methods: {
+    async addSac(e) {
+      e.preventDefault();
+
+      let image = window.localStorage.getItem('sac');
+      const file = await api.post('sac', {...this.form, image});
+      this.$notify("success", "Sucesso", "Sua solicitação foi enviada com sucesso", {
+        duration: 3000,
+        permanent: false
+      });
+      this.$router.push('/sac/view');
+    }
   },
   created(){
   }

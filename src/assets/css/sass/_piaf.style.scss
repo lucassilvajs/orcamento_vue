@@ -7603,8 +7603,7 @@ i.large-icon {
 .invoice-vue {
   .invoice-contents {
     background-color: $foreground-color;
-    height: 1200px;
-    max-width: 830px;
+    max-height: 1200px;
     position: relative;
   }
 }

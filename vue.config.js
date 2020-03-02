@@ -21,7 +21,8 @@ module.exports = {
     watchOptions: {
       poll: false,
       ignored: /node_modules/
-    }
+    },
+    https:false
   },
   chainWebpack: config => {
     config.module

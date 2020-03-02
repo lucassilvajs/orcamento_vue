@@ -72,7 +72,8 @@ export default {
             selectedParentMenu: '',
             isMenuOver: false,
             menuItems,
-            viewingParentMenu: ''
+            viewingParentMenu: '',
+            onlyEmployee: false
         }
     },
     mounted() {
@@ -251,6 +252,11 @@ export default {
             }
             return nextClasses
         },
+
+        run() {
+            const colaborador = JSON.parse(window.localStorage.getItem('user'))['user']['colaborador'];
+            this.menuItems = this.menuItems.filter( r => r.id != (colaborador ? 'sac' : 'bi'))
+        }
     },
     computed: {
         ...mapGetters({
@@ -258,6 +264,9 @@ export default {
             menuClickCount: 'getMenuClickCount',
             selectedMenuHasSubItems: 'getSelectedMenuHasSubItems'
         })
+    },
+    created() {
+        this.run();
     },
     watch: {
         '$route'(to, from) {

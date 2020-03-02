@@ -3,7 +3,15 @@
     <my-breadcrumb />
     <b-row>
         <b-colxx xxs="12">
-            <b-card class="mb-4" title="Dados do colaborador">
+
+            <b-card class="mb-3" v-if="companies">
+                <select class="form-control" @change="changeFields" v-model="setCompany">
+                    <option v-for="(company, index) in companies" :value="index" :key="index">{{company.company.split('-')[0]}}</option>
+                </select>
+            </b-card>
+
+
+            <b-card class="mb-4" title="Dados do colaborador" v-if="setCompany || !this.fields.colaborador ">
                 <form @submit.prevent="formStepOne" class="form">
                     <b-row v-if="fields">
                         <b-colxx lg="4">
@@ -22,6 +30,7 @@
                     </b-row>
                 </form>
             </b-card>
+
         </b-colxx>
     </b-row>
 </div>
@@ -42,8 +51,11 @@ export default {
                 requester: '',
                 company: '',
                 optical: '',
-                observation: ''
+                observation: '',
             },
+            companies: false,
+            company: false,
+            setCompany: false,
             fields: null,
             values: []
         }
@@ -67,17 +79,41 @@ export default {
             }
 
             order.info = form;
+            if(this.company) order.company = this.company;
             window.localStorage.setItem('order', JSON.stringify(order));
             this.$router.push("/order/products");    
         },
         getItemsAdd: async function() {
             const itemsFields = await api.get('company/fields');
             this.fields = itemsFields.data.data
+            if(this.fields.colaborador){
+                this.companies = this.fields.companies
+            }else{
+                this.values.push('');
+                this.fields.forEach((el) => {
+                    this.values.push('');
+                });
+    
+                let info = window.localStorage.getItem('order');
+                if(info) {
+                    info = JSON.parse(info).info;
+                    let ind = 0;
+                    for(let i in info) {
+                        this.values[ind] = info[i]
+                        ind++;
+                    }
+                }
+            }
+        },
+        changeFields: function () {
+            console.log(JSON.parse(this.companies[this.setCompany].field))
+            this.values = [];
             this.values.push('');
+            this.fields = JSON.parse(this.companies[this.setCompany].field)
             this.fields.forEach((el) => {
                 this.values.push('');
             });
-
+            this.company = this.companies[this.setCompany].idCompany
             let info = window.localStorage.getItem('order');
             if(info) {
                 info = JSON.parse(info).info;
@@ -87,7 +123,6 @@ export default {
                     ind++;
                 }
             }
-
         }
     },
 

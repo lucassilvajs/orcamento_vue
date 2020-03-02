@@ -16,7 +16,13 @@ const data = [
   id: "sac",
   icon: "iconsminds-headset",
   label: "SAC",
-  to: "/sac/new"
+  to: "/sac/view"
+},
+{
+  id: "bi",
+  icon: "iconsminds-monitor-analytics",
+  label: "BI",
+  to: "/bi/analytics"
 },
 // {
 //   id: "dashboards",
