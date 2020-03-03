@@ -22,7 +22,7 @@ const data = [
   id: "bi",
   icon: "iconsminds-monitor-analytics",
   label: "BI",
-  to: "/bi/analytics"
+  to: "/bi"
 },
 // {
 //   id: "dashboards",

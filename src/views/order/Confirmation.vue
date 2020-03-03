@@ -7,13 +7,16 @@
                 <b-row>
                     <b-colxx md="3" lg="3" class="">
                         <h5 class="mb-2 mt-4 card-title">Dados do colaborador</h5>
-                        <div v-if="order">
+                        <div v-if="order && order.info">
                             <p v-for="(field, index) in order.info" :key="index"><b>{{index == 'name' ? 'Nome': index}}: </b>{{field}}</p>
+                        </div>
+                        <div v-else>
+                            <p class="text-center">Você não inseriu dados do coladorador <router-link to="/order/information">Clique aqui</router-link> para adicionar</p>
                         </div>
                     </b-colxx>
                     <b-colxx md="3" lg="3" class="">
                         <h5 class="mb-2 mt-4 card-title">Produto Selecionado</h5>
-                        <div v-if="order.product">
+                        <div v-if="order && order.product">
                             <p><b>Nome: </b>{{order.product.name}}</p>
                             <p><b>Tamanho: </b>{{order.product.size}}</p>
                             <p><b>Cor: </b>{{order.product.color}}</p>
@@ -27,25 +30,25 @@
                             <img class="w-100" :src="`https://dp.idsafety.com.br/upload/product/${order.product.image}`" alt="">
                         </div>
                         <div v-else>
-                            <p class="text-danger text-center">Você ainda não selecionou o óculos <router-link to="/order/products">Clique aqui</router-link> para adicionar</p>
+                            <p class="text-center">Você ainda não selecionou o óculos <router-link to="/order/products">Clique aqui</router-link> para adicionar</p>
                         </div>
                     </b-colxx>
                     <b-colxx md="3" lg="3" class="">
                         <h5 class="mb-2 mt-4 card-title">Captura da face</h5>
-                        <div v-if="order.face">
-                            <img class="w-100" :src="`http://localhost/orcamento_api/${order.face}`" alt="">
+                        <div v-if="order && order.face">
+                            <img class="w-100" :src="`${baseURL}${order.face}`" alt="">
                         </div>
                         <div v-else>
-                            <p class="text-danger text-center">Você ainda não anexou a face <router-link to="/order/face">Clique aqui</router-link> para anexar</p>
+                            <p class="text-center">Você ainda não anexou a face <router-link to="/order/face">Clique aqui</router-link> para anexar</p>
                         </div>
                     </b-colxx>
                     <b-colxx md="3" lg="3" class="">
                         <h5 class="mb-2 mt-4 card-title">Captura da receita</h5>
-                        <div v-if="order.recipe">
-                            <img class="w-100" :src="`http://localhost/orcamento_api/${order.recipe}`" alt="">
+                        <div v-if="order && order.recipe">
+                            <img class="w-100" :src="`${baseURL}${order.recipe}`" alt="">
                         </div>
                         <div v-else>
-                            <p class="text-danger text-center">Você ainda não anexou a receita <router-link to="/order/recipe">Clique aqui</router-link> para anexar</p>
+                            <p class="text-center">Você ainda não anexou a receita <router-link to="/order/recipe">Clique aqui</router-link> para anexar</p>
                         </div>
                     </b-colxx>
                 </b-row>
@@ -66,7 +69,7 @@ import {
     mapActions
 } from "vuex";
 
-import {api} from '@/constants/config';
+import {api, baseURL} from '@/constants/config';
 import myBreadCrumb from '@/components/breadcrumb';
 export default {
     components: {
@@ -75,6 +78,7 @@ export default {
     data() {
         return {
             order: null,
+            baseURL
         }
     },
 
@@ -163,5 +167,9 @@ export default {
 <style scoped>
     p{
         margin-bottom: 5px!important;
+    }
+
+    .text-center a{
+        color: #00b3b7
     }
 </style>

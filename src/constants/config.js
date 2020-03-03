@@ -52,7 +52,9 @@ export const colors = [
 
 import axios from "axios";
 
-const url = "http://idsafety.orcamento.api/";
+const url = "http://api.lucasjs.com.br/";
+
+export const baseURL = "http://api.lucasjs.com.br/";
 
 const axiosInstance = axios.create({
   baseURL: url + ""

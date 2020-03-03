@@ -8,6 +8,7 @@ import chat from './modules/chat'
 import todo from './modules/todo'
 import survey from './modules/survey'
 import order from './modules/order'
+import apps from './modules/apps'
 
 Vue.use(Vuex)
 
@@ -31,6 +32,7 @@ export default new Vuex.Store({
     chat,
     todo,
     survey,
-    order
+    order,
+    apps
   }
 })

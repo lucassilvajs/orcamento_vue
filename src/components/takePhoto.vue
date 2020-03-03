@@ -27,7 +27,7 @@
 						<div class="d-inline glyph-icon simple-icon-like"></div>
 					</button>
 				</div>			
-				<button type="button" class="btn btn-outline-light" @click="changeCamera" style="z-index:10;">
+				<button v-if="devices.length > 1" type="button" class="btn btn-outline-light" @click="changeCamera" style="z-index:10;">
 					<div class="glyph-icon iconsminds-arrow-around"></div>
 				</button>
 				<button type="button" v-if="img" class="btn btn-outline-light mr-2" @click="img = false">
@@ -48,7 +48,7 @@
 <script>
 import { WebCam } from 'vue-web-cam';
 import Compress from 'compress.js';
-import {api} from '@/constants/config';
+import {api, baseURL} from '@/constants/config';
 export default {
 	data(){
 		return {
@@ -157,7 +157,7 @@ export default {
 			if(order){
 				order = JSON.parse(order);
 				if(order[this.target]) {
-					this.img = 'http://localhost/orcamento_api/'+order[this.target]
+					this.img = baseURL+order[this.target]
 				}
 			}
 		}
