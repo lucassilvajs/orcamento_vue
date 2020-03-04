@@ -16,7 +16,7 @@ const data = [
   id: "sac",
   icon: "iconsminds-headset",
   label: "SAC",
-  to: "/sac/view"
+  to: "/sac"
 },
 {
   id: "bi",

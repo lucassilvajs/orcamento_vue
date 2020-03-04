@@ -75,20 +75,7 @@ export default {
             },
             colors: [],
             sizes: [],
-            products: [
-                // {
-                //     id: 1,
-                //     title: 'Marble Cake',
-                //     img: '/assets/img/marble-cake-thumb.jpg',
-                //     category: 'Cakes',
-                //     createDate: '02.04.2018',
-                //     status: 'ON HOLD',
-                //     statusColor: 'primary',
-                //     description: 'Wedding cake with flowers Macarons and blueberries',
-                //     sales: 1647,
-                //     stock: 62
-                // },
-            ]
+            products: []
         }
     },
     methods: {

@@ -12,14 +12,20 @@
                       <th>Colaborador</th>
                       <th>Data</th>
                       <th>Status</th>
+                      <th>Ações</th>
                   </tr>
               </thead>
               <tbody>
                   <tr v-for="(item, index) in items" :key="index">
-                      <td>{{item.id}}</td>
+                      <td>{{index + 1}}</td>
                       <td>{{item.colaborador}}</td>
                       <td>{{item.date | date}}</td>
                       <td><span class="badge py-2 px-3" :style="{'background': item.color, 'color': '#fff'}">{{item.status}}</span></td>
+                      <td>
+                        <router-link :to="`/sac/view/${item.id}`" class="btn btn-outline-success btn-sm">
+                          <div class="glyph-icon simple-icon-eye"/>
+                        </router-link>
+                      </td>
                   </tr>
               </tbody>
           </table>

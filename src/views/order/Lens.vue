@@ -1,84 +1,87 @@
 <template>
   <div>
     <my-breadcrumb />
-    <b-row>
-        <b-colxx xxs="12">
-            <b-card class="mb-4">
-                <div class="row flex-wrap" v-if="tratament">
-                    <div class="col-sm-12 col-md-4">
-                        <h4>Lentes</h4>
-                        <table class="table w-100 table-hover">
-                            <tr v-for="(lens, index) in tratament.lens" :key="index">
-                                <td  @click="() => {
-                                    tratament.lens.map((re) => {
-                                        re.checked = false;
-                                        return re
-                                    })
-                                    lens.checked = !lens.checked
-                                    }">{{lens.name}}</td>
-                                <td class="float-right">
-                                    <label :for="`lens_${index}`" class="pointer">
-                                        <img v-if="!lens.checked" :src="check" alt="" class="img-input">
-                                        <img v-else :src="checked" alt="" class="img-input">
-                                    </label>
-                                    <input type="checkbox" @change="() => {
+        <b-card class="mb-4">
+            <b-row>
+                <b-colxx v-if="tratament" xxs="12">
+                    <div class="row flex-wrap">
+                        <div class="col-sm-12 col-md-4">
+                            <h4>Lentes</h4>
+                            <table class="table w-100 table-hover">
+                                <tr v-for="(lens, index) in tratament.lens" :key="index">
+                                    <td  @click="() => {
                                         tratament.lens.map((re) => {
                                             re.checked = false;
                                             return re
                                         })
                                         lens.checked = !lens.checked
-                                        }" name="" :id="`lens_${index}`" class="d-none">
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="col-sm-12 col-md-4">
-                        <h4>Dioptria</h4>
-                        <table class="table w-100 table-hover">
-                            <tr v-for="(dioptria, index) in tratament.diopter" :key="index">
-                                <td  @click="() => {
-                                    tratament.diopter = tratament.diopter.map( (re) => {
-                                        re.checked = false;
-                                        return re
-                                    })    
-                                    dioptria.checked = !dioptria.checked
-                                }">{{dioptria.name}}</td>
-                                <td class="float-right">
-                                    <label :for="`dioptria_${index}`" class="pointer">
-                                        <img v-if="!dioptria.checked" :src="check" alt="" class="img-input">
-                                        <img v-else :src="checked" alt="" class="img-input">
-                                    </label>
-                                    <input type="checkbox" @change="() => {
+                                        }">{{lens.name}}</td>
+                                    <td class="float-right">
+                                        <label :for="`lens_${index}`" class="pointer">
+                                            <img v-if="!lens.checked" :src="check" alt="" class="img-input">
+                                            <img v-else :src="checked" alt="" class="img-input">
+                                        </label>
+                                        <input type="checkbox" @change="() => {
+                                            tratament.lens.map((re) => {
+                                                re.checked = false;
+                                                return re
+                                            })
+                                            lens.checked = !lens.checked
+                                            }" name="" :id="`lens_${index}`" class="d-none">
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <h4>Dioptria</h4>
+                            <table class="table w-100 table-hover">
+                                <tr v-for="(dioptria, index) in tratament.diopter" :key="index">
+                                    <td  @click="() => {
                                         tratament.diopter = tratament.diopter.map( (re) => {
                                             re.checked = false;
                                             return re
                                         })    
                                         dioptria.checked = !dioptria.checked
-                                    }" name="" :id="`dioptria_${index}`" class="d-none">
-                                </td>
-                            </tr>
-                        </table>
+                                    }">{{dioptria.name}}</td>
+                                    <td class="float-right">
+                                        <label :for="`dioptria_${index}`" class="pointer">
+                                            <img v-if="!dioptria.checked" :src="check" alt="" class="img-input">
+                                            <img v-else :src="checked" alt="" class="img-input">
+                                        </label>
+                                        <input type="checkbox" @change="() => {
+                                            tratament.diopter = tratament.diopter.map( (re) => {
+                                                re.checked = false;
+                                                return re
+                                            })    
+                                            dioptria.checked = !dioptria.checked
+                                        }" name="" :id="`dioptria_${index}`" class="d-none">
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <h4>Tratamento</h4>
+                            <table class="table w-100 table-hover">
+                                <tr v-for="(tratament, index) in tratament.tratament" :key="index">
+                                    <td  @click="tratament.checked = !tratament.checked">{{tratament.name}}</td>
+                                    <td class="float-right">
+                                        <label :for="`tratament_${index}`" class="pointer">
+                                            <img v-if="!tratament.checked" :src="check" alt="" class="img-input">
+                                            <img v-else :src="checked" alt="" class="img-input">
+                                        </label>
+                                        <input type="checkbox" @change="tratament.checked = !tratament.checked" name="" :id="`tratament_${index}`" class="d-none">
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
-                    <div class="col-sm-12 col-md-4">
-                        <h4>Tratamento</h4>
-                        <table class="table w-100 table-hover">
-                            <tr v-for="(tratament, index) in tratament.tratament" :key="index">
-                                <td  @click="tratament.checked = !tratament.checked">{{tratament.name}}</td>
-                                <td class="float-right">
-                                    <label :for="`tratament_${index}`" class="pointer">
-                                        <img v-if="!tratament.checked" :src="check" alt="" class="img-input">
-                                        <img v-else :src="checked" alt="" class="img-input">
-                                    </label>
-                                    <input type="checkbox" @change="tratament.checked = !tratament.checked" name="" :id="`tratament_${index}`" class="d-none">
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <button class="btn btn-success float-right" @click="addTratament">Continuar</button>
-            </b-card>
-        </b-colxx>
-    </b-row>
+                    <button class="btn btn-success float-right" @click="addTratament">Continuar</button>
+                </b-colxx>
+                <b-colxx class="d-flex align-items-center justify-content-center text-center" v-else>
+                    <h2>Buscando tratamentos...</h2>
+                </b-colxx>
+            </b-row>
+        </b-card>
   </div>
 </template>
 

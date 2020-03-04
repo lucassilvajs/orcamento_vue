@@ -22,10 +22,24 @@
 						<div class="d-inline glyph-icon simple-icon-dislike"></div>
 						Tirar Outra
 					</button>
-					<button type="button" class="btn btn-success mr-2" @click="sendImage">
-						Gostei
-						<div class="d-inline glyph-icon simple-icon-like"></div>
-					</button>
+
+					<b-button variant="success" :disabled="processing" :class="{'btn-multiple-state btn-shadow': true,
+                    	'show-spinner': processing,
+                    	'show-success': !processing && uploadError===false,
+                    	'show-fail': !processing && uploadError }" @click="sendImage">
+						<span class="spinner d-inline-block">
+							<span class="bounce1"></span>
+							<span class="bounce2"></span>
+							<span class="bounce3"></span>
+						</span>
+						<span class="icon success">
+							<div class="d-inline glyph-icon simple-icon-like"></div> Gostei
+						</span>
+						<span class="icon fail">
+							<i class="simple-icon-exclamation"></i>
+						</span>
+						<span class="label">Gostei</span>
+					</b-button>
 				</div>			
 				<button v-if="devices.length > 1" type="button" class="btn btn-outline-light" @click="changeCamera" style="z-index:10;">
 					<div class="glyph-icon iconsminds-arrow-around"></div>
@@ -55,7 +69,9 @@ export default {
 			img: null,
             camera: null,
             deviceId: null,
-            devices: []
+			devices: [],
+			processing: false,
+			uploadError: false
 			
 		}
 	},
@@ -112,9 +128,17 @@ export default {
 		},
 		async sendImage() {
 			if(this.img.length > 100){
+				this.processing = true;
 				const file = await api.post(`saveFile/${this.target}`, {
 					image: this.img
 				});
+
+				if(file.data.status != 'success') {
+					this.uploadError = true
+					setTimeout(() => {
+						this.uploadError = false
+					}, 3500);
+				}
 
 				if(!this.sac){
 					if(file.data.status == 'success') {
@@ -150,6 +174,8 @@ export default {
 					window.localStorage.setItem('sac', file.data.data);
 				}
 			}
+
+			this.processing = false;
 
 		},
 		checkImg() {

@@ -47,7 +47,12 @@ const routes = [
           import("./views/order/Orders")
       },
       {
-        path: "/sac/view",
+        path: "/sac",
+        component: () => 
+          import("./views/sac/Show")
+      },
+      {
+        path: "/sac/view/:id",
         component: () => 
           import("./views/sac/Show")
       },
@@ -57,7 +62,7 @@ const routes = [
           import("./views/sac/New")
       },
       {
-        path: "/bi/analytics",
+        path: "/bi",
         component: () => 
           import("./views/bi/Analytics")
       },

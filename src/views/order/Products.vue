@@ -29,12 +29,14 @@
 										</option>
 									</select>
 								<div class="separator my-2"></div>
-								<div class="separator my-2"></div>
 								<button class="btn btn-outline-success float-right w-100">Adicionar</button>
 							</form>
 						</b-card-body>
 					</b-card>
 				</b-colxx>
+			</b-row>
+			<b-row v-else class="align-items-center justify-content-center text-center">
+				<h2>Buscando produtos...</h2>
 			</b-row>
         </b-card>
       </b-colxx>
@@ -56,6 +58,12 @@ export default {
 	},
 	methods: {
 		setProduct: function (index) {
+			if(!this.products.data[index].colorSelected || !this.products.data[index].sizeSelected){
+				this.$notify("error", 'Opsss.!!!', "Você precisa selecionar o tamanho e a cor do seu óculos", {
+					duration: 3000,
+					permanent: false
+				});
+			}
 			let order = window.localStorage.getItem('order');
 			if(order){
 				order = JSON.parse(order);

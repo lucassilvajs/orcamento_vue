@@ -57,7 +57,23 @@
     </b-row>
     <b-row>
         <b-colxx>
-            <button @click="sendInfo" class="btn btn-success float-right mb-3">Enviar Solicitação</button>
+            <b-button variant="success" :disabled="processing" :class="{'float-right mb-3 btn-multiple-state btn-shadow': true,
+                'show-spinner': processing,
+                'show-success': !processing && uploadError===false,
+                'show-fail': !processing && uploadError }" @click="sendInfo">
+                <span class="spinner d-inline-block">
+                    <span class="bounce1"></span>
+                    <span class="bounce2"></span>
+                    <span class="bounce3"></span>
+                </span>
+                <span class="icon success">
+                    Enviar Solicitação
+                </span>
+                <span class="icon fail">
+                    <i class="simple-icon-exclamation"></i>
+                </span>
+                <span class="label">Enviar Solicitação</span>
+            </b-button>
         </b-colxx>
     </b-row>
 </div>
@@ -78,7 +94,9 @@ export default {
     data() {
         return {
             order: null,
-            baseURL
+            baseURL,
+            processing: false,
+            uploadError: false
         }
     },
 
@@ -130,10 +148,10 @@ export default {
                     permanent: false
                 });
             }else{
+                this.processing = true;
                 let order = JSON.parse(window.localStorage.getItem('order'));
                 const response = await api.post('/order', order);
                 let data = response.data;
-                console.log(data)
                 if(data.status == 'success') {
                     this.$notify("success", `Pedido #${data.data.order.id}`, data.message, {
                         duration: 3000,
@@ -142,6 +160,12 @@ export default {
 
                     window.localStorage.removeItem('order');
                     this.$router.push('/order/orders');
+                }else{
+                    this.uploadError = false;
+                    this.$notify("error", 'Opsss...!', data.message, {
+                        duration: 3000,
+                        permanent: false
+                    });
                 }
             }
         },
