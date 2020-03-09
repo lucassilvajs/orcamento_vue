@@ -62,7 +62,7 @@ const routes = [
           import("./views/sac/New")
       },
       {
-        path: "/bi",
+        path: "/bi/analytics",
         component: () => 
           import("./views/bi/Analytics")
       },

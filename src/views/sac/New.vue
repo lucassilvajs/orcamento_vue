@@ -20,15 +20,15 @@
                     <textarea v-model="form.sobre" placeholder="Conte-nos o que aconteceu" rows="4" class="form-control mb-3"></textarea>
                   </b-colxx>
                 </b-row>
-                <b-row>
-                  <b-colxx>
-                    <button class="btn btn-success float-right">Solicitar atendimento</button>
-                  </b-colxx>
-                </b-row>
               </b-colxx>
               <b-colxx md="6">
                 <label for="">Envie uma foto</label>
                 <take-photo style="max-width:500px;" sac="1" target="sac"/>
+              </b-colxx>
+            </b-row>
+            <b-row>
+              <b-colxx>
+                <button class="btn btn-success float-right mt-3">Solicitar atendimento</button>
               </b-colxx>
             </b-row>
           </form>

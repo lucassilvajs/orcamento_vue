@@ -2,39 +2,80 @@
 <div>
     <b-row>
         <b-colxx xxs="12">
-            <h1>Analytics</h1>
+            <h1>BI</h1>
             <div class="separator mb-5"></div>
         </b-colxx>
     </b-row>
-    <b-row>
-        <b-colxx xl="12" lg="12" md="12" class="mb-4">
+    <b-row v-if="data">
+        <b-colxx xl="6" lg="6" md="6" class="mb-4">
             <b-card title="Metas">
-                <div v-for="(s,index) in profileStatuses" :key="index" class="mb-4">
+                <div v-for="(s,index) in data.metrics" :key="index" class="mb-4">
                     <p class="mb-2">
-                        {{ s.title }}
-                        <span class="float-right text-muted">{{s.status}}/{{s.total}}</span>
+                        {{ s.label }}
+                        <span class="float-right text-muted">{{s.total}}/{{s.objective}}</span>
                     </p>
-                    <b-progress :value="(s.status / s.total) * 100"></b-progress>
+                    <b-progress :value="(s.total / s.objective) * 100"></b-progress>
                 </div>
             </b-card>
         </b-colxx>
-        <b-colxx xl="12" lg="12" md="12">
+        <b-colxx lg="6">
+            <div class="icon-cards-row">
+                <glide-component :settings="glideIconsOption">
+                    <icon-card v-for="(card, index) in data.orders" :key="index" :title="card.label" :icon="card.icon" :value="card.value" />
+                </glide-component>
+            </div>
+        </b-colxx>
+    </b-row>
+    <b-row>
+        <b-colxx xl="6" lg="6" md="6" xxs="12">
             <b-row>
                 <b-colxx xxs="12">
-                    <h3>Metrica semanal</h3>
-                    <div class="separator mb-5"></div>
+                    <b-card title="Top Empresas">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nome</th>
+                                    <th>Último Pedido</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(comp, index) in data.companies.sales" :key="index">
+                                    <td>{{index+1}}</td>
+                                    <td>{{comp.name}}</td>
+                                    <td>{{comp.last_order | date}}</td>
+                                    <td>{{comp.total_month | numeroPreco}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </b-card>
                 </b-colxx>
-                <b-colxx xxs="6" class="mb-4">
-                    <small-line-chart-card class="dashboard-small-chart-analytics" :data="smallChartData1" />
-                </b-colxx>
-                <b-colxx xxs="6" class="mb-4">
-                    <small-line-chart-card class="dashboard-small-chart-analytics" :data="smallChartData2" />
-                </b-colxx>
-                <b-colxx xxs="6" class="mb-4">
-                    <small-line-chart-card class="dashboard-small-chart-analytics" :data="smallChartData3" />
-                </b-colxx>
-                <b-colxx xxs="6" class="mb-4">
-                    <small-line-chart-card class="dashboard-small-chart-analytics" :data="smallChartData4" />
+            </b-row>
+        </b-colxx>
+        <b-colxx>
+            <b-row>
+                <b-colxx xxs="12">
+                    <b-card title="Perdidos">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nome</th>
+                                    <th>Último Pedido</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                 <tr v-for="(comp, index) in data.companies.lose" :key="index">
+                                    <td>{{index+1}}</td>
+                                    <td>{{comp.name}}</td>
+                                    <td>{{comp.last_order | date}}</td>
+                                    <td>{{comp.total_month | numeroPreco}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </b-card>
                 </b-colxx>
             </b-row>
         </b-colxx>
@@ -43,8 +84,9 @@
 </template>
 
 <script>
-
+import {api, baseURL} from '@/constants/config';
 import SmallLineChartCard from '@/components/Cards/SmallLineChartCard'
+import GlideComponent from '@/components/Carousel/GlideComponent'
 import { ThemeColors } from '@/utils'
 const colors = ThemeColors()
 // import {
@@ -60,13 +102,35 @@ const colors = ThemeColors()
 //     lineChartData
 // } from '@/data/charts'
 // import profileStatuses from '@/data/profileStatuses'
-
+import IconCard from '@/components/Cards/IconCard'
 export default {
     components: {
         'small-line-chart-card': SmallLineChartCard,
+        'icon-card': IconCard,
+        'glide-component' : GlideComponent,
     },
     data() {
         return {
+            glideIconsOption: {
+                gap: 5,
+                perView: 3,
+                type: "carousel",
+                breakpoints: {
+                    320: {
+                        perView: 1
+                    },
+                    576: {
+                        perView: 1
+                    },
+                    1600: {
+                        perView: 3
+                    },
+                    1800: {
+                        perView: 3
+                    }
+                },
+                hideNav: true
+            },
             profileStatuses: [
                 {
                     title: 'Vendas (R$)',
@@ -145,7 +209,6 @@ export default {
                     }
                 ]
             },
-
             smallChartData4: {
                 labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'],
                 datasets: [
@@ -167,8 +230,18 @@ export default {
                         }
                     }
                 ]
-            }
+            },
+            data: null
         }
+    },
+    methods: {
+        async getBI() {
+            const response = await api.get('bi');
+            this.data = response.data.data
+        }
+    },
+    created() {
+        this.getBI();
     }
 }
 </script>
