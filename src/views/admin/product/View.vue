@@ -21,14 +21,14 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              <td>ID 103 - B</td>
-              <td>123</td>
-              <td>01/03/2020 12:59</td>
-              <td>R$ 69,90</td>
+            <tr v-for="(pro, index) in product" :key="index">
+              <td>{{index}}</td>
+              <td>{{pro.name}}</td>
+              <td>{{pro.sku}}</td>
+              <td>{{pro.date | date}}</td>
+              <td>{{pro.value | numeroPreco}}</td>
               <td>
-                <router-link class="btn btn-outline-info mr-1" to="/admin/product/edit/1"><div class="glyph-icon simple-icon-pencil"></div></router-link>
+                <router-link class="btn btn-outline-info mr-1" :to="`/admin/product/edit/${pro.id}`"><div class="glyph-icon simple-icon-pencil"></div></router-link>
                 <button class="btn btn-outline-danger"><div class="glyph-icon simple-icon-trash"></div></button>
               </td>
             </tr>
@@ -40,7 +40,7 @@
   </div>
 </template>
 <script>
-import { apiUrl } from '@/constants/config'
+import { api, apiUrl } from '@/constants/config'
 import axios from 'axios'
 import Vuetable from 'vuetable-2/src/components/Vuetable'
 import VuetablePaginationBootstrap from '@/components/Common/VuetablePaginationBootstrap'
@@ -52,58 +52,7 @@ export default {
   },
   data () {
     return {
-      items: [
-        { id: 1, Nome: 'ID 103 A', SKU: 'Otto', username: '<button></button>' },
-        { id: 2, Nome: 'ID 103 A', SKU: 'Thornton', username: '@fat' },
-        { id: 3, Nome: 'ID 103 A', SKU: 'the Bird', username: '@twitter' }
-      ],
-      vuetableItems: {
-        apiUrl: apiUrl + '/cakes/fordatatable',
-        fields: [
-          {
-            name: 'title',
-            sortField: 'title',
-            title: 'Name',
-            titleClass: '',
-            dataClass: 'list-item-heading'
-          },
-          {
-            name: 'sales',
-            sortField: 'sales',
-            title: 'Sales',
-            titleClass: '',
-            dataClass: 'text-muted'
-          },
-          {
-            name: 'stock',
-            sortField: 'stock',
-            title: 'Stock',
-            titleClass: '',
-            dataClass: 'text-muted'
-          },
-          {
-            name: 'category',
-            sortField: 'category',
-            title: 'Category',
-            titleClass: '',
-            dataClass: 'text-muted'
-          }
-        ]
-      },
-      currentPage: 1,
-      perPage: 5,
-      totalRows: 0,
-      bootstrapTable: {
-        selected: [],
-        selectMode: 'multi',
-        fields: [
-          { key: 'title', label: 'Title', sortable: true, sortDirection: 'desc', tdClass: 'list-item-heading' },
-          { key: 'sales', label: 'Sales', sortable: true, tdClass: 'text-muted' },
-          { key: 'stock', label: 'Stock', sortable: true, tdClass: 'text-muted' },
-          { key: 'category', label: 'Category', sortable: true, tdClass: 'text-muted' },
-          { key: 'status', label: 'Status', sortable: true, tdClass: 'text-muted' }
-        ]
-      }
+      product: null
     }
   },
   methods: {
@@ -147,7 +96,14 @@ export default {
         // Optional
       }
       return apiParams
+    },
+    async getProducts() {
+      const response = await api.get('admin/product');
+      this.product = response.data.data;
     }
+  },
+  created() {
+    this.getProducts();
   }
 }
 </script>

@@ -27,7 +27,7 @@
                                 </div>
 
                             </div>
-                            <img class="w-100" :src="`https://dp.idsafety.com.br/upload/product/${order.product.image}`" alt="">
+                            <img class="w-100" :src="`${baseURL}${order.product.image}`" alt="">
                         </div>
                         <div v-else>
                             <p class="text-center">Você ainda não selecionou o óculos <router-link to="/order/products">Clique aqui</router-link> para adicionar</p>
