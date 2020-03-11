@@ -35,7 +35,7 @@ const data = [
         to: "/admin/employee/view"
       },
       {
-        icon: "iconsminds-add-user",
+        icon: "simple-icon-plus",
         label: "Adicionar",
         to: "/admin/employee/new"
       },
@@ -53,7 +53,7 @@ const data = [
         to: "/admin/company/view"
       },
       {
-        icon: "iconsminds-add-user",
+        icon: "simple-icon-plus",
         label: "Adicionar",
         to: "/admin/company/new"
       },
@@ -71,7 +71,7 @@ const data = [
         to: "/admin/user/view"
       },
       {
-        icon: "iconsminds-add-user",
+        icon: "simple-icon-plus",
         label: "Adicionar",
         to: "/admin/user/new"
       },

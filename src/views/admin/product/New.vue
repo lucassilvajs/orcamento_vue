@@ -60,8 +60,8 @@
                             <b-colxx v-for="(product,productIndex) in product.colors" xxs="6" lg="3" xl="3" class="mb-4" :key="`product_${productIndex}`">
                                 <b-card no-body>
                                     <div class="position-relative">
-                                        <b-card-img top :alt="product.title" :src="baseURL+product.image" />
-                                        <h4 class="product_title">{{product.title}}</h4>
+                                        <b-card-img top :alt="product.name" :src="baseURL+product.image" />
+                                        <h4 class="product_title">{{product.name}}</h4>
                                     </div>
                                 </b-card>
                             </b-colxx>

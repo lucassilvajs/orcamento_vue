@@ -2,48 +2,52 @@
 <div>
   <b-row>
     <b-colxx xxs="12">
-      <h1>Colaboradores</h1>
+      <h1>Empresas</h1>
       <div class="separator mb-5"></div>
     </b-colxx>
   </b-row>
-  <b-row class="mb-5">
+  <b-row class="mb-5" v-if="company">
     <b-colxx xxs="12">
-      <b-card class="mb-4" title="Colaboradores">
-        <div class="table-responsive">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Nome</th>
-                <th>E-mail</th>
-                <th>Criação</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Lucas Silva</td>
-                <td>lucas@idsafety.com.br</td>
-                <td>01/03/2020 12:59</td>
-                <td>
-                  <router-link class="btn btn-outline-info mr-1" to="/app/products/edit/1"><div class="glyph-icon simple-icon-pencil"></div></router-link>
-                  <button class="btn btn-outline-danger"><div class="glyph-icon simple-icon-trash"></div></button>
-                  <button class="btn btn-outline-dark"><div class="glyph-icon simple-icon-chart"></div></button>
-                  <b-tooltip :target="'tool-'+item.placement"
-                        :placement="item.placement"
-                        :title="item.body">
-                  </b-tooltip>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <b-card class="mb-4" title="Empresas">
+        <table class="table table-hover" v-if="company.length">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th>Email</th>
+              <th>Tem contrato</th>
+              <th>Cadastro</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(com, index) in company" :key="index">
+              <td>{{index+1}}</td>
+              <td>{{com.name}}</td>
+              <td>{{com.email}}</td>
+              <td v-if="com.has_contract == 1"><span class="badge badge-success">Possui contrato</span></td>
+              <td v-else><span class="badge badge-info">Não possui contrato</span></td>
+              <td>{{com.date | date}}</td>
+              <td>
+                <router-link class="btn btn-outline-info mr-1" :to="`/admin/company/edit/${com.id}`"><div class="glyph-icon simple-icon-pencil"></div></router-link>
+                <button class="btn btn-outline-danger" @click="hideButton(index)" v-if="!com.inDelete">
+                  <div class="glyph-icon simple-icon-trash"></div>
+                </button>
+                <button class="btn btn-danger" @click="deleteItem(index)" v-else>
+                  <div class="glyph-icon simple-icon-exclamation flash"></div>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="alert alert-info" v-else>Você não possui nenhum item cadastrado</div>
       </b-card>
     </b-colxx>
   </b-row>
   </div>
 </template>
 <script>
-import { apiUrl } from '@/constants/config'
+import { api, apiUrl } from '@/constants/config'
 import axios from 'axios'
 import Vuetable from 'vuetable-2/src/components/Vuetable'
 import VuetablePaginationBootstrap from '@/components/Common/VuetablePaginationBootstrap'
@@ -55,113 +59,54 @@ export default {
   },
   data () {
     return {
-      items: [
-        { id: 1, Nome: 'ID 103 A', SKU: 'Otto', username: '<button></button>' },
-        { id: 2, Nome: 'ID 103 A', SKU: 'Thornton', username: '@fat' },
-        { id: 3, Nome: 'ID 103 A', SKU: 'the Bird', username: '@twitter' }
-      ],
-      vuetableItems: {
-        apiUrl: apiUrl + '/cakes/fordatatable',
-        fields: [
-          {
-            name: 'title',
-            sortField: 'title',
-            title: 'Name',
-            titleClass: '',
-            dataClass: 'list-item-heading'
-          },
-          {
-            name: 'sales',
-            sortField: 'sales',
-            title: 'Sales',
-            titleClass: '',
-            dataClass: 'text-muted'
-          },
-          {
-            name: 'stock',
-            sortField: 'stock',
-            title: 'Stock',
-            titleClass: '',
-            dataClass: 'text-muted'
-          },
-          {
-            name: 'category',
-            sortField: 'category',
-            title: 'Category',
-            titleClass: '',
-            dataClass: 'text-muted'
-          }
-        ]
-      },
-      currentPage: 1,
-      perPage: 5,
-      totalRows: 0,
-      bootstrapTable: {
-        selected: [],
-        selectMode: 'multi',
-        fields: [
-          { key: 'title', label: 'Title', sortable: true, sortDirection: 'desc', tdClass: 'list-item-heading' },
-          { key: 'sales', label: 'Sales', sortable: true, tdClass: 'text-muted' },
-          { key: 'stock', label: 'Stock', sortable: true, tdClass: 'text-muted' },
-          { key: 'category', label: 'Category', sortable: true, tdClass: 'text-muted' },
-          { key: 'status', label: 'Status', sortable: true, tdClass: 'text-muted' }
-        ]
-      }
+      company: null
     }
   },
   methods: {
-    onPaginationData (paginationData) {
-      this.$refs.pagination.setPaginationData(paginationData)
+    async getCompanies() {
+      const response = await api.get('admin/company');
+      this.company = response.data.data.map(p => {p.inDelete = false; return p});
     },
-    onChangePage (page) {
-      this.$refs.vuetable.changePage(page)
+    deleteItem(item){
+      this.company = this.company.filter((r,i) => {if(i != item) return r; else api.put(`admin/company/delete/${r.id}`) })
+      this.$notify('success', "Sucesso", "Produto deletado com sucesso", {
+        duration: 3000,
+        permanent: false
+      })
     },
-    rowSelected (items) {
-      this.bootstrapTable.selected = items
-    },
-    dataProvider (ctx) {
-      const params = this.apiParamsConverter(ctx)
-      let promise = axios.get(apiUrl + '/cakes/fordatatable', { params: params })
-
-      return promise
-        .then(result => result.data)
-        .then((data) => {
-          this.currentPage = data.current_page
-          this.perPage = data.per_page
-          this.totalRows = data.total
-          const items = data.data
-          return items;
-        }).catch(_error => {
-          return []
-        })
-    },
-    apiParamsConverter (params) {
-      let apiParams = {}
-      if (params.perPage !== 0) {
-        apiParams.per_page = params.perPage
-      }
-      if (params.currentPage >= 1) {
-        apiParams.page = params.currentPage
-      }
-      if (params.sortBy && params.sortBy.length > 0) {
-        apiParams.sort = `${params.sortBy}|${params.sortDesc ? 'desc' : 'asc'}`
-      }
-      if (params.filter && params.filter.length > 0) {
-        // Optional
-      }
-      return apiParams
+    hideButton(index) {
+      this.company[index].inDelete = true;
+      this.$notify('warning', "Certeza?", "Você deseja realmente deletar essa empresa", {
+        duration: 3000,
+        permanent: false
+      })
+      setTimeout(() => {
+        this.company[index].inDelete = false;
+      }, 3500);
     }
   },
-  mounted () {
-    /* popover manuel close */
-    this.$root.$on('bv::popover::show', () => {
-      this.$root.$emit('bv::hide::popover')
-    })
-    document.addEventListener('click', e => {
-      if (e.target.id.indexOf('pop') === -1) {
-        this.$root.$emit('bv::hide::popover')
-      }
-    })
+  created() {
+    this.getCompanies();
   }
 }
 </script>
+
+<style>
+  .flash {
+    animation-name: flash;
+    animation-duration: .5s;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes flash {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: .4;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+</style>

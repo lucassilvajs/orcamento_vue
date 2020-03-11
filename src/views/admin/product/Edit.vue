@@ -10,6 +10,7 @@
     <b-row>
         <b-colxx xxs="12">
             <b-card class="mb-4" title="Novo produto">
+                {{product.type}}
                 <b-row>
                     <b-colxx md="4" lg="3">
                         <b-form-group label="Nome do Produto" class="has-float-label mb-4">
@@ -34,7 +35,7 @@
                     <b-colxx md="4" lg="3">
                         <b-form-group>
                             <select class="form-control" v-model="product.type">
-                                <option value="1" selected="selected">Tipo do produto</option>
+                                <option value="1">Tipo do produto</option>
                                 <option value="1">Óculos</option>
                                 <option value="2">Lente</option>
                                 <option value="4">Tratamento</option>
@@ -44,7 +45,7 @@
                 </b-row>
             </b-card>
             
-            <b-card class="mb-4" title="Cor">
+            <b-card class="mb-4" title="Cor" v-if="product.type == 1">
                 <b-row>
                     <b-colxx md="4" lg="3">
                         <b-form-group label="Cor" class="has-float-label mb-4">
@@ -60,8 +61,8 @@
                             <b-colxx v-for="(product,productIndex) in product.colors" xxs="6" lg="3" xl="3" class="mb-4" :key="`product_${productIndex}`">
                                 <b-card no-body>
                                     <div class="position-relative">
-                                        <b-card-img top :alt="product.title" :src="baseURL+product.image" />
-                                        <h4 class="product_title">{{product.title}}</h4>
+                                        <b-card-img top :alt="product.name" :src="baseURL+product.image" />
+                                        <h4 class="product_title">{{product.name}}</h4>
                                     </div>
                                 </b-card>
                             </b-colxx>
@@ -70,7 +71,7 @@
                 </b-row>
             </b-card>
 
-            <b-card class="mb-4" title="Tamanho">
+            <b-card class="mb-4" title="Tamanho" v-if="product.type == 1">
                 <b-row>
                     <b-colxx lg="3">
                         <div class="alert alert-info"><i class="glyph-icon simple-icon-info"></i> Insira uma medida e tecle Enter</div>
@@ -85,7 +86,7 @@
             </b-card>
         </b-colxx>
         <b-colxx>
-            <button class="btn btn-success float-right" @click="editProduct">Adicionar Produto</button>
+            <button class="btn btn-success float-right" @click="editProduct">Editar Produto</button>
         </b-colxx>
     </b-row>
 </div>
@@ -111,13 +112,13 @@ export default {
         return {
             product:{
                 type: '1',
-                name: '',
+                name: 's',
                 sku: '',
                 price: '',
                 colors: [],
                 sizes: {
-                    commercial: [48, 50],
-                    internal: [48, 50]
+                    commercial: [],
+                    internal: []
                 }
             },
             baseURL,
@@ -145,23 +146,23 @@ export default {
     methods: {
         ...mapActions(["loading"]),
         dropzoneTemplate() {
-            return `<div class="dz-preview dz-file-preview mb-3">
-                  <div class="d-flex flex-row "> <div class="p-0 w-30 position-relative">
-                      <div class="dz-error-mark"><span><i></i>  </span></div>
-                      <div class="dz-success-mark"><span><i></i></span></div>
-                      <div class="preview-container">
-                        <img data-dz-thumbnail class="img-thumbnail border-0" />
-                        <i class="simple-icon-doc preview-icon"></i>
-                      </div>
-                  </div>
-                  <div class="pl-3 pt-2 pr-2 pb-1 w-70 dz-details position-relative">
-                    <div> <span data-dz-name /> </div>
-                    <div class="text-primary text-extra-small" data-dz-size /> </div>
-                    <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
-                    <div class="dz-error-message"><span data-dz-errormessage></span></div>
-                  </div>
-                  <a href="#" class="remove" data-dz-remove> <i class="glyph-icon simple-icon-trash"></i> </a>
+        return `<div class="dz-preview dz-file-preview mb-3">
+                <div class="d-flex flex-row "> <div class="p-0 w-30 position-relative">
+                    <div class="dz-error-mark"><span><i></i>  </span></div>
+                    <div class="dz-success-mark"><span><i></i></span></div>
+                    <div class="preview-container">
+                    <img data-dz-thumbnail class="img-thumbnail border-0" />
+                    <i class="simple-icon-doc preview-icon"></i>
+                    </div>
                 </div>
+                <div class="pl-3 pt-2 pr-2 pb-1 w-70 dz-details position-relative">
+                <div> <span data-dz-name /> </div>
+                <div class="text-primary text-extra-small" data-dz-size /> </div>
+                <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+                <div class="dz-error-message"><span data-dz-errormessage></span></div>
+                </div>
+                <a href="#" class="remove" data-dz-remove> <i class="glyph-icon simple-icon-trash"></i> </a>
+            </div>
         `
         },
         addImage() {
@@ -186,7 +187,7 @@ export default {
             this.color.image = JSON.parse(file.xhr.response).data;
         },
         async editProduct() {
-            const response = await api.post('admin/product', this.product);
+            const response = await api.put(`admin/product/${this.$route.params.id}`, this.product);
             if(response.data.status == 'success') {
                 this.$notify("success", "Sucesso", response.data.message, {
                     duration: 3000,
@@ -219,5 +220,19 @@ export default {
     background: #fff;
     width: 100%;
     text-shadow: 1px 1px 2px rgba(0,0,0,.2);
+}
+
+.delete-color {
+    width: 40px;
+    height: 40px;
+    background: #ddd;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.8rem;
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    font-weight: bold;
+    padding: 0;
 }
 </style>

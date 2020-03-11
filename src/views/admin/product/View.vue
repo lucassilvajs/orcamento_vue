@@ -6,10 +6,10 @@
       <div class="separator mb-5"></div>
     </b-colxx>
   </b-row>
-  <b-row class="mb-5">
+  <b-row class="mb-5" v-if="product">
     <b-colxx xxs="12">
       <b-card class="mb-4" title="Produtos">
-        <table class="table table-hover">
+        <table class="table table-hover" v-if="product.length">
           <thead>
             <tr>
               <th>ID</th>
@@ -22,18 +22,24 @@
           </thead>
           <tbody>
             <tr v-for="(pro, index) in product" :key="index">
-              <td>{{index}}</td>
+              <td>{{index+1}}</td>
               <td>{{pro.name}}</td>
               <td>{{pro.sku}}</td>
               <td>{{pro.date | date}}</td>
               <td>{{pro.value | numeroPreco}}</td>
               <td>
                 <router-link class="btn btn-outline-info mr-1" :to="`/admin/product/edit/${pro.id}`"><div class="glyph-icon simple-icon-pencil"></div></router-link>
-                <button class="btn btn-outline-danger"><div class="glyph-icon simple-icon-trash"></div></button>
+                <button class="btn btn-outline-danger" @click="hideButton(index)" v-if="!pro.inDelete">
+                  <div class="glyph-icon simple-icon-trash"></div>
+                </button>
+                <button class="btn btn-danger" @click="deleteItem(index)" v-else>
+                  <div class="glyph-icon simple-icon-exclamation flash"></div>
+                </button>
               </td>
             </tr>
           </tbody>
         </table>
+        <div class="alert alert-info" v-else>Você não possuí nenhum item cadastrado</div>
       </b-card>
     </b-colxx>
   </b-row>
@@ -56,50 +62,26 @@ export default {
     }
   },
   methods: {
-    onPaginationData (paginationData) {
-      this.$refs.pagination.setPaginationData(paginationData)
-    },
-    onChangePage (page) {
-      this.$refs.vuetable.changePage(page)
-    },
-    rowSelected (items) {
-      this.bootstrapTable.selected = items
-    },
-    dataProvider (ctx) {
-      const params = this.apiParamsConverter(ctx)
-      let promise = axios.get(apiUrl + '/cakes/fordatatable', { params: params })
-
-      return promise
-        .then(result => result.data)
-        .then((data) => {
-          this.currentPage = data.current_page
-          this.perPage = data.per_page
-          this.totalRows = data.total
-          const items = data.data
-          return items;
-        }).catch(_error => {
-          return []
-        })
-    },
-    apiParamsConverter (params) {
-      let apiParams = {}
-      if (params.perPage !== 0) {
-        apiParams.per_page = params.perPage
-      }
-      if (params.currentPage >= 1) {
-        apiParams.page = params.currentPage
-      }
-      if (params.sortBy && params.sortBy.length > 0) {
-        apiParams.sort = `${params.sortBy}|${params.sortDesc ? 'desc' : 'asc'}`
-      }
-      if (params.filter && params.filter.length > 0) {
-        // Optional
-      }
-      return apiParams
-    },
     async getProducts() {
       const response = await api.get('admin/product');
-      this.product = response.data.data;
+      this.product = response.data.data.map(p => {p.inDelete = false; return p});
+    },
+    deleteItem(item){
+      this.product = this.product.filter((r,i) => {if(i != item) return r; else api.put(`admin/product/delete/${r.id}`) })
+      this.$notify('success', "Sucesso", "Produto deletado com sucesso", {
+        duration: 3000,
+        permanent: false
+      })
+    },
+    hideButton(index) {
+      this.product[index].inDelete = true;
+      this.$notify('warning', "Certeza?", "Você deseja realmente deletar esse produto", {
+        duration: 3000,
+        permanent: false
+      })
+      setTimeout(() => {
+        this.product[index].inDelete = false;
+      }, 3500);
     }
   },
   created() {
@@ -107,3 +89,23 @@ export default {
   }
 }
 </script>
+
+<style>
+  .flash {
+    animation-name: flash;
+    animation-duration: .5s;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes flash {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: .4;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+</style>
