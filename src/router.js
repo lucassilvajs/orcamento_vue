@@ -178,7 +178,7 @@ const routes = [
       {
         path: "/admin/company/edit/:id",
         component: () =>
-          import(/* webpackChunkName: "dashboards" */ "./views/admin/company/New")
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/company/Edit")
       },
 
       {

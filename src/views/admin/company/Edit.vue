@@ -6,7 +6,7 @@
             <div class="separator mb-5"></div>
         </b-colxx>
     </b-row>
-    <b-row>
+    <b-row v-if="company.name.length > 1">
         <b-colxx xxs="12">
             <b-card class="mb-4" title="Empresa">
                 <b-row>
@@ -53,7 +53,7 @@
                     </b-colxx>
                 </b-row>
             </b-card>
-            <b-card class="mb-4" title="Restrições" v-if="product">
+            <!-- <b-card class="mb-4" title="Restrições" v-if="product">
                 <b-colxx md="12" lg="12">
                     <div class="alert alert-info">Selecione os parametros <b>não</b> permitidos para essa empresa!</div>
                     <b-row>
@@ -82,17 +82,17 @@
                     <b-row v-for="(user, index) in company.users" :key="index">
                         <b-colxx md="4" lg="4">
                             <b-form-group label="E-mail" class="has-float-label mb-4">
-                                <b-form-input v-model="user.email" type="text" placeholder="Nome da empresa" />
+                                <b-form-input v-model="user.email" type="text" placeholder="E-mail" />
                             </b-form-group>
                         </b-colxx>
                         <b-colxx md="4" lg="4">
                             <b-form-group label="Senha" class="has-float-label mb-4">
-                                <b-form-input v-model="user.password" type="text" placeholder="Nome da empresa" />
+                                <b-form-input v-model="user.password" type="text" placeholder="Senha" />
                             </b-form-group>
                         </b-colxx>
                         <b-colxx md="3" lg="3">
                             <b-form-group label="Nome" class="has-float-label mb-4">
-                                <b-form-input v-model="user.name" type="text" placeholder="Nome da empresa" />
+                                <b-form-input v-model="user.name" type="text" placeholder="Nome" />
                             </b-form-group>
                         </b-colxx>
                         <b-colxx md="1" lg="1">
@@ -106,10 +106,10 @@
                     </b-row>
 
                 </b-colxx>
-            </b-card>
+            </b-card> -->
         </b-colxx>
         <b-colxx>
-            <button class="btn btn-success float-right" @click="addCompany">Adicionar Empresa</button>
+            <button class="btn btn-success float-right" @click="addCompany">Editar Empresa</button>
         </b-colxx>
     </b-row>
 </div>
@@ -222,34 +222,42 @@ export default {
         completeUpload(file) {
             this.company.image = JSON.parse(file.xhr.response).data;
         },
+        async getCompany() {
+            const response = await api.get(`admin/company/${this.$route.params.id}`);
+            this.company = response.data.data;
+        },
         async getProducts() {
             const response = await api.get(`admin/product/filter?type=1`);
             this.product = response.data.data.products.map(r => {r.checked = true; return r});
             
-            const colors = this.product.map(r => r.variation.colors.map(c => c.name))
-            let cor = []
-            colors.forEach(element => {
-                element.forEach(el => {
-                    cor.push(el);
-                })
-            });
+            // const colors = this.product.map(r => r.variation.colors.map(c => c.name))
+            // let cor = []
+            // colors.forEach(element => {
+            //     element.forEach(el => {
+            //         cor.push(el);
+            //     })
+            // });
 
-            this.company.restrictions.colors = cor.filter((value, index, self) => { 
-                return self.indexOf(value) === index;
-            });
+            // this.company.restrictions.colors = cor.filter((value, index, self) => { 
+            //     return self.indexOf(value) === index;
+            // });
 
-            let size = [];
-            this.product.forEach(el => {
-                el.variation.sizes.commercial.forEach((e) => {size.push(e)})
-            });
-        
-            this.company.restrictions.sizes = size.filter((value, index, self) => { 
-                return self.indexOf(value) === index;
-            });
+            // let size = [];
+            // this.product.forEach(el => {
+            //     el.variation.sizes.commercial.forEach((e) => {size.push(e)})
+            // });
+
+            // this.company.restrictions.sizes = size.filter((value, index, self) => { 
+            //     return self.indexOf(value) === index;
+            // });
         },
         async getAllProducts() {
             const response = await api.get('admin/product');
-            this.allProduct = response.data.data.map(p => {p.valueD = 0; p.restrict = false; return p});
+            this.allProduct = response.data.data.map(p => {
+                p.valueD = 0;
+                p.restrict = false;
+                return p
+            });
         },
         removeUser(index) {
             if(this.company.users.length == 1) {
@@ -264,13 +272,13 @@ export default {
         async addCompany(){
             await api.post('admin/company', {company: this.company, dynamic: this.allProduct});
         },
-        removeItem() {
-            
+        removeItem() {            
         }
     },
-    created(){
-        this.getProducts();
-        this.getAllProducts();
+    async created(){
+        await this.getCompany();
+        await this.getAllProducts();
+        await this.getProducts();
     }
 }
 </script>

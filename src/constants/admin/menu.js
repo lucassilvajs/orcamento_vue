@@ -6,6 +6,12 @@ const data = [
     to: "/admin/dashboard"
   },
   {
+    id: "sac",
+    icon: "iconsminds-headset",
+    label: "SAC",
+    to: "/admin/sac"
+  },
+  {
     id: "product",
     icon: "simple-icon-eyeglass",
     label: "Produtos",

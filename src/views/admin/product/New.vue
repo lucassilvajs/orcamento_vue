@@ -97,7 +97,7 @@ import {
     mapGetters,
     mapActions
 } from "vuex";
-import {Money} from '../../../../dist/assets/js/vmoney.js'
+import {Money} from '@/vmoney.js'
 import {api, baseURL} from '@/constants/config';
 import VueDropzone from 'vue2-dropzone';
 import InputTag from '@/components/Form/InputTag'
