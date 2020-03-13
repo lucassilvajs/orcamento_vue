@@ -132,7 +132,6 @@ const routes = [
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/bi/Bi")
       },
-
       {
         path: "/admin/product/view",
         component: () =>
@@ -148,7 +147,6 @@ const routes = [
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/product/Edit")
       },
-
       {
         path: "/admin/employee/view",
         component: () =>
@@ -164,7 +162,6 @@ const routes = [
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/employee/New")
       },
-
       {
         path: "/admin/company/view",
         component: () =>
@@ -180,7 +177,6 @@ const routes = [
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/company/Edit")
       },
-
       {
         path: "/admin/user/view",
         component: () =>
@@ -195,6 +191,11 @@ const routes = [
         path: "/admin/user/edit/:id",
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/user/New")
+      },
+      {
+        path: "/admin/sac",
+        component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/sac/View")
       },
     ]
   },

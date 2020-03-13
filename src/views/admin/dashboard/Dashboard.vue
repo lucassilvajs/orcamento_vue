@@ -6,22 +6,22 @@
             <div class="separator mb-5"></div>
         </b-colxx>
     </b-row>
-    <b-row>
+    <b-row v-if="data">
         <b-colxx xl="6" lg="12">
             <b-row>
                 <b-colxx md="12" class="mb-4">
                     <b-card title="Vendas no mês">
                         <div class="dashboard-line-chart">
-                            <line-shadow-chart :data='{ "labels": ["Ter", "Qua", "Qui", "Sex", "Sab", "Dom", "Seg" ], "datasets": [ { "label": "", "data": [ 54, 63, 60, 65, 60, 55, 36 ], "borderColor": "#00b3b7", "pointBackgroundColor": "white", "pointBorderColor": "#00b3b7", "pointHoverBackgroundColor": "#00b3b7", "pointHoverBorderColor": "white", "pointRadius": 6, "pointBorderWidth": 2, "pointHoverRadius": 8, "fill": false, "_meta": {} } ] }' :height="300" />
+                            <line-shadow-chart :data='{ "labels": data.orders.labels, "datasets": [ { "label": "", "data": data.orders.datasets[0].data, "borderColor": "#00b3b7", "pointBackgroundColor": "white", "pointBorderColor": "#00b3b7", "pointHoverBackgroundColor": "#00b3b7", "pointHoverBorderColor": "white", "pointRadius": 6, "pointBorderWidth": 2, "pointHoverRadius": 8, "fill": false, "_meta": {} } ] }' :height="300" />
                         </div>
                     </b-card>
                 </b-colxx>
             </b-row>
-            <b-row>
+            <b-row v-if="data">
               <b-colxx lg="12" md="12" class="mb-4">
-            <b-card :title="$t('dashboards.logs')">
+            <b-card title="Logs">
                 <vue-perfect-scrollbar class="dashboard-logs scroll" :settings="{ suppressScrollX: true, wheelPropagation: false }">
-                    <log-list :logs='[ { "label": "Admin - Logou as 09/03/2020 14:12", "time": "14:12", "color": "border-theme-1", "key": 0 }, { "label": "Pedido #2314 - Solicitado a Panasonic", "time": "09:28", "color": "border-theme-2", "key": 7 }, { "label": "Usuário Lucas alterou o item Óculos 101", "time": "09:25", "color": "border-theme-2", "key": 8 }, { "label": "Consultor Carlos efetuou um pedido para Natura", "time": "09:20", "color": "border-theme-2", "key": 9 }, { "label": "Pedido #2105 aprovado", "time": "09:10", "color": "border-theme-2", "key": 10 } ]' />
+                    <log-list :logs="data.logs" />
                 </vue-perfect-scrollbar>
             </b-card>
         </b-colxx>
@@ -29,7 +29,7 @@
         <b-colxx lg="12" md="12" class="mb-4">
             <b-card title="SAC">
                 <vue-perfect-scrollbar class="scroll dashboard-list-with-user" :settings="{ suppressScrollX: true, wheelPropagation: false }">
-                    <list-with-user-item v-for='(ticket, index) in [ { "title": "Luis Carlos", "detail": "09.09.2020 - 12:45", "thumb": "https://dp.idsafety.com.br/upload/company/ylBCAthYf00YuJiNabYe.jpg" }, { "title": "Mimi Carreira", "detail": "05.09.2020 - 10:20", "thumb": "https://dp.idsafety.com.br/upload/company/ylBCAthYf00YuJiNabYe.jpg" }, { "title": "Paulo Vicente", "detail": "05.09.2020 - 09:12", "thumb": "https://dp.idsafety.com.br/upload/company/ylBCAthYf00YuJiNabYe.jpg" }, { "title": "Terese Threadgill", "detail": "01.09.2020 - 18:20", "thumb": "https://dp.idsafety.com.br/upload/company/ylBCAthYf00YuJiNabYe.jpg" }, { "title": "Tânia Maria", "detail": "27.07.2020 - 11:45", "thumb": "https://dp.idsafety.com.br/upload/company/ylBCAthYf00YuJiNabYe.jpg" }, { "title": "Laura Silva", "detail": "24.02.2020 - 15:00", "thumb": "https://dp.idsafety.com.br/upload/company/ylBCAthYf00YuJiNabYe.jpg" }, { "title": "Laree Munsch", "detail": "24.05.2020 - 11:00", "thumb": "https://dp.idsafety.com.br/upload/company/ylBCAthYf00YuJiNabYe.jpg" } ]' :data="ticket" detail-path="/app/pages/product/details" :key="index" />
+                    <list-with-user-item v-for='(ticket, index) in data.sac' :data="ticket" :detail-path="`/admin/sac/${ticket.id}`" :key="index" />
                 </vue-perfect-scrollbar>
             </b-card>
         </b-colxx>
@@ -39,13 +39,7 @@
         <b-colxx lg="12" xl="6" class="mb-4">
             <b-card title="Pedidos Recentes">
                 <vue-perfect-scrollbar class="scroll dashboard-list-with-thumbs" :settings="{ suppressScrollX: true, wheelPropagation: false }">
-                    <recent-order-item v-for='(order,index) in [ 
-                    { "id": 1, "title": "101 - B Cristal", "img": "https://dp.idsafety.com.br/upload/product/42yy1VTikFz9ACTRD0OT.jpg", "category": "Cakes", "createDate": "06/03/2020", "status": "APROVADO", "statusColor": "primary", "description": "", "sales": 1647, "stock": 62 }, 
-                    { "id": 2, "title": "103 - B Cristal", "category": "Cupcakes", "img": "https://dp.idsafety.com.br/upload/product/42yy1VTikFz9ACTRD0OT.jpg", "createDate": "01.04.2018", "status": "REPROVADO", "statusColor": "secondary", "description": "", "sales": 1240, "stock": 48 }, 
-                    { "id": 3, "title": "103 - B Fumê", "img": "https://dp.idsafety.com.br/upload/product/3vqS7zLg7bzlbr6ktXbz.jpg", "category": "Cakes", "createDate": "25.03.2018", "status": "PENDENTE", "statusColor": "warning", "description": "", "sales": 1080, "stock": 57 }, 
-                    { "id": 4, "title": "102 - B Vermelho", "img": "https://dp.idsafety.com.br/upload/product/8umHYLpVxNuCfunuryKK.jpg", "category": "Cakes", "createDate": "21.03.2018", "status": "PENDENTE", "statusColor": "warning", "description": "", "sales": 1014, "stock": 41 }, 
-                    { "id": 5, "title": "102 - B Cristal", "category": "Cupcakes", "img": "https://dp.idsafety.com.br/upload/product/mg9aJbaMVYbTgFhXFQef.jpg", "createDate": "02.06.2018", "status": "APROVADO", "statusColor": "primary", "description": "", "sales": 985, "stock": 23 }, 
-                    { "id": 6, "title": "103 - A FumÊ", "img": "https://dp.idsafety.com.br/upload/product/3vqS7zLg7bzlbr6ktXbz.jpg", "category": "Desserts", "createDate": "14.07.2018", "status": "PENDENTE", "statusColor": "warning", "description": "", "sales": 962, "stock": 34 } ]' :order="order" detail-path="/app/pages/product/details" :key="index" />
+                    <recent-order-item v-for='(order,index) in data.ordersList' :order="order" :detail-path="`/admin/order/${order.id}`" :key="index" />
                 </vue-perfect-scrollbar>
             </b-card>
         </b-colxx>
@@ -107,7 +101,8 @@ import profileStatuses from '../../../data/profileStatuses'
 import cakes from '../../../data/cakes'
 import {
     apiUrl,
-    api
+    api,
+    baseURL
 } from '../../../constants/config'
 export default {
     components: {
@@ -136,6 +131,7 @@ export default {
     data() {
         return {
             data: null,
+            baseURL,
             glideIconsOption: {
                 gap: 5,
                 perView: 4,
@@ -312,6 +308,7 @@ export default {
         async getData() {
             const response = await api.get('admin/')
             this.data = response.data.data;
+            this.data.sac = this.data.sac.map(r => {r.thumb = baseURL+r.thumb; return r})
         }
     },
     created() {

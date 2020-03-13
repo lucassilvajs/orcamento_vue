@@ -12,6 +12,12 @@ const data = [
     to: "/admin/sac"
   },
   {
+    id: "order",
+    icon: "simple-icon-doc",
+    label: "Pedidos",
+    to: "/admin/order"
+  },
+  {
     id: "product",
     icon: "simple-icon-eyeglass",
     label: "Produtos",
