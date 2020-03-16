@@ -13,62 +13,62 @@ const routes = [
     children: [
       {
         path: "/order/information",
-        component: () => 
+        component: () =>
           import("./views/order/Information")
       },
       {
         path: "/order/products",
-        component: () => 
+        component: () =>
           import("./views/order/Products")
       },
       {
         path: "/order/lens",
-        component: () => 
+        component: () =>
           import("./views/order/Lens")
       },
       {
         path: "/order/face",
-        component: () => 
+        component: () =>
           import("./views/order/Face")
       },
       {
         path: "/order/recipe",
-        component: () => 
+        component: () =>
           import("./views/order/Recipe")
       },
       {
         path: "/order/confirmation",
-        component: () => 
+        component: () =>
           import("./views/order/Confirmation")
       },
       {
         path: "/order/orders",
-        component: () => 
+        component: () =>
           import("./views/order/Orders")
       },
       {
         path: "/sac",
-        component: () => 
+        component: () =>
           import("./views/sac/Show")
       },
       {
         path: "/sac/view/:id",
-        component: () => 
+        component: () =>
           import("./views/sac/Show")
       },
       {
         path: "/sac/new",
-        component: () => 
+        component: () =>
           import("./views/sac/New")
       },
       {
         path: "/bi/analytics",
-        component: () => 
+        component: () =>
           import("./views/bi/Analytics")
       },
       {
         path: "/logout",
-        component: () => 
+        component: () =>
           import("./views/order/Confirmation")
       }
     ]
@@ -108,7 +108,7 @@ const routes = [
         path: "forgot-password",
         component: () =>
           import(/* webpackChunkName: "user" */ "./views/user/ForgotPassword")
-      },    
+      },
       {
         path: "reset-password",
         component: () =>
@@ -126,7 +126,15 @@ const routes = [
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/dashboard/Dashboard")
       },
-
+      {
+        path: "/admin/sac",
+        component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/sac/View")
+      },{
+        path: "/admin/order",
+        component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/order/View")
+      },
       {
         path: "/admin/bi",
         component: () =>
@@ -191,11 +199,6 @@ const routes = [
         path: "/admin/user/edit/:id",
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/user/New")
-      },
-      {
-        path: "/admin/sac",
-        component: () =>
-          import(/* webpackChunkName: "dashboards" */ "./views/admin/sac/View")
       },
     ]
   },

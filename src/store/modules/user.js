@@ -71,24 +71,19 @@ export default {
         }, 3000)
       }
     },
-    forgotPassword({ commit }, payload) {
+    async forgotPassword({ commit }, payload) {
       commit('clearError')
       commit('setProcessing', true)
-      firebase
-        .auth()
-        .sendPasswordResetEmail(payload.email)
-        .then(
-          user => {
-            commit('clearError')
-            commit('setForgotMailSuccess')
-          },
-          err => {
-            commit('setError', err.message)
-            setTimeout(() => {
-              commit('clearError')
-            }, 3000)
-          }
-        )
+      const response = await api.post('/forgot_password', payload)
+      if(response.data.status == 'success') {
+        commit('clearError');
+        commit('setForgotMailSuccess')
+      }else{
+        commit('setError', response.data.message);
+        setTimeout(() => {
+          commit('clearError')
+        }, 3000)
+      }
     },
     resetPassword({ commit }, payload) {
       commit('clearError')

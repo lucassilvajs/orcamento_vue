@@ -2,13 +2,13 @@
 <div>
   <b-row>
     <b-colxx xxs="12">
-      <h1>Usuários</h1>
+      <h1>Pedidos</h1>
       <div class="separator mb-5"></div>
     </b-colxx>
   </b-row>
   <b-row class="mb-5">
     <b-colxx xxs="12">
-      <b-card class="mb-4" title="Usuários">
+      <b-card class="mb-4" title="Pedidos">
         <table class="table table-striped">
           <thead>
             <tr>

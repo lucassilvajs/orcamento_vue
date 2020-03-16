@@ -14,7 +14,7 @@
                         <b-form-group label="Nome da empresa" class="has-float-label mb-4">
                             <b-form-input v-model="company.name" type="text" placeholder="Nome da empresa" />
                         </b-form-group>
-                        <vue-dropzone 
+                        <vue-dropzone
                             @vdropzone-complete="completeUpload"
                             ref="myVueDropzone" id="dropzone" class="mb-4" :options="dropzoneOptions">
                         </vue-dropzone>
@@ -46,7 +46,6 @@
                 <div class="alert alert-info">Para manter o preço original você pode deixar o campo do valor zerado</div>
                 <b-row>
                     <b-colxx md="3" lg="3" v-for="(pro, index) in allProduct" :key="index">
-                        <p class="mb-1">{{pro.name}}</p>
                         <b-input-group class="mb-3">
                             <Money class="form-control" v-model="pro.value" :disabled="true" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
                             <Money class="form-control" v-model="pro.valueD" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
@@ -80,7 +79,6 @@
             </b-card>
            <b-card class="mb-4" title="Usuários de acesso">
                 <b-colxx md="12" lg="12">
-                    {{company.users}}
                     <div v-for="(user, index) in company.users" :key="index">
                         <b-row v-if="!user.deleted">
                             <b-colxx md="4" lg="4">
@@ -99,7 +97,6 @@
                                 </b-form-group>
                             </b-colxx>
                             <b-colxx md="1" lg="1">
-                                {{user.deleted}}
                                 <button @click="user.deleted = true" class="btn btn-outline-danger"><i class="glyph-icon simple-icon-trash"></i></button>
                                 <!-- <button @click="removeUser(index)" class="btn btn-outline-danger"><i class="glyph-icon simple-icon-trash"></i></button> -->
                             </b-colxx>
@@ -240,7 +237,7 @@ export default {
         },
         async getProducts() {
             const response = await api.get(`admin/product/filter?type=1`);
-            this.product = response.data.data.products.map(r => {r.checked = true; return r});            
+            this.product = response.data.data.products.map(r => {r.checked = true; return r});
         },
         async getAllProducts() {
             const response = await api.get('admin/product');
@@ -265,7 +262,7 @@ export default {
                 // }
             }
         },
-        removeItem() {            
+        removeItem() {
         },
         async editCompany() {
             const response = await api.put(`admin/company/${this.$route.params.id}`, {company: this.company, dynamic: this.allProduct});

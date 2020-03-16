@@ -22,7 +22,7 @@
                         <b-form-invalid-feedback v-else-if="!$v.form.password.minLength || !$v.form.password.maxLength">Your password must be between 4 and 16 characters</b-form-invalid-feedback>
                     </b-form-group>
                     <div class="d-flex justify-content-between align-items-center">
-                        <!-- <router-link tag="a" to="/user/forgot-password">Esqueceu sua senha?</router-link> -->
+                        <router-link tag="a" to="/forgot-password">Esqueceu sua senha?</router-link>
                         <b-button type="submit" variant="primary" size="lg" :disabled="processing" :class="{'btn-multiple-state btn-shadow': true,
                     'show-spinner': processing,
                     'show-success': !processing && loginError===false,

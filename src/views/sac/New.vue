@@ -63,7 +63,7 @@ export default {
         duration: 3000,
         permanent: false
       });
-      this.$router.push('/sac/view');
+      this.$router.push('/sac');
     }
   },
   created(){
