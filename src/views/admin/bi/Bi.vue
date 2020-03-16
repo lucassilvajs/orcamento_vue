@@ -38,6 +38,7 @@
                                     <th>Nome</th>
                                     <th>Último Pedido</th>
                                     <th>Total</th>
+                                    <th>Pedidos Aprovados</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -46,6 +47,7 @@
                                     <td>{{comp.name}}</td>
                                     <td>{{comp.last_order | date}}</td>
                                     <td>{{comp.total_month | numeroPreco}}</td>
+                                    <td>{{comp.total_win}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -64,6 +66,7 @@
                                     <th>Nome</th>
                                     <th>Último Pedido</th>
                                     <th>Total</th>
+                                    <th>Pedidos reprovados</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -72,12 +75,18 @@
                                     <td>{{comp.name}}</td>
                                     <td>{{comp.last_order | date}}</td>
                                     <td>{{comp.total_month | numeroPreco}}</td>
+                                    <td>{{comp.total_lose}}</td>
                                 </tr>
                             </tbody>
                         </table>
                     </b-card>
                 </b-colxx>
             </b-row>
+        </b-colxx>
+    </b-row>
+    <b-row key="thumb">
+        <b-colxx xxs="12" class="mb-3" v-for="(item,index) in values " :key="index" :id="item.id">
+            <thumb-list-item :key="item.id" :data="item" v-contextmenu:contextmenu />
         </b-colxx>
     </b-row>
 </div>
@@ -103,14 +112,43 @@ const colors = ThemeColors()
 // } from '@/data/charts'
 // import profileStatuses from '@/data/profileStatuses'
 import IconCard from '@/components/Cards/IconCard'
+import GradientWithRadialProgressCard from '@/components/Cards/GradientWithRadialProgressCard'
+import ThumbListItem from '@/components/Listing/ThumbListItem'
 export default {
     components: {
         'small-line-chart-card': SmallLineChartCard,
         'icon-card': IconCard,
         'glide-component' : GlideComponent,
+        'gradient-with-radial-progress-card': GradientWithRadialProgressCard,
+        'thumb-list-item': ThumbListItem,
     },
     data() {
         return {
+            values:  [
+        {
+            id: 18,
+            title: "Bebinca",
+            img: "/assets/img/bebinca-thumb.jpg",
+            category: "Desserts",
+            status: "PROCESSED",
+            statusColor: "secondary",
+            description: "Homemade cheesecake with fresh berries and mint",
+            sales: 574,
+            stock: 16,
+            date: "17.02.2020"
+        },
+        {
+            id: 18,
+            title: "Bebinca",
+            img: "/assets/img/bebinca-thumb.jpg",
+            category: "Desserts",
+            status: "PROCESSED",
+            statusColor: "secondary",
+            description: "Homemade cheesecake with fresh berries and mint",
+            sales: 574,
+            stock: 16,
+            date: "17.02.2020"
+        }],
             glideIconsOption: {
                 gap: 5,
                 perView: 3,
@@ -238,6 +276,7 @@ export default {
         async getBI() {
             const response = await api.get('bi');
             this.data = response.data.data
+            this.data.orders[this.data.orders.length] = {label: 'Ticket Médio', icon: 'simple-icon-chart', value: 'R$ 516,32'}
         }
     },
     created() {

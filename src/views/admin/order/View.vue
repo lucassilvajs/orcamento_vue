@@ -31,8 +31,15 @@
               <td>{{item.status}}</td>
               <td>
                 <button @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-success">
-                  <div class="glyph-icon simple-icon-eye"/>
+                  <div class="simple-icon-doc"/>
                 </button>
+                <router-link :to="`/admin/order/measure/${item.id}`" v-b-modal.modalright class="btn btn-outline-info" :id="`measure${item.id}`">
+                  <div class="glyph-icon simple-icon-eye"/>
+                </router-link>
+                <b-tooltip :target="`measure${item.id}`"
+                        :placement="`measure${item.id}`"
+                        title="Eye Measure">
+                </b-tooltip>
               </td>
             </tr>
           </tbody>

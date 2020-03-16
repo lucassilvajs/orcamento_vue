@@ -255,7 +255,7 @@ export default {
 
         run() {
             const colaborador = JSON.parse(window.localStorage.getItem('user'))['user']['colaborador'];
-            this.menuItems = this.menuItems.filter( r => r.id != (colaborador ? 'sac' : 'bi'))
+            this.menuItems = this.menuItems.filter( r => {if(!colaborador) {return r.id != 'bi'}else{return r}})
         }
     },
     computed: {

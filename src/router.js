@@ -130,10 +130,21 @@ const routes = [
         path: "/admin/sac",
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/sac/View")
-      },{
+      },
+      {
+        path: "/admin/sac/:id",
+        component: () =>
+        import(/* webpackChunkName: "dashboards" */ "./views/admin/sac/View")
+      },
+      {
         path: "/admin/order",
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/order/View")
+      },
+      {
+        path: "/admin/order/measure/:id",
+        component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/order/Measure")
       },
       {
         path: "/admin/bi",

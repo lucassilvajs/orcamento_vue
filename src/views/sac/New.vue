@@ -7,6 +7,8 @@
             <b-row>
               <b-colxx md="6" class="mb-3">
                 <b-row>
+                  <b-colxx xxs="12" md="6">
+                  </b-colxx>
                   <b-colxx md="12">
                     <label for="">Nome do colaborador</label>
                     <input v-model="form.colaborador" type="text" class="form-control mb-3" placeholder="Nome do colaborador">
@@ -38,19 +40,27 @@
   </div>
 </template>
 <script>
+import {
+    VueAutosuggest
+} from 'vue-autosuggest'
 import {api} from '@/constants/config';
 import takePhoto from '@/components/takePhoto';
 export default {
   components: {
-        'take-photo': takePhoto,
+    'take-photo': takePhoto,
+    'vue-autosuggest': VueAutosuggest,
 	},
   data () {
     return {
+      companies: null,
       form: {
         colaborador: '',
         nota: '',
         sobre: ''
-      }
+      },
+      vueAutosuggestForm: {
+        selected: {}
+      },
     }
   },
   methods: {
@@ -64,9 +74,45 @@ export default {
         permanent: false
       });
       this.$router.push('/sac');
-    }
+    },
+
+    async getEmpresa() {
+      const user = JSON.parse(window.localStorage.getItem('user'));
+      if(user.user.colaborador) {
+        const response = await api.get(`sac/companies`);
+        this.companies = response.data.data;
+      }
+    },
+    onAutoSuggestInputChange(text, oldText) {
+      if (text === null) {
+          /* Maybe the text is null but you wanna do
+            *  something else, but don't filter by null.
+            */
+        return
+      }
+
+      const filteredData = this.suggestions[0].data.filter(option => {
+        return option.name.toLowerCase().indexOf(text.toLowerCase()) > -1
+      })
+
+      // Store data in one property, and filtered in another
+      this.filteredOptions = [{
+        data: filteredData
+      }]
+    },
+    onAutosuggestSelected(item) {
+      this.vueAutosuggestForm.selected = item
+    },
+    renderSuggestion(suggestion) {
+      const character = suggestion.item
+      return character.name /* renderSuggestion will override the default suggestion template slot. */
+    },
+    getSuggestionValue(suggestion) {
+      return suggestion.item.name
+    },
   },
   created(){
+    this.getEmpresa();
   }
 }
 </script>

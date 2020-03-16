@@ -29,7 +29,7 @@
         <b-colxx lg="12" md="12" class="mb-4">
             <b-card title="SAC">
                 <vue-perfect-scrollbar class="scroll dashboard-list-with-user" :settings="{ suppressScrollX: true, wheelPropagation: false }">
-                    <list-with-user-item v-for='(ticket, index) in data.sac' :data="ticket" :detail-path="`/admin/sac/${ticket.id}`" :key="index" />
+                    <list-with-user-item v-for='(ticket, index) in data.sac' :data="ticket" :detail-path="`/admin/sac/`" :key="index" />
                 </vue-perfect-scrollbar>
             </b-card>
         </b-colxx>

@@ -5,6 +5,13 @@
         <b-colxx xxs="12">
 
             <b-card class="mb-3" v-if="companies">
+                <!-- <b-row v-if="companiesValue">
+                    <b-colxx>
+                        <b-form-group label="Selecione a empresa">
+                            <v-select @change="changeFields" v-model="setCompany" :options='companiesValue' dir="rtl" />
+                        </b-form-group>
+                    </b-colxx>
+                </b-row> -->
                 <select class="form-control" @change="changeFields" v-model="setCompany">
                     <option v-for="(company, index) in companies" :value="index" :key="index">{{company.company.split('-')[0]}}</option>
                 </select>
@@ -45,11 +52,13 @@
 
 <script>
 
+import vSelect from 'vue-select'
 import myBreadCrumb from '@/components/breadcrumb';
 import {api} from '@/constants/config'; 
 export default {
     components: {
-        'my-breadcrumb': myBreadCrumb
+        'my-breadcrumb': myBreadCrumb,
+        'v-select': vSelect,
     },
     data() {
         return {
@@ -64,11 +73,21 @@ export default {
             company: false,
             setCompany: false,
             fields: null,
-            values: []
+            values: [],
+            selectData: [
+                'Chocolate',
+                'Vanilla',
+                'Strawberry',
+                'Caramel',
+                'Cookies and Cream',
+                'Peppermint'
+            ],
         }
     },
-
     computed: {
+        companiesValue: function(){
+            return ["Lucas", "Aline", "Cecilia"]
+        }
     },
     methods: {
         formStepOne: function(){
@@ -130,7 +149,7 @@ export default {
                     ind++;
                 }
             }
-        }
+        },
     },
 
     watch: {

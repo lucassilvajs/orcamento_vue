@@ -52,8 +52,8 @@ export const colors = [
 
 import axios from "axios";
 
-// export const baseURL = "http://api.lucasjs.com.br/";
-export const baseURL = "http://192.168.0.2/orcamento_api/";
+// export const baseURL = "https://lucasjs.com.br/apid/";
+export const baseURL = "http://192.168.0.95/orcamento_api/";
 const url = baseURL;
 
 const axiosInstance = axios.create({

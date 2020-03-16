@@ -31,7 +31,7 @@ export default {
                     link: '/order/products'
                 },
                 {
-                    text: 'Selecionar tratamento',
+                    text: 'Selecionar lentes',
                     link: '/order/lens'
                 },
                 {
