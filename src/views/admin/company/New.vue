@@ -14,7 +14,7 @@
                         <b-form-group label="Nome da empresa" class="has-float-label mb-4">
                             <b-form-input v-model="company.name" type="text" placeholder="Nome da empresa" />
                         </b-form-group>
-                        <vue-dropzone 
+                        <vue-dropzone
                             @vdropzone-complete="completeUpload"
                             ref="myVueDropzone" id="dropzone" class="mb-4" :options="dropzoneOptions">
                         </vue-dropzone>
@@ -50,42 +50,111 @@
                             <Money class="form-control" v-model="pro.value" :disabled="true" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
                             <Money class="form-control" v-model="pro.valueD" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
                         </b-input-group>
+
                     </b-colxx>
                 </b-row>
             </b-card>
             <b-card class="mb-4" title="Restrições" v-if="product">
-                <b-colxx md="12" lg="12">
-                    <div class="alert alert-info">Selecione os parametros <b>não</b> permitidos para essa empresa!</div>
-                    <b-row>
-                        <b-colxx md="6" lg="6">
-                            <b-form-group label="Tamanhos não permitidos" class="has-float-label mb-4">
-                                <input-tag v-model="company.restrictions.sizes"></input-tag>
-                            </b-form-group>
-                        </b-colxx>
-                        <b-colxx md="6" lg="6">
-                            <b-form-group label="Cores não permitidas" class="has-float-label mb-4">
-                                <input-tag v-model="company.restrictions.colors"></input-tag>
-                            </b-form-group>
-                        </b-colxx>
-                    </b-row>
-                    <b-row>
-                        <b-colxx md="3" class="mt-3" v-for="(pro, i) in allProduct" :key="pro.id">
-                            <b-card no-body style="cursor:pointer;" class="d-flex justify-content-center" @click="pro.restrict = !pro.restrict">
-                                    <h4 class="">{{pro.name}} <img :src="pro.restrict ? checked : check" style="width:20px; float:right;" /> </h4>
-                            </b-card>
-                        </b-colxx>
-                    </b-row>
-                </b-colxx>
+                <b-row>
+                  <b-colxx class="mb-4" md="3" lg="3" v-for="(pro, index) in allProduct" :key="index" >
+                    <b-card no-body>
+                      <b-card-body>
+                          <div class="d-flex justify-content-between align-items-center">
+                              <div class="d-inline-block">
+                                  <h5 class="d-inline">{{ pro.name }}</h5>
+                              </div>
+                              <div :id="`res_pro_${pro.id}`" v-if="restrictions.product.indexOf(pro.id) == -1" class="text-danger cursor-pointer" @click="restrictions.product.push(pro.id)"><i class="glyph-icon simple-icon-trash p-0"></i></div>
+
+                              <div :id="`res_pro_${pro.id}`" v-else class="cursor-pointer text-success" @click="restrictions.product = restrictions.product.filter(r => r != pro.id)"><i class="glyph-icon simple-icon-check p-0"></i></div>
+
+                              <b-tooltip :target="`res_pro_${pro.id}`" :placement="`res_pro_${pro.id}`"
+                                  :title="(restrictions.product.indexOf(pro.id) >= 0 ? 'Permitir' : 'Restringir') + ` produto`" ></b-tooltip>
+                          </div>
+                          <div v-if="pro.variation && restrictions.product.indexOf(pro.id) == -1">
+                            <hr>
+                            <h4>Variações: </h4>
+                            <div class="sizes" v-if="pro.variation.sizes">
+                              <p class="mb-0">Tamanhos</p>
+                              <div class="d-flex justify-content-between align-items-center my-2 area py-1" v-for="(sizes, i) in pro.variation.sizes.commercial" :key="i">
+                                <span> {{sizes}}</span>
+                                <div v-if="restrictions.sizes.indexOf(`${pro.id}_${sizes}`) >= 0" class="text-success cursor-pointer" @click="removeVariationRestrict(pro.id, sizes, 'sizes')" :id="`res_size_${pro.id}_${sizes}`">
+                                  <i class="glyph-icon simple-icon-check p-0"></i>
+                                </div>
+
+                                <div v-else class="text-danger cursor-pointer" @click="addVariationRestrict(pro.id, sizes, 'sizes')" :id="`res_size_${pro.id}_${sizes}`">
+                                  <i class="glyph-icon simple-icon-trash p-0"></i>
+                                </div>
+                                  <b-tooltip :target="`res_size_${pro.id}_${sizes}`" :placement="`res_size_${pro.id}_${sizes}`"
+                                  :title="(restrictions.sizes.indexOf(`${pro.id}_${sizes}`) >= 0 ? 'Permitir' : 'Restringir')+` variação`" ></b-tooltip>
+
+                              </div>
+                            </div>
+                            <hr>
+                            <div class="sizes" v-if="pro.variation.colors">
+                              <p class="mb-0">Cores</p>
+                              <div class="d-flex justify-content-between align-items-center my-2 area py-1" v-for="(colors, index) in pro.variation.colors" :key="index">
+                                <span> {{colors.name}}</span>
+                                 <div v-if="restrictions.colors.indexOf(`${pro.id}_${colors.name}`) >= 0" class="text-success cursor-pointer" @click="removeVariationRestrict(pro.id, colors.name, 'colors')" :id="`res_size_${pro.id}_${colors.name}`">
+                                  <i class="glyph-icon simple-icon-check p-0"></i>
+                                </div>
+
+                                <div v-else class="text-danger cursor-pointer" @click="addVariationRestrict(pro.id, colors.name, 'colors')" :id="`res_size_${pro.id}_${colors.name}`">
+                                  <i class="glyph-icon simple-icon-trash p-0"></i>
+                                </div>
+                                  <b-tooltip :target="`res_size_${pro.id}_${colors.name}`" :placement="`res_size_${pro.id}_${colors.name}`"
+                                  :title="(restrictions.colors.indexOf(`${pro.id}_${colors.name}`) >= 0 ? 'Permitir' : 'Restringir')+` variação`" ></b-tooltip>
+                              </div>
+                            </div>
+                          </div>
+
+                      </b-card-body>
+                    </b-card>
+                  </b-colxx>
+                </b-row>
+            </b-card>
+            <b-card class="mb-4" title="Produtos especifícos">
+                <b-alert variant="info" fade show dismissible>Os produtos cadastrados aqui vão aparecer apenas para essa empresa!</b-alert>
+                <b-row v-for="(product, index) in newProduct" :key="index">
+                    <b-colxx md="4" lg="3">
+                        <b-form-group label="Nome do Produto" class="has-float-label mb-4">
+                            <b-form-input v-model="product.name" type="text" placeholder="Nome do Produto" />
+                        </b-form-group>
+                    </b-colxx>
+                    <b-colxx md="4" lg="3">
+                        <b-form-group label="Preço" class="has-float-label mb-4">
+                            <fieldset class="form-group has-float-label mb-4">
+                                <legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0">Preço</legend>
+                                <div tabindex="-1" role="group" class="bv-no-focus-ring">
+                                    <Money class="form-control" v-model="product.price" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
+                                </div>
+                            </fieldset>
+                        </b-form-group>
+                    </b-colxx>
+                    <b-colxx md="4" lg="3">
+                        <b-form-group>
+                            <select class="form-control" v-model="product.type">
+                                <option value="2">Tipo do produto</option>
+                                <option value="2">Lente</option>
+                                <option value="2">Diopmetria</option>
+                                <option value="4">Tratamento</option>
+                            </select>
+                        </b-form-group>
+                    </b-colxx>
+                    <b-colxx md="4" lg="3">
+                      <button v-if="index+1 != newProduct.length" class="btn btn-outline-danger float-right" @click="newProduct.splice(index, 1)"><i class="glyph-icon simple-icon-trash p-0"></i></button>
+                      <button v-else class="btn btn-outline-success float-right" @click="newProduct.push({name: '', type: '', price: ''})"><i class="glyph-icon simple-icon-plus p-0"></i></button>
+                    </b-colxx>
+                </b-row>
             </b-card>
             <b-card class="mb-4" title="Usuários de acesso">
                 <b-colxx md="12" lg="12">
                     <b-row v-for="(user, index) in company.users" :key="index">
-                        <b-colxx md="4" lg="4">
+                        <b-colxx md="3" lg="3">
                             <b-form-group label="E-mail" class="has-float-label mb-4">
                                 <b-form-input v-model="user.email" type="text" placeholder="Nome da empresa" />
                             </b-form-group>
                         </b-colxx>
-                        <b-colxx md="4" lg="4">
+                        <b-colxx md="3" lg="3">
                             <b-form-group label="Senha" class="has-float-label mb-4">
                                 <b-form-input v-model="user.password" type="text" placeholder="Nome da empresa" />
                             </b-form-group>
@@ -95,8 +164,8 @@
                                 <b-form-input v-model="user.name" type="text" placeholder="Nome da empresa" />
                             </b-form-group>
                         </b-colxx>
-                        <b-colxx md="1" lg="1">
-                            <button @click="removeUser(index)" class="btn btn-outline-danger"><i class="glyph-icon simple-icon-trash"></i></button>
+                        <b-colxx md="3" lg="3">
+                            <button @click="removeUser(index)" class="btn btn-outline-danger float-right"><i class="glyph-icon simple-icon-trash"></i></button>
                         </b-colxx>
                     </b-row>
                     <b-row class="mb-4">
@@ -104,7 +173,6 @@
                             <button @click="() => { company.users.push({email: '', password: '', name: ''}) }" class="btn btn-outline-success float-right">Adicionar mais um usuário</button>
                         </b-colxx>
                     </b-row>
-
                 </b-colxx>
             </b-card>
         </b-colxx>
@@ -136,6 +204,18 @@ export default {
     },
     data() {
         return {
+          newProduct:[
+            {
+              name: '',
+              type: '',
+              price: ''
+            }
+          ],
+          restrictions: {
+            product:[],
+            sizes: [],
+            colors: []
+          },
             company: {
                 name: '',
                 cnpj: '',
@@ -150,8 +230,12 @@ export default {
                     }
                 ],
                 restrictions: {
-                    sizes: [],
-                    colors: []
+                  colors: [
+
+                  ],
+                  sizes: [
+
+                  ]
                 },
             },
             product:null,
@@ -225,27 +309,6 @@ export default {
         async getProducts() {
             const response = await api.get(`admin/product/filter?type=1`);
             this.product = response.data.data.products.map(r => {r.checked = true; return r});
-            
-            const colors = this.product.map(r => r.variation.colors.map(c => c.name))
-            let cor = []
-            colors.forEach(element => {
-                element.forEach(el => {
-                    cor.push(el);
-                })
-            });
-
-            this.company.restrictions.colors = cor.filter((value, index, self) => { 
-                return self.indexOf(value) === index;
-            });
-
-            let size = [];
-            this.product.forEach(el => {
-                el.variation.sizes.commercial.forEach((e) => {size.push(e)})
-            });
-        
-            this.company.restrictions.sizes = size.filter((value, index, self) => { 
-                return self.indexOf(value) === index;
-            });
         },
         async getAllProducts() {
             const response = await api.get('admin/product');
@@ -262,10 +325,14 @@ export default {
             }
         },
         async addCompany(){
-            await api.post('admin/company', {company: this.company, dynamic: this.allProduct});
+          this.company.restrictions = this.restrictions;
+            await api.post('admin/company', {company: this.company, dynamic: this.allProduct, newProduct: this.newProduct});
         },
-        removeItem() {
-            
+        addVariationRestrict(product, value, type) {
+          this.restrictions[type].push(`${product}_${value}`);
+        },
+        removeVariationRestrict(product, value, type) {
+          this.restrictions[type] = this.restrictions[type].filter(r => r != `${product}_${value}`);
         }
     },
     created(){
@@ -285,7 +352,6 @@ export default {
     font-size: 1.1rem;
     padding: 5px 0;
 }
-
 .check-area{
     height: 20px;
     float: right;
@@ -303,5 +369,28 @@ div#dropzone::after {
     font-size: 90%;
     padding: 0 3px;
     background: #fff;
+}
+.sizes {
+  display: block;
+}
+
+.but {
+  display: block;
+  width: 25px;
+  height: 25px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.area:hover {
+  background: #dedede;
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 </style>

@@ -18,7 +18,7 @@ export default {
     name: 'InputTag',
     props: {
         value: {
-            type: Array,
+            type: Array | Object,
             default: () => []
         },
         placeholder: {
@@ -68,6 +68,11 @@ export default {
         isLimit: function () {
             return this.limit > 0 && Number(this.limit) === this.innerTags.length
         }
+    },
+    watch: {
+      value(val){
+        this.innerTags = [...val]
+      }
     },
     methods: {
         focusNewTag() {

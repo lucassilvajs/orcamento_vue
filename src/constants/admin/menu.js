@@ -38,7 +38,7 @@ const data = [
   {
     id: "employees",
     icon: "simple-icon-people",
-    label: "Colaboradores",
+    label: "Consultores",
     to: "/admin/dashboards",
     subs: [
       {

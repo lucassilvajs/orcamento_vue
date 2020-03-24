@@ -42,7 +42,7 @@
                     </b-colxx>
                 </b-row>
             </b-card>
-            <b-card class="mb-4" title="Tabela de preços dinamica" v-if="product">
+            <b-card class="mb-4" title="Tabela de preços dinamica" v-if="allProduct">
                 <div class="alert alert-info">Para manter o preço original você pode deixar o campo do valor zerado</div>
                 <b-row>
                     <b-colxx md="3" lg="3" v-for="(pro, index) in allProduct" :key="index">
@@ -53,29 +53,100 @@
                     </b-colxx>
                 </b-row>
             </b-card>
-             <b-card class="mb-4" title="Restrições" v-if="product">
-                <b-colxx md="12" lg="12">
-                    <div class="alert alert-info">Selecione os parametros <b>não</b> permitidos para essa empresa!</div>
-                    <b-row>
-                        <b-colxx md="6" lg="6">
-                            <b-form-group label="Tamanhos não permitidos" class="has-float-label mb-4">
-                                <input-tag v-model="company.restrictions.sizes"></input-tag>
-                            </b-form-group>
-                        </b-colxx>
-                        <b-colxx md="6" lg="6">
-                            <b-form-group label="Cores não permitidas" class="has-float-label mb-4">
-                                <input-tag v-model="company.restrictions.colors"></input-tag>
-                            </b-form-group>
-                        </b-colxx>
-                    </b-row>
-                    <b-row>
-                        <b-colxx md="3" class="mt-3" v-for="pro in allProduct" :key="pro.id">
-                            <b-card no-body style="cursor:pointer;" class="d-flex justify-content-center" @click="pro.restrict = !pro.restrict">
-                                    <h4 class="">{{pro.name}} <img :src="pro.restrict ? checked : check" style="width:20px; float:right;" /> </h4>
-                            </b-card>
-                        </b-colxx>
-                    </b-row>
-                </b-colxx>
+            <b-card class="mb-4" title="Restrições" v-if="allProduct">
+                <b-row>
+                  <b-colxx class="mb-4" md="3" lg="3" v-for="(pro, index) in allProduct" :key="index" >
+                    <b-card no-body>
+                      <b-card-body>
+                          <div class="d-flex justify-content-between align-items-center">
+                              <div class="d-inline-block">
+                                  <h5 class="d-inline">{{ pro.name }}</h5>
+                              </div>
+
+                              <div :id="`res_pro_${pro.id}`" v-if="restrictions && restrictions.product.indexOf(pro.id) == -1" class="text-danger cursor-pointer" @click="restrictions.product.push(pro.id)">
+                                <i class="glyph-icon simple-icon-trash p-0"></i>
+                              </div>
+
+                              <div :id="`res_pro_${pro.id}`" v-else class="cursor-pointer text-success" @click="restrictions.product = restrictions.product.filter(r => r != pro.id)">
+                                <i class="glyph-icon simple-icon-check p-0"></i>
+                              </div>
+
+                              <b-tooltip :target="`res_pro_${pro.id}`" :placement="`res_pro_${pro.id}`"
+                                  :title="(restrictions && restrictions.product.indexOf(pro.id) >= 0 ? 'Permitir' : 'Restringir') + ` produto`" ></b-tooltip>
+                          </div>
+                          <div v-if="pro.variation && restrictions.product.indexOf(pro.id) == -1">
+                            <hr>
+                            <h4>Variações: </h4>
+                            <div class="sizes" v-if="pro.variation.sizes">
+                              <p class="mb-0">Tamanhos</p>
+                              <div class="d-flex justify-content-between align-items-center my-2 area py-1" v-for="(sizes, i) in pro.variation.sizes.commercial" :key="i">
+                                <span> {{sizes}}</span>
+                                <div v-if="restrictions.sizes.indexOf(`${pro.id}_${sizes}`) >= 0" class="text-success cursor-pointer" @click="removeVariationRestrict(pro.id, sizes, 'sizes')" :id="`res_size_${pro.id}_${sizes}`">
+                                  <i class="glyph-icon simple-icon-check p-0"></i>
+                                </div>
+
+                                <div v-else class="text-danger cursor-pointer" @click="addVariationRestrict(pro.id, sizes, 'sizes')" :id="`res_size_${pro.id}_${sizes}`">
+                                  <i class="glyph-icon simple-icon-trash p-0"></i>
+                                </div>
+                                  <b-tooltip :target="`res_size_${pro.id}_${sizes}`" :placement="`res_size_${pro.id}_${sizes}`"
+                                  :title="(restrictions.sizes.indexOf(`${pro.id}_${sizes}`) >= 0 ? 'Permitir' : 'Restringir')+` variação`" ></b-tooltip>
+                              </div>
+                            </div>
+                            <hr>
+                            <div class="sizes" v-if="pro.variation.colors">
+                              <p class="mb-0">Cores</p>
+                              <div class="d-flex justify-content-between align-items-center my-2 area py-1" v-for="(colors, index) in pro.variation.colors" :key="index">
+                                <span> {{colors.name}}</span>
+                                 <div v-if="restrictions.colors.indexOf(`${pro.id}_${colors.name}`) >= 0" class="text-success cursor-pointer" @click="removeVariationRestrict(pro.id, colors.name, 'colors')" :id="`res_size_${pro.id}_${colors.name}`">
+                                  <i class="glyph-icon simple-icon-check p-0"></i>
+                                </div>
+
+                                <div v-else class="text-danger cursor-pointer" @click="addVariationRestrict(pro.id, colors.name, 'colors')" :id="`res_size_${pro.id}_${colors.name}`">
+                                  <i class="glyph-icon simple-icon-trash p-0"></i>
+                                </div>
+                                  <b-tooltip :target="`res_size_${pro.id}_${colors.name}`" :placement="`res_size_${pro.id}_${colors.name}`"
+                                  :title="(restrictions.colors.indexOf(`${pro.id}_${colors.name}`) >= 0 ? 'Permitir' : 'Restringir')+` variação`" ></b-tooltip>
+                              </div>
+                            </div>
+                          </div>
+                      </b-card-body>
+                    </b-card>
+                  </b-colxx>
+                </b-row>
+            </b-card>
+            <b-card class="mb-4" title="Produtos especifícos">
+                <b-alert variant="info" fade show dismissible>Os produtos cadastrados aqui vão aparecer apenas para essa empresa!</b-alert>
+                <b-row v-for="(product, index) in newProduct" :key="index">
+                    <b-colxx md="4" lg="3">
+                        <b-form-group label="Nome do Produto" class="has-float-label mb-4">
+                            <b-form-input v-model="product.name" type="text" placeholder="Nome do Produto" />
+                        </b-form-group>
+                    </b-colxx>
+                    <b-colxx md="4" lg="3">
+                        <b-form-group label="Preço" class="has-float-label mb-4">
+                            <fieldset class="form-group has-float-label mb-4">
+                                <legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0">Preço</legend>
+                                <div tabindex="-1" role="group" class="bv-no-focus-ring">
+                                    <Money class="form-control" v-model="product.price" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
+                                </div>
+                            </fieldset>
+                        </b-form-group>
+                    </b-colxx>
+                    <b-colxx md="4" lg="3">
+                        <b-form-group>
+                            <select class="form-control" v-model="product.type">
+                                <option value="">Tipo do produto</option>
+                                <option value="2">Lente</option>
+                                <option value="3">Diopmetria</option>
+                                <option value="4">Tratamento</option>
+                            </select>
+                        </b-form-group>
+                    </b-colxx>
+                    <b-colxx md="4" lg="3">
+                      <button v-if="index+1 != newProduct.length" class="btn btn-outline-danger float-right" @click="newProduct.splice(index, 1)"><i class="glyph-icon simple-icon-trash p-0"></i></button>
+                      <button v-else class="btn btn-outline-success float-right" @click="newProduct.push({name: '', type: '', price: ''})"><i class="glyph-icon simple-icon-plus p-0"></i></button>
+                    </b-colxx>
+                </b-row>
             </b-card>
            <b-card class="mb-4" title="Usuários de acesso">
                 <b-colxx md="12" lg="12">
@@ -97,7 +168,7 @@
                                 </b-form-group>
                             </b-colxx>
                             <b-colxx md="1" lg="1">
-                                <button @click="user.deleted = true" class="btn btn-outline-danger"><i class="glyph-icon simple-icon-trash"></i></button>
+                                <button @click="company.users = company.users.map((r,i) => {if(i == index){ r.deleted = true} return r});" class="btn btn-outline-danger"><i class="glyph-icon simple-icon-trash"></i></button>
                                 <!-- <button @click="removeUser(index)" class="btn btn-outline-danger"><i class="glyph-icon simple-icon-trash"></i></button> -->
                             </b-colxx>
                         </b-row>
@@ -139,6 +210,18 @@ export default {
     },
     data() {
         return {
+          newProduct:[
+            {
+              name: '',
+              type: '',
+              price: ''
+            }
+          ],
+          restrictions: {
+            product:[],
+            sizes: [],
+            colors: []
+          },
             company: {
                 name: '',
                 cnpj: '',
@@ -167,7 +250,6 @@ export default {
             check,
             checked,
             allProduct: null,
-            dynamic: ''
         }
     },
     computed: {
@@ -232,21 +314,22 @@ export default {
             this.company.users = this.company.users.map(r => {
                 r.deleted = false
                 return r;
-            })
-            this.dynamic = response.data.data;
-        },
-        async getProducts() {
-            const response = await api.get(`admin/product/filter?type=1`);
-            this.product = response.data.data.products.map(r => {r.checked = true; return r});
+            });
+
+            this.newProduct = this.company.newProduct;
+            this.restrictions = this.company.restrictions;
         },
         async getAllProducts() {
-            const response = await api.get('admin/product');
-            this.allProduct = response.data.data.map(p => {
-                p.valueD = this.dynamic.dynamic[p.id] ? this.dynamic.dynamic[p.id].price : 0;
-                p.id = this.dynamic.dynamic[p.id] ? this.dynamic.dynamic[p.id].id : 0;
-                p.restrict = this.dynamic.restrictions.model.filter(r => {return r == p.id}).length
-                return p
-            });
+          const response = await api.get('admin/product');
+          let vv = this.company
+          this.allProduct = response.data.data.map(function(r) {
+            if(vv.dynamic[r.id]){
+              r.valueD = vv.dynamic[r.id].price
+            }else{
+              r.valueD = 0;
+            }
+            return r;
+          });
         },
         removeUser(index) {
             if(this.company.users.filter(r => {if(!r.deleted) {return r}}).length == 1) {
@@ -256,22 +339,24 @@ export default {
                 });
             }else{
                 this.company.users[index].deleted = true;
-                console.log(this.company.users[index]);
-                // if(this.company.users[index].id == 0) {
-                //     this.company.users = this.company.users.filter((r,i) => {return i != index})
-                // }
             }
         },
         removeItem() {
         },
         async editCompany() {
-            const response = await api.put(`admin/company/${this.$route.params.id}`, {company: this.company, dynamic: this.allProduct});
+          this.company.restrictions = this.restrictions;
+          const response = await api.put(`admin/company/${this.$route.params.id}`, {company: this.company, dynamic: this.allProduct, newProduct: this.newProduct});
 
+        },
+        addVariationRestrict(product, value, type) {
+          this.restrictions[type].push(`${product}_${value}`);
+        },
+        removeVariationRestrict(product, value, type) {
+          this.restrictions[type] = this.restrictions[type].filter(r => r != `${product}_${value}`);
         }
     },
     async created(){
         await this.getCompany();
-        await this.getProducts();
         await this.getAllProducts();
     }
 }

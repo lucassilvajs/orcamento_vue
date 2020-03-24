@@ -3,6 +3,9 @@
     <b-row>
         <b-colxx xxs="12">
             <h1>BI</h1>
+            <div class="float-right">
+              <button v-b-modal.modalright class="btn btn-success">Definir Meta</button>
+            </div>
             <div class="separator mb-5"></div>
         </b-colxx>
     </b-row>
@@ -89,6 +92,49 @@
             <thumb-list-item :key="item.id" :data="item" v-contextmenu:contextmenu />
         </b-colxx>
     </b-row>
+
+    <b-modal id="modalright" ref="modalright" title="Metas" modal-class="modal-right" v-if="data">
+      <b-row>
+        <b-colxx xxs="12">
+          <b-form-group label="Mês da meta (mês/ano)" class="has-float-label mb-4">
+            <the-mask class="form-control" v-model="period" :mask="['##/##', '##/####']" />
+          </b-form-group>
+        </b-colxx>
+        <b-colxx xxs="12" class="my-3">
+          <h5>Consultores</h5>
+        </b-colxx>
+        <b-colxx xxs="12" v-for="consult in data.consult" :key="consult.id">
+          <b-form-group :label="consult.name" class="has-float-label">
+            <Money class="form-control" v-model="consult.meta"  v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
+          </b-form-group>
+          <div class="ml-3 mt-1 mb-4" v-if="consult.metas">
+            <h5>Metas adicionadas</h5>
+            <p class="mb-1" v-for="(val, index) in consult.metas" :key="index"><b>{{index}}:</b> {{val | numeroPreco}}</p>
+          </div>
+        </b-colxx>
+      </b-row>
+      <template slot="modal-footer">
+          <b-button variant="success" @click="saveMeta()" :disabled="processing" :class="{'float-right btn-multiple-state btn-shadow': true,
+                'show-spinner': processing,
+                'show-success': !processing && errorButton===false,
+                'show-fail': !processing && errorButton }">
+                <span class="spinner d-inline-block">
+                    <span class="bounce1"></span>
+                    <span class="bounce2"></span>
+                    <span class="bounce3"></span>
+                </span>
+                <span class="icon success">
+                    Salvar Métricas
+                </span>
+                <span class="icon fail">
+                    <i class="simple-icon-exclamation"></i>
+                </span>
+                <span class="label">Salvar Métricas</span>
+            </b-button>
+
+          <b-button variant="info" @click="hideModal('modalright')">Fechar</b-button>
+      </template>
+    </b-modal>
 </div>
 </template>
 
@@ -97,20 +143,9 @@ import {api, baseURL} from '@/constants/config';
 import SmallLineChartCard from '@/components/Cards/SmallLineChartCard'
 import GlideComponent from '@/components/Carousel/GlideComponent'
 import { ThemeColors } from '@/utils'
+import {Money} from '@/vmoney.js';
+import {TheMask} from 'vue-the-mask';
 const colors = ThemeColors()
-// import {
-//     areaChartData,
-//     conversionChartData,
-//     doughnutChartData,
-//     // smallChartData1,
-//     smallChartData2,
-//     smallChartData3,
-//     smallChartData4,
-//     polarAreaChartData,
-//     radarChartData,
-//     lineChartData
-// } from '@/data/charts'
-// import profileStatuses from '@/data/profileStatuses'
 import IconCard from '@/components/Cards/IconCard'
 import GradientWithRadialProgressCard from '@/components/Cards/GradientWithRadialProgressCard'
 import ThumbListItem from '@/components/Listing/ThumbListItem'
@@ -121,6 +156,8 @@ export default {
         'glide-component' : GlideComponent,
         'gradient-with-radial-progress-card': GradientWithRadialProgressCard,
         'thumb-list-item': ThumbListItem,
+        TheMask,
+        Money
     },
     data() {
         return {
@@ -181,103 +218,66 @@ export default {
                     status: 14
                 },
             ],
-            smallChartData1: {
-                labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'],
-                datasets: [
-                    {
-                        label: 'Pedidos',
-                        borderColor: colors.themeColor1,
-                        pointBorderColor: colors.themeColor1,
-                        pointHoverBackgroundColor: colors.themeColor1,
-                        pointHoverBorderColor: colors.themeColor1,
-                        pointRadius: 2,
-                        pointBorderWidth: 3,
-                        pointHoverRadius: 2,
-                        fill: false,
-                        borderWidth: 2,
-                        data: [3, 8, 0, 0, 2, 5, 15],
-                        datalabels: {
-                            align: 'end',
-                            anchor: 'end'
-                        }
-                    }
-                ]
-            },
-            smallChartData2: {
-                labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'],
-                datasets: [
-                    {
-                    label: 'Pedidos pendentes',
-                    borderColor: colors.themeColor1,
-                    pointBorderColor: colors.themeColor1,
-                    pointHoverBackgroundColor: colors.themeColor1,
-                    pointHoverBorderColor: colors.themeColor1,
-                    pointRadius: 2,
-                    pointBorderWidth: 3,
-                    pointHoverRadius: 2,
-                    fill: false,
-                    borderWidth: 2,
-                    data: [115, 120, 300, 222, 105, 85, 36],
-                    datalabels: {
-                        align: 'end',
-                        anchor: 'end'
-                    }
-                    }
-                ]
-            },
-            smallChartData3: {
-                labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'],
-                datasets: [
-                    {
-                    label: 'Pedidos Aprovados',
-                    borderColor: colors.themeColor1,
-                    pointBorderColor: colors.themeColor1,
-                    pointHoverBackgroundColor: colors.themeColor1,
-                    pointHoverBorderColor: colors.themeColor1,
-                    pointRadius: 2,
-                    pointBorderWidth: 3,
-                    pointHoverRadius: 2,
-                    fill: false,
-                    borderWidth: 2,
-                    data: [350, 452, 762, 952, 630, 85, 158],
-                    datalabels: {
-                        align: 'end',
-                        anchor: 'end'
-                    }
-                    }
-                ]
-            },
-            smallChartData4: {
-                labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'],
-                datasets: [
-                    {
-                    label: 'Pedidos Recusado',
-                    borderColor: colors.themeColor1,
-                    pointBorderColor: colors.themeColor1,
-                    pointHoverBackgroundColor: colors.themeColor1,
-                    pointHoverBorderColor: colors.themeColor1,
-                    pointRadius: 2,
-                    pointBorderWidth: 3,
-                    pointHoverRadius: 2,
-                    fill: false,
-                    borderWidth: 2,
-                    data: [200, 452, 250, 630, 125, 85, 20],
-                        datalabels: {
-                            align: 'end',
-                            anchor: 'end'
-                        }
-                    }
-                ]
-            },
-            data: null
+            data: null,
+            period: '',
+            processing: false,
+            errorButton: false
         }
     },
     methods: {
         async getBI() {
-            const response = await api.get('bi');
+            const response = await api.get('admin/bi');
             this.data = response.data.data
-            this.data.orders[this.data.orders.length] = {label: 'Ticket Médio', icon: 'simple-icon-chart', value: 'R$ 516,32'}
-        }
+        },
+        async saveMeta() {
+          if(this.period.length < 4){
+            this.$notify("error", 'Opsss...!', 'Você precisa colocar o mês do vigor da meta', {
+                duration: 3000,
+                permanent: false
+            });
+
+            this.errorButton = true
+            setTimeout(() => {
+              this.errorButton = false
+            }, 3000);
+
+
+          }else{
+            this.processing = true;
+            if(this.period.indexOf('/') < 0) this.period = this.period.slice(0,2)+'/'+this.period.slice(2);
+            const response = await api.post('/admin/metas', {consult: this.data.consult, date: this.period});
+              this.processing = false;
+            this.$notify(response.data.status, 'Opsss...!', response.data.message, {
+              duration: 3000,
+              permanent: false
+            });
+
+            if(response.data.status == 'error') {
+              this.errorButton = true
+              setTimeout(() => {
+                this.errorButton = false
+              }, 3000);
+            }else{
+              this.data.consult = response.data.data.consult;
+            }
+          }
+        },
+        hideModal (refname) {
+      this.$refs[refname].hide()
+      console.log('hide modal:: ' + refname)
+
+      if (refname === 'modalnestedinline') {
+        this.$refs['modalnested'].show()
+      }
+    },
+    somethingModal (refname) {
+      this.$refs[refname].hide()
+      console.log('something modal:: ' + refname)
+
+      if (refname === 'modalnestedinline') {
+        this.$refs['modalnested'].show()
+      }
+    }
     },
     created() {
         this.getBI();

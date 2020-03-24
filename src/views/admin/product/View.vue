@@ -14,7 +14,6 @@
             <tr>
               <th>ID</th>
               <th>Nome</th>
-              <th>SKU</th>
               <th>Criação</th>
               <th>Preço</th>
               <th>Ações</th>
@@ -24,7 +23,6 @@
             <tr v-for="(pro, index) in product" :key="index">
               <td>{{index+1}}</td>
               <td>{{pro.name}}</td>
-              <td>{{pro.sku}}</td>
               <td>{{pro.date | date}}</td>
               <td>{{pro.value | numeroPreco}}</td>
               <td>

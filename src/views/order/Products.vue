@@ -8,7 +8,7 @@
 				<b-colxx md="4" lg="3" v-for="(pro, i) in products.data" :key="i">
 					<b-card class="mb-4" style="border:1px solid rgba(100,100,100,.5); border-radius:6px" no-body>
 						<div class="position-relative">
-							<img v-if="pro.colorSelected" :src="`${baseURL}${pro.color.filter(color => color.color == pro.colorSelected)[0].image}`" class="card-img-top" />
+							<img v-if="pro.colorSelected" :src="`${baseURL}${pro.color.filter(color => color.name == pro.colorSelected)[0].image}`" class="card-img-top" />
 							<img v-else :src="`${baseURL}${pro.image}`" class="card-img-top" />
 						</div>
 						<b-card-body>
@@ -25,7 +25,7 @@
 									<select v-model="pro.colorSelected" name="" id="" class="form-control">
 										<option value="">Selecione a cor</option>
 										<option v-for="(color, ci) in pro.color" :key="ci">
-											{{color.color | capitalize}}
+											{{color.name}}
 										</option>
 									</select>
 								<div class="separator my-2"></div>
@@ -76,7 +76,7 @@ export default {
 				name: this.products.data[index].name,
 				color: this.products.data[index].colorSelected,
 				size: this.products.data[index].sizeSelected,
-				image: this.products.data[index].color.filter(color => color.color == this.products.data[index].colorSelected)[0].image
+				image: this.products.data[index].color.filter(color => color.name == this.products.data[index].colorSelected)[0].image
 			};
 			window.localStorage.setItem('order',JSON.stringify(order));
 			this.$router.push("/order/lens");
@@ -85,7 +85,7 @@ export default {
 		getProducts: async function()
 		{
 			const products = await api.get("/products");
-			this.products = products.data	
+			this.products = products.data
 		}
 	},
 	created() {

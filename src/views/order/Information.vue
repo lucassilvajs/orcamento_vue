@@ -13,7 +13,7 @@
                     </b-colxx>
                 </b-row> -->
                 <select class="form-control" @change="changeFields" v-model="setCompany">
-                    <option v-for="(company, index) in companies" :value="index" :key="index">{{company.company.split('-')[0]}}</option>
+                    <option v-for="(company, index) in companies" :value="index" :key="index">{{company.company + ' - ' + company.cnpj}}</option>
                 </select>
             </b-card>
 
@@ -54,7 +54,7 @@
 
 import vSelect from 'vue-select'
 import myBreadCrumb from '@/components/breadcrumb';
-import {api} from '@/constants/config'; 
+import {api} from '@/constants/config';
 export default {
     components: {
         'my-breadcrumb': myBreadCrumb,
@@ -107,7 +107,7 @@ export default {
             order.info = form;
             if(this.company) order.company = this.company;
             window.localStorage.setItem('order', JSON.stringify(order));
-            this.$router.push("/order/products");    
+            this.$router.push("/order/products");
         },
         getItemsAdd: async function() {
                 const itemsFields = await api.get('company/fields');
@@ -119,7 +119,7 @@ export default {
                     this.fields.forEach((el) => {
                         this.values.push('');
                     });
-        
+
                     let info = window.localStorage.getItem('order');
                     if(info) {
                         info = JSON.parse(info).info;

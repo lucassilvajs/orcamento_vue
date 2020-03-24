@@ -17,11 +17,6 @@
                         </b-form-group>
                     </b-colxx>
                     <b-colxx md="4" lg="3">
-                        <b-form-group label="SKU" class="has-float-label mb-4">
-                            <b-form-input v-model="product.sku" type="text" placeholder="SKU" />
-                        </b-form-group>
-                    </b-colxx>
-                    <b-colxx md="4" lg="3">
                         <b-form-group label="Preço" class="has-float-label mb-4">
                             <fieldset class="form-group has-float-label mb-4">
                                 <legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0">Preço</legend>
@@ -31,26 +26,20 @@
                             </fieldset>
                         </b-form-group>
                     </b-colxx>
-                    <b-colxx md="4" lg="3">
-                        <b-form-group>
-                            <select class="form-control" v-model="product.type">
-                                <option value="1" selected="selected">Tipo do produto</option>
-                                <option value="1">Óculos</option>
-                                <option value="2">Lente</option>
-                                <option value="4">Tratamento</option>
-                            </select>
-                        </b-form-group>
-                    </b-colxx>
                 </b-row>
             </b-card>
-            
+
             <b-card class="mb-4" title="Cor">
                 <b-row>
                     <b-colxx md="4" lg="3">
-                        <b-form-group label="Cor" class="has-float-label mb-4">
+                        <b-form-group label="SKU (mesmo do bling)" class="has-float-label mb-1">
+                            <b-form-input v-model="color.sku" type="text" placeholder="SKU" />
+                        </b-form-group>
+                        <b-alert variant="info" show  dismissible>O mesmo do bling!</b-alert>
+                        <b-form-group label="Cor" class="has-float-label my-4">
                             <b-form-input v-model="color.name" type="text" placeholder="Cor" />
                         </b-form-group>
-                        <vue-dropzone 
+                        <vue-dropzone
                             @vdropzone-complete="completeUpload"
                             ref="myVueDropzone" id="dropzone" :options="dropzoneOptions"></vue-dropzone>
                         <button class="btn btn-success w-100 mt-3" @click="addImage">Adicionar Cor</button>
@@ -123,7 +112,8 @@ export default {
             baseURL,
             color: {
                 name: '',
-                image: ''
+                image: '',
+                sku: ''
             },
             file: null
         }
@@ -165,14 +155,16 @@ export default {
         `
         },
         addImage() {
-            if(this.color.name && this.color.image){
+            if(this.color.name && this.color.image && this.color.sku ){
                 this.product.colors.push({
                     name: this.color.name,
                     image: this.color.image,
+                    sku: this.color.sku,
                 });
 
                 this.color.name = '';
                 this.color.image = '';
+                this.color.sku = '';
                 this.$refs.myVueDropzone.removeFile(this.file);
             }else{
                 this.$notify("error", "Opsss...!", "Você precisa inserir uma imagem e o nome da cor", {
