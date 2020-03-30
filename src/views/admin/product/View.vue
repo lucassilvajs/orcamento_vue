@@ -9,6 +9,24 @@
   <b-row class="mb-5" v-if="product">
     <b-colxx xxs="12">
       <b-card class="mb-4" title="Produtos">
+        <b-row v-hide="true">
+          <b-colxx md="4" lg="3">
+              <b-form-group label="Nome do produto" class="has-float-label mb-4">
+                  <b-form-input v-model="filter.name" type="text" placeholder="Nome do produto" />
+              </b-form-group>
+          </b-colxx>
+          <b-colxx md="4" lg="3">
+              <b-form-group label="Status" class="has-float-label mb-4">
+                  <select v-model="filter.status" id="status" class="form-control">
+                    <option value="Active">Ativo</option>
+                    <option value="Inactive">Inativo</option>
+                  </select>
+              </b-form-group>
+          </b-colxx>
+          <b-colxx md="4" lg="6">
+              <button class="btn btn-outline-success float-right" @click="buscarProduto()">Buscar</button>
+          </b-colxx>
+        </b-row>
         <table class="table table-hover" v-if="product.length">
           <thead>
             <tr>
@@ -16,6 +34,7 @@
               <th>Nome</th>
               <th>Criação</th>
               <th>Preço</th>
+              <th>Status</th>
               <th>Ações</th>
             </tr>
           </thead>
@@ -25,6 +44,7 @@
               <td>{{pro.name}}</td>
               <td>{{pro.date | date}}</td>
               <td>{{pro.value | numeroPreco}}</td>
+              <td>{{pro.status == 'Active' ? 'Ativo' : 'Inativo'}}</td>
               <td>
                 <router-link class="btn btn-outline-info mr-1" :to="`/admin/product/edit/${pro.id}`"><div class="glyph-icon simple-icon-pencil"></div></router-link>
                 <button class="btn btn-outline-danger" @click="hideButton(index)" v-if="!pro.inDelete">
@@ -56,7 +76,8 @@ export default {
   },
   data () {
     return {
-      product: null
+      product: null,
+      filter: {}
     }
   },
   methods: {
@@ -80,6 +101,10 @@ export default {
       setTimeout(() => {
         this.product[index].inDelete = false;
       }, 3500);
+    },
+    async buscarProduto(){
+      const response = await api.post(`admin/product/`, {filter: this.filter});
+      this.product = response.data.data.map(p => {p.inDelete = false; return p});
     }
   },
   created() {

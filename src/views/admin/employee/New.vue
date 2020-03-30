@@ -28,29 +28,6 @@
                     </b-colxx>
                 </b-row>
             </b-card>
-            
-            <b-card class="mb-4" title="Empresas consultadas">
-                <b-row>
-                    <b-colxx lg="3">
-                        <b-form-select :options="['Option1', 'Option2','Option3','Option4']"  plain class="mb-3"  />
-                        <button class="btn btn-success w-100" @click="loading(true)">Vincular empresa</button>
-                    </b-colxx>
-                    <b-colxx lg="9">
-                        <b-row>
-                            <b-colxx v-for="(product,productIndex) in products" xxs="6" lg="3" xl="3" class="mb-4" :key="`product_${productIndex}`">
-                                <b-card no-body>
-                                    <div class="position-relative">
-                                        <b-card-img top :alt="product.title" :src="product.img" />
-                                    </div>
-                                    <b-card-body>
-                                        <b-card-sub-title>{{product.title}}</b-card-sub-title>
-                                    </b-card-body>
-                                </b-card>
-                            </b-colxx>
-                        </b-row>
-                    </b-colxx>
-                </b-row>
-            </b-card>
         </b-colxx>
         <b-colxx>
             <button class="btn btn-success float-right">Adicionar Produto</button>

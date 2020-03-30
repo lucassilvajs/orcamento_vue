@@ -167,20 +167,20 @@ const routes = [
           import(/* webpackChunkName: "dashboards" */ "./views/admin/product/Edit")
       },
       {
-        path: "/admin/employee/view",
+        path: "/admin/consult/view",
         component: () =>
-          import(/* webpackChunkName: "dashboards" */ "./views/admin/employee/View")
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/consult/View")
       },
-      {
-        path: "/admin/employee/new",
-        component: () =>
-          import(/* webpackChunkName: "dashboards" */ "./views/admin/employee/New")
-      },
-      {
-        path: "/admin/employee/edit/:id",
-        component: () =>
-          import(/* webpackChunkName: "dashboards" */ "./views/admin/employee/New")
-      },
+      // {
+      //   path: "/admin/consult/new",
+      //   component: () =>
+      //     import(/* webpackChunkName: "dashboards" */ "./views/admin/consult/New")
+      // },
+      // {
+      //   path: "/admin/consult/edit/:id",
+      //   component: () =>
+      //     import(/* webpackChunkName: "dashboards" */ "./views/admin/consult/New")
+      // },
       {
         path: "/admin/company/view",
         component: () =>

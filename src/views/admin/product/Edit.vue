@@ -21,9 +21,17 @@
                             <fieldset class="form-group has-float-label mb-4">
                                 <legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0">Preço</legend>
                                 <div tabindex="-1" role="group" class="bv-no-focus-ring">
-                                    <Money class="form-control" v-model="product.price" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
+                                  <Money class="form-control" v-model="product.price" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
                                 </div>
                             </fieldset>
+                        </b-form-group>
+                    </b-colxx>
+                    <b-colxx md="4" lg="3">
+                        <b-form-group label="Status" class="has-float-label mb-4">
+                            <select class="form-control" v-model="product.status" id="status">
+                              <option value="Active">Ativo</option>
+                              <option value="Inactive">Inativo</option>
+                            </select>
                         </b-form-group>
                     </b-colxx>
                 </b-row>
@@ -43,14 +51,15 @@
                         <vue-dropzone
                             @vdropzone-complete="completeUpload"
                             ref="myVueDropzone" id="dropzone" :options="dropzoneOptions"></vue-dropzone>
-                        <button class="btn btn-success w-100 mt-3" @click="addImage">Adicionar Cor</button>
+                          <button class="btn btn-success w-100 mt-3" @click="addImage">{{color.index === false ? 'Adicionar' : 'Editat'}} cor</button>
+
                     </b-colxx>
                      <b-colxx md="8" lg="9">
                         <b-row>
                             <b-colxx v-for="(product,productIndex) in product.colors" xxs="6" lg="3" xl="3" class="mb-4" :key="`product_${productIndex}`">
-                                <b-card no-body>
+                                <b-card style="cursor:pointer;" no-body @click="editColor(productIndex)">
                                     <div class="position-relative">
-                                        <b-card-img top :alt="product.name" :src="baseURL+product.image" />
+                                        <b-card-img top :alt="product.name" :src="product.image ? baseURL+product.image :  placeholder" />
                                         <h4 class="product_title">{{product.name}}</h4>
                                     </div>
                                 </b-card>
@@ -82,7 +91,7 @@
 </template>
 
 <script>
-
+import placeholder from '@/assets/img/placeholder-image.png'
 import {
     mapGetters,
     mapActions
@@ -99,6 +108,7 @@ export default {
     },
     data() {
         return {
+            placeholder,
             product:{
                 type: '1',
                 name: 's',
@@ -114,7 +124,8 @@ export default {
             color: {
                 name: '',
                 image: '',
-                sku: ''
+                sku: '',
+                index: false
             },
             file: null
         }
@@ -156,12 +167,23 @@ export default {
         `
         },
         addImage() {
-            if(this.color.name && this.color.image && this.color.sku){
+            if(this.color.name && this.color.image && this.color.sku ){
+              console.log(this.color.index)
+              if(this.color.index !== false) {
+                this.product.colors[this.color.index] = {
+                  name: this.color.name,
+                  image: this.color.image,
+                  sku: this.color.sku,
+                }
+
+                this.color.index = false
+              }else{
                 this.product.colors.push({
                     name: this.color.name,
                     image: this.color.image,
                     sku: this.color.sku,
                 });
+              }
 
                 this.color.name = '';
                 this.color.image = '';
@@ -197,6 +219,12 @@ export default {
             const id = this.$route.params.id;
             const response = await api.get(`admin/product/${id}`);
             this.product = response.data.data;
+        },
+        editColor(index){
+          console.log('INdex', index)
+          let i = this.product.colors[index];
+          this.color = i
+          this.color.index = index;
         }
     },
     created(){

@@ -109,7 +109,7 @@ export default {
             if (val && val.token && val.token.length > 0) {
                 // setTimeout(() => {
                 //     }, 200);
-                this.$router.push("/order/information");
+                this.$router.push("/admin");
             }
         },
         loginError(val) {

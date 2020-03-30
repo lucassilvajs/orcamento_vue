@@ -11,27 +11,46 @@
             <b-card class="mb-4" title="Empresa">
                 <b-row>
                     <b-colxx md="4" lg="3">
-                        <b-form-group label="Nome da empresa" class="has-float-label mb-4">
-                            <b-form-input v-model="company.name" type="text" placeholder="Nome da empresa" />
-                        </b-form-group>
+                      <b-input-group class="mb-4 cnpj">
+                        <the-mask class="form-control " v-model="company.cnpj" :mask="['###.###.###-##', '##.###.###/####-##']" />
+                        <b-input-group-append>
+                          <b-button variant="outline-info" @click="buscaBling()"
+                            :disabled="processing" :class="{'btn-multiple-state btn-shadow': true,
+                            'show-spinner': processing,
+                            'show-success': !processing && requestError===false,
+                            'show-fail': !processing && requestError }">
+                              <span class="spinner d-inline-block">
+                                  <span class="bounce1"></span>
+                                  <span class="bounce2"></span>
+                                  <span class="bounce3"></span>
+                              </span>
+                              <span class="icon success">
+                                  <i class="simple-icon-check"></i>
+                              </span>
+                              <span class="icon fail">
+                                  <i class="simple-icon-exclamation"></i>
+                              </span>
+                              <span class="label">Buscar</span>
+                          </b-button>
+                        </b-input-group-append>
+                      </b-input-group>
                         <vue-dropzone
                             @vdropzone-complete="completeUpload"
                             ref="myVueDropzone" id="dropzone" class="mb-4" :options="dropzoneOptions">
                         </vue-dropzone>
                     </b-colxx>
                     <b-colxx md="4" lg="3">
-                        <b-form-group label="CNPJ" class="has-float-label">
-                            <fieldset class="form-group has-float-label mb-2">
-                                <div tabindex="-1" role="group" class="bv-no-focus-ring">
-                                    <the-mask class="form-control" v-model="company.cnpj" :mask="['###.###.###-##', '##.###.###/####-##']" />
-                                </div>
-                            </fieldset>
+                        <b-form-group label="Nome da empresa" class="has-float-label mb-4">
+                            <b-form-input v-model="company.name" type="text" placeholder="Nome da empresa" />
                         </b-form-group>
-                        <img :src="`${baseURL}${company.image}`" :alt="company.name" class="w-100">
+                        <img v-if="company.image" :src="`${baseURL}${company.image}`" :alt="company.name" class="w-100">
                     </b-colxx>
                     <b-colxx md="4" lg="3">
                         <b-form-group label="E-mail Primario" class="has-float-label mb-4">
                             <b-form-input v-model="company.email" type="text" placeholder="E-mail" />
+                        </b-form-group>
+                        <b-form-group label="Vendedor" class="has-float-label mb-4">
+                            <b-form-input v-model="company.vendedor" type="text" placeholder="E-mail" />
                         </b-form-group>
                     </b-colxx>
                     <b-colxx md="4" lg="3">
@@ -250,6 +269,8 @@ export default {
             check,
             checked,
             allProduct: null,
+            processing: false,
+            requestError: false
         }
     },
     computed: {
@@ -317,6 +338,13 @@ export default {
             });
 
             this.newProduct = this.company.newProduct;
+            this.newProduct.push({
+              name: '',
+              price: '',
+              type: ''
+            });
+
+            this.company.users.push({email: '', password: '', name: '', deleted: false, id: 0});
             this.restrictions = this.company.restrictions;
         },
         async getAllProducts() {
@@ -353,6 +381,25 @@ export default {
         },
         removeVariationRestrict(product, value, type) {
           this.restrictions[type] = this.restrictions[type].filter(r => r != `${product}_${value}`);
+        },
+        async buscaBling() {
+          this.processing = true;
+          const response = await api.get(`admin/bling/company/${this.company.cnpj.replace(/[^\w\s]/gi, '')}`);
+          const data = response.data;
+          this.$notify(data.status, data.status == 'success' ? "Sucesso" : "Opsss...!", data.message, {
+            duration: 3000,
+            permanent: false
+          });
+
+          if(data.status == 'success') {
+            const {nome, cnpj, nomeVendedor, email } = data.data.company;
+            this.company.name = nome;
+            this.company.cnpj = cnpj;
+            this.company.email = email;
+            this.company.vendedor = nomeVendedor;
+          }
+
+          this.processing = false;
         }
     },
     async created(){

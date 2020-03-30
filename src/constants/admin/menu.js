@@ -1,9 +1,9 @@
 const data = [
   {
     id: "home",
-    icon: "simple-icon-home",
-    label: "Dashboard",
-    to: "/admin/dashboard"
+    icon: "iconsminds-monitor-analytics",
+    label: "BI",
+    to: "/admin/BI"
   },
   {
     id: "sac",
@@ -36,7 +36,7 @@ const data = [
     ]
   },
   {
-    id: "employees",
+    id: "consults",
     icon: "simple-icon-people",
     label: "Consultores",
     to: "/admin/dashboards",
@@ -44,12 +44,7 @@ const data = [
       {
         icon: "simple-icon-user",
         label: "Ver",
-        to: "/admin/employee/view"
-      },
-      {
-        icon: "simple-icon-plus",
-        label: "Adicionar",
-        to: "/admin/employee/new"
+        to: "/admin/consult/view"
       },
     ]
   },
@@ -88,12 +83,6 @@ const data = [
         to: "/admin/user/new"
       },
     ]
-  },
-  {
-    id: "bi",
-    icon: "iconsminds-monitor-analytics",
-    label: "BI",
-    to: "/admin/bi"
   },
 ];
 export default data;
