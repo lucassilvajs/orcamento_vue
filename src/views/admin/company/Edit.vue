@@ -60,11 +60,22 @@
                         <div class="alert alert-info">Após inserir um campo tecle enter para adicionar outro</div>
                     </b-colxx>
                 </b-row>
+                <b-row>
+                  <b-colxx md="4" lg="3">
+                    <b-form-group label="Empresa com contrato" class="has-float-label mb-4">
+                      <select class="form-control" v-model="company.has_contract" id="">
+                        <option value="0">Sem contrato</option>
+                        <option value="1">Com contrato</option>
+                      </select>
+                    </b-form-group>
+                  </b-colxx>
+                </b-row>
             </b-card>
             <b-card class="mb-4" title="Tabela de preços dinamica" v-if="allProduct">
                 <div class="alert alert-info">Para manter o preço original você pode deixar o campo do valor zerado</div>
                 <b-row>
                     <b-colxx md="3" lg="3" v-for="(pro, index) in allProduct" :key="index">
+                        {{pro.name}}
                         <b-input-group class="mb-3">
                             <Money class="form-control" v-model="pro.value" :disabled="true" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
                             <Money class="form-control" v-model="pro.valueD" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
@@ -374,7 +385,11 @@ export default {
         async editCompany() {
           this.company.restrictions = this.restrictions;
           const response = await api.put(`admin/company/${this.$route.params.id}`, {company: this.company, dynamic: this.allProduct, newProduct: this.newProduct});
-
+          this.$notify('success', "Sucesso", "Empresa editada com sucesso", {
+            duration: 3000,
+            permanent: false
+          });
+          this.$router.push("/admin/company/view");
         },
         addVariationRestrict(product, value, type) {
           this.restrictions[type].push(`${product}_${value}`);

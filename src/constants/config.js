@@ -74,8 +74,8 @@ axiosInstance.interceptors.request.use(
 );
 
 export const api = {
-  get(endpoint) {
-    return axiosInstance.get(endpoint);
+  get(endpoint, parameter = '') {
+    return axiosInstance.get(endpoint, parameter);
   },
   post(endpoint, body) {
     return axiosInstance.post(endpoint, body);

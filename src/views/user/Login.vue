@@ -102,6 +102,9 @@ export default {
                     password: this.form.password
                 });
             //}
+        },
+        clearSession(){
+          window.localStorage.clear();
         }
     },
     watch: {
@@ -109,7 +112,7 @@ export default {
             if (val && val.token && val.token.length > 0) {
                 // setTimeout(() => {
                 //     }, 200);
-                this.$router.push("/admin");
+                this.$router.push(`/`);
             }
         },
         loginError(val) {
@@ -121,6 +124,9 @@ export default {
 
             }
         }
+    },
+    created(){
+      this.clearSession();
     }
 };
 </script>

@@ -3,24 +3,21 @@
     <my-breadcrumb />
     <b-row>
         <b-colxx xxs="12">
-
             <b-card class="mb-3" v-if="companies">
-                <!-- <b-row v-if="companiesValue">
+                <b-row v-if="companiesValue">
                     <b-colxx>
                         <b-form-group label="Selecione a empresa">
-                            <v-select @change="changeFields" v-model="setCompany" :options='companiesValue' dir="rtl" />
+                            <v-select v-model="setCompany"
+                                :options="companiesValue" dir="ltr"></v-select>
                         </b-form-group>
                     </b-colxx>
-                </b-row> -->
-                <select class="form-control" @change="changeFields" v-model="setCompany">
-                    <option v-for="(company, index) in companies" :value="index" :key="index">{{company.company + ' - ' + company.cnpj}}</option>
-                </select>
+                </b-row>
             </b-card>
 
             <b-card class="mb-4" title="Dados do colaborador">
                 <b-row>
                     <b-colxx v-if="fields">
-                        <form @submit.prevent="formStepOne" class="form" v-if="setCompany || !this.fields.colaborador ">
+                        <form @submit.prevent="formStepOne" class="form" v-if="false && setCompany || !this.fields.colaborador ">
                             <b-row>
                                 <b-colxx lg="4">
                                     <b-form-group label="Nome do colaborador" class="has-float-label mb-4">
@@ -52,7 +49,8 @@
 
 <script>
 
-import vSelect from 'vue-select'
+import vSelect from 'vue-select';
+import 'vue-select/dist/vue-select.css';
 import myBreadCrumb from '@/components/breadcrumb';
 import {api} from '@/constants/config';
 export default {
@@ -74,20 +72,11 @@ export default {
             setCompany: false,
             fields: null,
             values: [],
-            selectData: [
-                'Chocolate',
-                'Vanilla',
-                'Strawberry',
-                'Caramel',
-                'Cookies and Cream',
-                'Peppermint'
-            ],
+            companiesValue: [],
         }
     },
     computed: {
-        companiesValue: function(){
-            return ["Lucas", "Aline", "Cecilia"]
-        }
+
     },
     methods: {
         formStepOne: function(){
@@ -113,7 +102,11 @@ export default {
                 const itemsFields = await api.get('company/fields');
                 this.fields = itemsFields.data.data
                 if(this.fields.colaborador){
-                    this.companies = this.fields.companies
+                  this.companies = this.fields.companies
+                  this.companiesValue = [];
+                  this.fields.companies.forEach((el, index) => {
+                    this.companiesValue.push({code: index, label: el.company});
+                  });
                 }else{
                     this.values.push('');
                     this.fields.forEach((el) => {
@@ -132,27 +125,66 @@ export default {
                 }
         },
         changeFields: function () {
-            console.log(JSON.parse(this.companies[this.setCompany].field))
-            this.values = [];
-            this.values.push('');
-            this.fields = JSON.parse(this.companies[this.setCompany].field)
-            this.fields.forEach((el) => {
-                this.values.push('');
-            });
-            this.company = this.companies[this.setCompany].idCompany
-            let info = window.localStorage.getItem('order');
-            if(info) {
-                info = JSON.parse(info).info;
-                let ind = 0;
-                for(let i in info) {
-                    this.values[ind] = info[i]
-                    ind++;
-                }
-            }
+          console.log(this.companies)
+            // console.log(JSON.parse(this.companies[this.setCompany].field))
+            // this.values = [];
+            // this.values.push('');
+            // this.fields = JSON.parse(this.companies[this.setCompany].field)
+            // this.fields.forEach((el) => {
+            //     this.values.push('');
+            // });
+            // this.company = this.companies[this.setCompany].idCompany
+            // let info = window.localStorage.getItem('order');
+            // if(info) {
+            //     info = JSON.parse(info).info;
+            //     let ind = 0;
+            //     for(let i in info) {
+            //         this.values[ind] = info[i]
+            //         ind++;
+            //     }
+            // }
+
+            //  let order = window.localStorage.getItem('order');
+            // if(order){
+            //     order = JSON.parse(order);
+            // }else{
+            //     order = {}
+            // }
+
+            // if(this.company) order.company = this.company;
+            // window.localStorage.setItem('order', JSON.stringify(order));
         },
     },
 
     watch: {
+      setCompany(novo, old) {
+          this.values = [];
+          this.values.push('');
+          this.fields = JSON.parse(this.companies[novo.code].field)
+          this.fields.forEach((el) => {
+              this.values.push('');
+          });
+          this.company = this.companies[novo.code].idCompany
+          let info = window.localStorage.getItem('order');
+          if(info) {
+              info = JSON.parse(info).info;
+              let ind = 0;
+              for(let i in info) {
+                  this.values[ind] = info[i]
+                  ind++;
+              }
+          }
+
+          let order = window.localStorage.getItem('order');
+          if(order){
+              order = JSON.parse(order);
+          }else{
+              order = {}
+          }
+
+          if(this.company) order.company = this.company;
+          window.localStorage.setItem('order', JSON.stringify(order));
+      }
     },
 
     created() {

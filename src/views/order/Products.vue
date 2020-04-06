@@ -84,7 +84,23 @@ export default {
 
 		getProducts: async function()
 		{
-			const products = await api.get("/products");
+      let order = JSON.parse(window.localStorage.getItem('order'));
+      let user = JSON.parse(window.localStorage.getItem('user'));
+      let company = '';
+      console.log(order)
+      console.log(user)
+      if(user.user.colaborador) {
+        if(!order || !order.company) {
+          this.$notify("error", 'Opsss.!!!', "Por favor, selecione uma empresa para buscarmos a relação de produto disponível", {
+            duration: 5000,
+            permanent: false
+          });
+          return false;
+        }else{
+          company = order.company;
+        }
+      }
+			const products = await api.get(`/products/${company}`);
 			this.products = products.data
 		}
 	},

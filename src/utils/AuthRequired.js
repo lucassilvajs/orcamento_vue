@@ -1,13 +1,16 @@
-import { isDemo } from '../constants/config'
-export default (to, from, next) => {
-
-  if (isDemo)
-    next()
+import { isDemo } from '../constants/config';
+import {api} from '@/constants/config';
+export default async (to, from, next) => {
   if (localStorage.getItem('user') != null && localStorage.getItem('user').length > 0) {
-    // verify with firebase or jwt
-    next()
+    const valid = await api.get('valid');
+    if(valid.data.data == true) {
+      next()
+    }else{
+      localStorage.clear();
+      next('/login');
+    }
   } else {
-    localStorage.removeItem('user')
+    localStorage.clear();
     next('/login')
   }
 }

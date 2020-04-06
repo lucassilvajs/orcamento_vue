@@ -41,9 +41,7 @@
         <b>Imagem:</b> <br />
         <img class="w-100" :src="baseURL + modal.image" alt="">
         <template slot="modal-footer">
-            <b-button variant="success" @click="somethingModal('modalright')" class="mr-1">Aprovar</b-button>
-            <b-button variant="secondary" @click="somethingModal('modalright')" class="mr-1">Reprovar</b-button>
-            <b-button variant="info" @click="hideModal('modalright')">Fechar</b-button>
+          <b-button variant="info" @click="hideModal('modalright')">Fechar</b-button>
         </template>
     </b-modal>
 

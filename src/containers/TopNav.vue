@@ -19,7 +19,8 @@
                 <template slot="button-content">
                     <span class="name mr-1">{{currentUser.user.name}} - {{currentUser.user.company_name.split('-')[0]}}</span>
                     <span>
-                        <img :alt="currentUser.user.title" :src="`https://dp.idsafety.com.br/upload/company/${currentUser.user.logo}`" />
+                        <img v-if="currentUser.user.logo.indexOf('http') >= 0" :alt="currentUser.user.title" :src="`${currentUser.user.logo}`" />
+                        <img v-else :alt="currentUser.user.title" :src="`https://dp.idsafety.com.br/upload/company/${currentUser.user.logo}`" />
                     </span>
                 </template>
                 <!-- <b-dropdown-item>Account</b-dropdown-item>

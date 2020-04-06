@@ -120,11 +120,12 @@ const routes = [
     path: "/admin",
     component: () => import(/* webpackChunkName: "user" */ "./views/admin"),
     redirect: "/admin/dashboard",
+    beforeEnter: AuthRequired,
     children: [
       {
         path: "/admin/dashboard",
         component: () =>
-          import(/* webpackChunkName: "dashboards" */ "./views/admin/dashboard/Dashboard")
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/bi/Bi")
       },
       {
         path: "/admin/sac",
