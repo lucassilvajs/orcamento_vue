@@ -109,10 +109,11 @@ export default {
     },
     watch: {
         currentUser(val) {
+          console.log('VAL: ',  val);
             if (val && val.token && val.token.length > 0) {
                 // setTimeout(() => {
                 //     }, 200);
-                this.$router.push(`/`);
+                this.$router.push(`/${val.user.level}`);
             }
         },
         loginError(val) {

@@ -30,19 +30,23 @@
           <h2>{{data.metrics.sales.total | numeroPreco}}</h2>
           <div class="metrics d-flex justify-content-between">
 
-          <span v-if="parseInt(100 * data.metrics.sales.total / data.metrics.sales.totalLastYear) > 0" class="item">Ano Anterior
-            <span class="valor text-success">{{ parseInt(100 * data.metrics.sales.total / data.metrics.sales.totalLastYear)}}%</span>
-            <i class="glyph-icon simple-icon-arrow-up-circle p-0"></i>
-          </span>
-
-          <span v-else class="item">Ano Anterior<br />
-            <span class="valor text-danger">{{ parseInt(100 * data.metrics.sales.total / data.metrics.sales.totalLastYear)}}%</span>
-            <i class="glyph-icon simple-icon-arrow-up-circle p-0"></i>
+          <span class="item">Ano Anterior<br />
+            <span class="valor" :class="[
+              {'text-success': data.metrics.sales.progressSalesLastYear},
+              {'text-danger': !data.metrics.sales.progressSalesLastYear},
+            ]">{{ parseInt(100 * data.metrics.sales.total / data.metrics.sales.totalLastYear)}}%</span>
+            <i class="glyph-icon p-0" :class="[
+              {'simple-icon-arrow-up-circle': data.metrics.sales.progressSalesLastYear},
+              {'simple-icon-arrow-down-circle': !data.metrics.sales.progressSalesLastYear},
+            ]"></i>
           </span>
 
           <span class="item">Meta mês<br />
-            <span v-if="data.metrics.sales.total && data.metrics.sales.objective" class="valor text-dark">
-              {{parseInt(data.metrics.sales.total * 100 / data.metrics.sales.objective)}}% </span>
+            <span v-if="data.metrics.sales.total && data.metrics.sales.objective" class="valor" :class="[{'text-success': data.metrics.sales.progressSales}, {'text-danger': !data.metrics.sales.progressSales}]">
+              {{data.metrics.sales.percentMonth}}% <i class="glyph-icon p-0" :class="[
+                {'simple-icon-arrow-up-circle' : data.metrics.sales.progressSales},
+                {'simple-icon-arrow-down-circle' : !data.metrics.sales.progressSales},
+              ]"></i></span>
             <span v-else class="valor text-dark">0% </span>
           </span>
           </div>

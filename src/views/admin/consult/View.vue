@@ -34,7 +34,7 @@
             </thead>
             <tbody>
               <tr v-for="(consult, index) in data.consult" :key="index">
-                <td>{{index}}</td>
+                <td>{{index + 1}}</td>
                 <td>{{consult.vendedor ? consult.vendedor : 'Não atribuido'}}</td>
                 <td>{{consult.email}}</td>
                 <td>{{consult.totalComp}}</td>
