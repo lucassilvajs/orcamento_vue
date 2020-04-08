@@ -30,14 +30,14 @@
           <h2>{{data.metrics.sales.total | numeroPreco}}</h2>
           <div class="metrics d-flex justify-content-between">
 
-          <span class="item">Ano Anterior
+          <span class="item">Ano Anterior <br />
             <span class="valor" :class="[
-              {'text-success': data.metrics.sales.progressSalesLastYear},
-              {'text-danger': !data.metrics.sales.progressSalesLastYear}
-            ]">{{ parseInt(100 * data.metrics.sales.total / data.metrics.sales.totalLastYear)}}%</span>
+              {'text-success': data.metrics.sales.progressSalesLastYear >= 100},
+              {'text-danger': data.metrics.sales.progressSalesLastYear <= 100}
+            ]">{{ parseInt(data.metrics.sales.progressSalesLastYear)}}%</span>
             <i class="glyph-icon p-0" id="tool-month" :class="[
-              {'simple-icon-arrow-up-circle': data.metrics.sales.progressSalesLastYear},
-              {'simple-icon-arrow-down-circle': !data.metrics.sales.progressSalesLastYear}
+              {'simple-icon-arrow-up-circle': data.metrics.sales.progressSalesLastYear >= 100},
+              {'simple-icon-arrow-down-circle': data.metrics.sales.progressSalesLastYear < 100}
             ]"></i>
             <b-tooltip target="tool-month"
               placement="top"
@@ -47,9 +47,9 @@
 
           <span class="item">Meta mês<br />
             <span class="valor" :class="[
-              {'text-success': data.metrics.sales.progressSales},
-              {'text-danger': !data.metrics.sales.progressSales}
-            ]">{{parseInt(data.metrics.sales.total * 100 / data.metrics.sales.objective)}}% </span>
+              {'text-success': data.metrics.sales.progressSales >= 100},
+              {'text-danger': data.metrics.sales.progressSales < 100}
+            ]">{{parseInt(data.metrics.sales.progressSales)}}% </span>
             <i class="glyph-icon p-0" :class="[
               {'simple-icon-arrow-up-circle': data.metrics.sales.progressSales},
               {'simple-icon-arrow-down-circle': !data.metrics.sales.progressSales}
@@ -434,7 +434,7 @@ export default {
 .demo {
   margin: auto;
   width: 100%;
-  height: 30px;
+  height: 35px;
   background-image: linear-gradient( 100deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0) 80% );
   background-repeat: repeat-y;
   background-size:50px 200px;

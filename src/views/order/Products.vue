@@ -8,8 +8,8 @@
 				<b-colxx md="4" lg="3" v-for="(pro, i) in products.data" :key="i">
 					<b-card class="mb-4" style="border:1px solid rgba(100,100,100,.5); border-radius:6px" no-body>
 						<div class="position-relative">
-							<img v-if="pro.colorSelected" :src="`${baseURL}${pro.color.filter(color => color.name == pro.colorSelected)[0].image}`" class="card-img-top" />
-							<img v-else :src="`${baseURL}${pro.image}`" class="card-img-top" />
+							<img v-if="pro.colorSelected" :src="`${pro.color.filter(color => color.name == pro.colorSelected)[0].image ? baseURL+pro.color.filter(color => color.name == pro.colorSelected)[0].image : 'https://via.placeholder.com/870x470'}`" class="card-img-top" />
+							<img v-else :src="`${pro.image ? baseURL+pro.image : 'https://via.placeholder.com/870x470' }`" class="card-img-top" />
 						</div>
 						<b-card-body>
 							<form @submit.prevent="setProduct(i)">

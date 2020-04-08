@@ -18,6 +18,12 @@ const data = [
     to: "/admin/order"
   },
   {
+    id: "proposal",
+    icon: "iconsminds-file-edit",
+    label: "Propostas",
+    to: "/admin/proposal"
+  },
+  {
     id: "product",
     icon: "simple-icon-eyeglass",
     label: "Produtos",
@@ -27,11 +33,6 @@ const data = [
         icon: "iconsminds-tag",
         label: "Ver produtos",
         to: "/admin/product/view"
-      },
-      {
-        icon: "simple-icon-plus",
-        label: "Adicionar",
-        to: "/admin/product/new"
       },
     ]
   },
@@ -58,11 +59,6 @@ const data = [
         icon: "iconsminds-building",
         label: "Ver",
         to: "/admin/company/view"
-      },
-      {
-        icon: "simple-icon-plus",
-        label: "Adicionar",
-        to: "/admin/company/new"
       },
     ]
   },

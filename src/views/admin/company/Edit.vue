@@ -291,7 +291,7 @@ export default {
                 url: `${baseURL}saveFile/company`,
                 thumbnailWidth: 150,
                 maxFilesize: 1,
-                headers: { "x-auth-token": token },
+                headers: { "X-Auth-Token": token },
                 dictDefaultMessage: "Clique ou arraste para adicionar uma imagem",
                 previewTemplate: this.dropzoneTemplate(),
                 maxFiles: 1

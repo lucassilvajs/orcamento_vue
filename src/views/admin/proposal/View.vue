@@ -2,20 +2,20 @@
 <div>
   <b-row>
     <b-colxx xxs="12">
-      <h1>Pedidos</h1>
+      <h1>Propostas</h1>
       <div class="separator mb-5"></div>
     </b-colxx>
   </b-row>
   <b-row class="mb-5">
     <b-colxx xxs="12">
-      <b-card class="mb-4" title="Pedidos">
+      <b-card class="mb-4" title="Propostas">
         <table class="table table-striped">
           <thead>
             <tr>
               <th>#</th>
               <th>Nome</th>
               <th>Nota</th>
-              <th>Aprovado</th>
+              <th>Solicitação</th>
               <th>Valor</th>
               <th>Produto</th>
               <th>Status</th>
@@ -86,7 +86,7 @@ export default {
   },
   methods: {
     async getOrder() {
-      const items = await api.get('/admin/order');
+      const items = await api.get('/admin/proposal');
       this.items = items.data.data
     },
     getInfoOrder(index) {

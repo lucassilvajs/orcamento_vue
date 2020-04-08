@@ -32,22 +32,21 @@
 
           <span class="item">Ano Anterior<br />
             <span class="valor" :class="[
-              {'text-success': data.metrics.sales.progressSalesLastYear},
-              {'text-danger': !data.metrics.sales.progressSalesLastYear},
-            ]">{{ parseInt(100 * data.metrics.sales.total / data.metrics.sales.totalLastYear)}}%</span>
+              {'text-success': data.metrics.sales.progressSalesLastYear >= 100},
+              {'text-danger': data.metrics.sales.progressSalesLastYear < 100},
+            ]">{{ parseInt(data.metrics.sales.progressSalesLastYear)}}%</span>
             <i class="glyph-icon p-0" :class="[
-              {'simple-icon-arrow-up-circle': data.metrics.sales.progressSalesLastYear},
-              {'simple-icon-arrow-down-circle': !data.metrics.sales.progressSalesLastYear},
+              {'simple-icon-arrow-up-circle': data.metrics.sales.progressSalesLastYear >= 100},
+              {'simple-icon-arrow-down-circle': data.metrics.sales.progressSalesLastYear < 100},
             ]"></i>
           </span>
 
           <span class="item">Meta mês<br />
-            <span v-if="data.metrics.sales.total && data.metrics.sales.objective" class="valor" :class="[{'text-success': data.metrics.sales.progressSales}, {'text-danger': !data.metrics.sales.progressSales}]">
-              {{data.metrics.sales.percentMonth}}% <i class="glyph-icon p-0" :class="[
-                {'simple-icon-arrow-up-circle' : data.metrics.sales.progressSales},
-                {'simple-icon-arrow-down-circle' : !data.metrics.sales.progressSales},
+            <span class="valor" :class="[{'text-success': data.metrics.sales.progressSales >= 100}, {'text-danger': data.metrics.sales.progressSales < 100}]">
+              {{parseInt(data.metrics.sales.progressSales)}}% <i class="glyph-icon p-0" :class="[
+                {'simple-icon-arrow-up-circle' : data.metrics.sales.progressSales >= 100},
+                {'simple-icon-arrow-down-circle' :  data.metrics.sales.progressSales < 100},
               ]"></i></span>
-            <span v-else class="valor text-dark">0% </span>
           </span>
           </div>
         </div>

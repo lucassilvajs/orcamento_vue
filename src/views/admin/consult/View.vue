@@ -30,9 +30,10 @@
                 <th>Nome</th>
                 <th>E-mail</th>
                 <th>Numero de empresas</th>
+                <th>Ações</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody v-if="data.consult">
               <tr v-for="(consult, index) in data.consult" :key="index">
                 <td>{{index + 1}}</td>
                 <td>{{consult.vendedor ? consult.vendedor : 'Não atribuido'}}</td>
@@ -43,6 +44,16 @@
                         <div class="glyph-icon simple-icon-eye"/>
                     </button>
                 </td>
+                <td>
+                  <router-link :to="`/admin/consult/edit/${consult.id}`" class="btn btn-outline-info">
+                    <div class="glyph-icon simple-icon-pencil"></div>
+                  </router-link>
+                </td>
+              </tr>
+            </tbody>
+            <tbody v-else>
+              <tr v-for="comp in 10" :key="comp">
+                <td colspan="5" class="demo"></td>
               </tr>
             </tbody>
           </table>
@@ -131,3 +142,28 @@ export default {
   }
 }
 </script>
+<style>
+.demo {
+  margin: auto;
+  width: 100%;
+  height: 30px;
+  background-image: linear-gradient( 100deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0) 80% );
+  background-repeat: repeat-y;
+  background-size:50px 200px;
+  background-position: 0 0;
+}
+
+.demo:nth-child(odd) {
+  animation: shine 1s infinite;
+}
+
+.demo:nth-child(even) {
+  animation: shine 2s infinite;
+}
+
+@keyframes shine {
+  to {
+  background-position:100% 0;
+  }
+}
+</style>

@@ -113,7 +113,11 @@ export default {
             if (val && val.token && val.token.length > 0) {
                 // setTimeout(() => {
                 //     }, 200);
-                this.$router.push(`/${val.user.level}`);
+                  this.$router.push(`/`);
+                if(!val.user.level) {
+                }else{
+                  this.$router.push(`/${val.user.level}`);
+                }
             }
         },
         loginError(val) {

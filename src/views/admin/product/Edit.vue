@@ -137,7 +137,7 @@ export default {
                 url: `${baseURL}saveFile/product`,
                 thumbnailWidth: 150,
                 maxFilesize: 1,
-                headers: { "x-auth-token": token },
+                headers: { "X-Auth-Token": token },
                 dictDefaultMessage: "Adicionar Imagem do produto",
                 previewTemplate: this.dropzoneTemplate(),
                 maxFiles: 1

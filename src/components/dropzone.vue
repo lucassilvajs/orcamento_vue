@@ -23,7 +23,7 @@ export default {
           url: `${baseURL}saveFile/product`,
           thumbnailWidth: 150,
           maxFilesize: 0.5,
-          headers: { "x-auth-token": 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9pZHNhZmV0eS5vcmNhbWVudG8uYXBpXC8iLCJhdWQiOiJodHRwOlwvXC9pZHNhZmV0eS5vcmNhbWVudG8uYXBpXC8iLCJpYXQiOjE1ODM3ODY4NzYsInN1YiI6IjEifQ.ibivQLa83xBgEXEoqOI0TMF6xHpY4_kXxzJr-qeFIuI' },
+          headers: { "X-Auth-Token": 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9pZHNhZmV0eS5vcmNhbWVudG8uYXBpXC8iLCJhdWQiOiJodHRwOlwvXC9pZHNhZmV0eS5vcmNhbWVudG8uYXBpXC8iLCJpYXQiOjE1ODM3ODY4NzYsInN1YiI6IjEifQ.ibivQLa83xBgEXEoqOI0TMF6xHpY4_kXxzJr-qeFIuI' },
           dictDefaultMessage: "Adicionar Imagem do produto"
       }
     }

@@ -52,8 +52,14 @@ export const colors = [
 
 import axios from "axios";
 
-// export const baseURL = "https://lucasjs.com.br/apid/";
-export const baseURL = "http://localhost/orcamento_api/";
+let base = "";
+if(window.location.href.indexOf('localhost') >= 0) {
+  base = "http://192.168.0.2/orcamento_api/";
+}else{
+  base = "https://api.idsafety.com.br/";
+}
+
+export const baseURL = base;
 const url = baseURL;
 
 const axiosInstance = axios.create({
@@ -64,7 +70,7 @@ axiosInstance.interceptors.request.use(
   function(config) {
     const token = window.localStorage.token;
     if (token) {
-      config.headers['x-auth-token'] = token;
+      config.headers['X-Auth-Token'] = token;
     }
     return config;
   },
