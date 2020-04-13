@@ -2,7 +2,7 @@
 <div>
   <b-row v-if="items">
     <b-colxx xxs="12">
-      <h1>Measure - Pedido #{{items.id}}</h1>
+      <h1>Measure - Pedido #{{items.id}}</h1> <router-link to="/admin/order" class="float-right btn btn-sm btn-outline-success">Voltar</router-link>
       <div class="separator mb-5"></div>
     </b-colxx>
   </b-row>
@@ -10,22 +10,8 @@
     <b-colxx xxs="12">
       <b-card class="mb-4" :title="`Measure - Pedido #${items.id}`">
         <b-row>
-          <b-colxx md="8">
-            <img class="w-100" :src="baseURL+items.object.face" alt="">
-          </b-colxx>
-          <b-colxx md="4">
-            <b-row class="align-items-start">
-              <b-colxx lg="12" v-for="(item, index ) in items.object.info" :key="index">
-                <b>{{index == 'name' ? 'Nome' : index}}:</b> {{item}} <br />
-              </b-colxx>
-              <b-colxx lg="12">
-              </b-colxx>
-            </b-row>
-            <b-row class="align-items-end">
-              <b-colxx lg="12">
-                <button type="button" class="btn btn-outline-success mt-5">Salvar Medidas</button>
-              </b-colxx>
-            </b-row>
+          <b-colxx md="12">
+            <iframe :src="`${baseURL}measure/${items.id}`" frameborder="0" style="width:100%; height:1000px;"></iframe>
           </b-colxx>
         </b-row>
       </b-card>

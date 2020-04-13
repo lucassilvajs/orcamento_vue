@@ -32,12 +32,12 @@
 
           <span class="item">Ano Anterior <br />
             <span class="valor" :class="[
-              {'text-success': data.metrics.sales.progressSalesLastYear >= 100},
-              {'text-danger': data.metrics.sales.progressSalesLastYear <= 100}
+              {'text-success': data.metrics.sales.progressSalesLastYear >= 0},
+              {'text-danger': data.metrics.sales.progressSalesLastYear <= 0}
             ]">{{ parseInt(data.metrics.sales.progressSalesLastYear)}}%</span>
             <i class="glyph-icon p-0" id="tool-month" :class="[
-              {'simple-icon-arrow-up-circle': data.metrics.sales.progressSalesLastYear >= 100},
-              {'simple-icon-arrow-down-circle': data.metrics.sales.progressSalesLastYear < 100}
+              {'simple-icon-arrow-up-circle': data.metrics.sales.progressSalesLastYear >= 0},
+              {'simple-icon-arrow-down-circle': data.metrics.sales.progressSalesLastYear < 0}
             ]"></i>
             <b-tooltip target="tool-month"
               placement="top"
@@ -47,12 +47,12 @@
 
           <span class="item">Meta mês<br />
             <span class="valor" :class="[
-              {'text-success': data.metrics.sales.progressSales >= 100},
-              {'text-danger': data.metrics.sales.progressSales < 100}
+              {'text-success': data.metrics.sales.progressSales >= 0},
+              {'text-danger': data.metrics.sales.progressSales < 0}
             ]">{{parseInt(data.metrics.sales.progressSales)}}% </span>
             <i class="glyph-icon p-0" :class="[
-              {'simple-icon-arrow-up-circle': data.metrics.sales.progressSales},
-              {'simple-icon-arrow-down-circle': !data.metrics.sales.progressSales}
+              {'simple-icon-arrow-up-circle': data.metrics.sales.progressSales >= 0},
+              {'simple-icon-arrow-down-circle': data.metrics.sales.progressSales < 0}
             ]"></i>
           </span>
           </div>

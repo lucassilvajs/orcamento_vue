@@ -47,6 +47,11 @@ const data = [
         label: "Ver",
         to: "/admin/consult/view"
       },
+      {
+        icon: "simple-icon-user",
+        label: "Adicionar",
+        to: "/admin/consult/new"
+      },
     ]
   },
   {

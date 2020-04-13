@@ -12,9 +12,55 @@
         <h3>Informações do pedido</h3>
     </b-colxx>
   </b-row>
-  
+
   <b-row class="invoice-vue" v-if="order">
     <b-colxx xxs="12" lg="6" class="mb-5">
+      <b-card v-if="order.pedido_compra" class="mb-4">
+        <b-card-header>
+          <h3>Enviar Pedido de Compra</h3>
+        </b-card-header>
+        <b-card-body v-if="!pcSend">
+          <b-form-group label="Número do pedido" class="has-float-label mb-4">
+              <b-form-input type="text" v-model="pc.number" />
+          </b-form-group>
+          <b-input-group class="mb-3">
+            <b-form-file v-model="pc.file"  placeholder="Anexar"></b-form-file>
+          </b-input-group>
+          <div class="text-right">
+            <b-button variant="success" :disabled="processing" :class="{'float-right mb-3 btn-multiple-state btn-shadow': true,
+                'show-spinner': processing,
+                'show-success': !processing && uploadError===false,
+                'show-fail': !processing && uploadError }" @click="sendPedidoCompra">
+                <span class="spinner d-inline-block">
+                    <span class="bounce1"></span>
+                    <span class="bounce2"></span>
+                    <span class="bounce3"></span>
+                </span>
+                <span class="icon success">
+                    Enviar pedido
+                </span>
+                <span class="icon fail">
+                    <i class="simple-icon-exclamation"></i>
+                </span>
+                <span class="label">Enviar pedido</span>
+            </b-button>
+          </div>
+        </b-card-body>
+        <b-card-body v-else>
+          <div class="d-flex justify-content-center align-items-center w-100">
+              <div class="svg-box">
+                  <svg class="circular green-stroke">
+                      <circle class="path" cx="75" cy="75" r="50" fill="none" stroke-width="5" stroke-miterlimit="10"/>
+                  </svg>
+                  <svg class="checkmark green-stroke">
+                      <g transform="matrix(0.79961,8.65821e-32,8.39584e-32,0.79961,-489.57,-205.679)">
+                          <path class="checkmark__check" fill="none" d="M616.306,283.025L634.087,300.805L673.361,261.53"/>
+                      </g>
+                  </svg>
+              </div>
+          </div>
+        </b-card-body>
+      </b-card>
         <b-card v-if="!feedbackSend">
             <b-card-header>
                 <div v-if="response != 'approved'">
@@ -149,13 +195,18 @@ export default {
     },
     data(){
         return {
-            rate: 3,
-            feedback: '',
-            order: null,
-            response: this.$route.params.response,
-            processing: false,
-            uploadError: false,
-            feedbackSend: false
+          pc: {
+            file: null,
+            number: null
+          },
+          rate: 3,
+          feedback: '',
+          order: null,
+          response: this.$route.params.response,
+          processing: false,
+          uploadError: false,
+          feedbackSend: false,
+          pcSend: false,
         }
     },
     methods: {
@@ -176,6 +227,21 @@ export default {
             await api.post('feedback', {rate: this.rate, feedback: this.feedback});
             this.processing = false;
             this.feedbackSend = true;
+        },
+        async sendPedidoCompra(){
+          this.processing = true;
+          let fd = new FormData();
+          fd.append('file', this.pc.file);
+          const file = await api.post('saveFile/pc', fd);
+          const fileName = file.data.data;
+
+          const order = await api.put(`order/addPc/${this.order.order}`, {fileName, number: this.pc.number});
+          this.processing = false;
+          this.pcSend = true;
+          this.$notify("success", 'Sucesso', 'Seu pedido de compra foi inserido com sucesso.', {
+              duration: 3000,
+              permanent: false
+          });
         }
     },
     created(){

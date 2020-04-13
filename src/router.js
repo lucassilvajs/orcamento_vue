@@ -42,6 +42,16 @@ const routes = [
           import("./views/order/Confirmation")
       },
       {
+        path: "/order/aproved",
+        component: () =>
+          import("./views/order/Orders")
+      },
+      {
+        path: "/order/proposal",
+        component: () =>
+          import("./views/order/Orders")
+      },
+      {
         path: "/order/orders",
         component: () =>
           import("./views/order/Orders")
@@ -177,11 +187,11 @@ const routes = [
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/consult/View")
       },
-      // {
-      //   path: "/admin/consult/new",
-      //   component: () =>
-      //     import(/* webpackChunkName: "dashboards" */ "./views/admin/consult/New")
-      // },
+      {
+        path: "/admin/consult/new",
+        component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/consult/New")
+      },
       {
         path: "/admin/consult/edit/:id",
         component: () =>

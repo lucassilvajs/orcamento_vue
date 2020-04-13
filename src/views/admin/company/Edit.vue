@@ -69,6 +69,22 @@
                       </select>
                     </b-form-group>
                   </b-colxx>
+                  <b-colxx md="4" lg="3">
+                    <b-form-group label="Pedido de compra" class="has-float-label mb-4">
+                      <select class="form-control" v-model="company.pedido_compra" id="">
+                        <option value="0">Não obrigatório</option>
+                        <option value="1">Obrigatório</option>
+                      </select>
+                    </b-form-group>
+                  </b-colxx>
+                  <b-colxx md="4" lg="3">
+                    <b-form-group label="Multiplos pedidos" class="has-float-label mb-4">
+                      <select class="form-control" v-model="company.multiple_order" id="">
+                        <option value="0">Compra direta</option>
+                        <option value="1">Multiplos pedidos</option>
+                      </select>
+                    </b-form-group>
+                  </b-colxx>
                 </b-row>
             </b-card>
             <b-card class="mb-4" title="Tabela de preços dinamica" v-if="allProduct">
@@ -198,14 +214,14 @@
                                 </b-form-group>
                             </b-colxx>
                             <b-colxx md="1" lg="1">
-                                <button @click="company.users = company.users.map((r,i) => {if(i == index){ r.deleted = true} return r});" class="btn btn-outline-danger"><i class="glyph-icon simple-icon-trash"></i></button>
+                                <button v-if="company.users.filter(r => !r.deleted).length > 1" @click="company.users = company.users.map((r,i) => {if(i == index){ r.deleted = true} return r});" class="btn btn-outline-danger"><i class="glyph-icon simple-icon-trash"></i></button>
                                 <!-- <button @click="removeUser(index)" class="btn btn-outline-danger"><i class="glyph-icon simple-icon-trash"></i></button> -->
                             </b-colxx>
                         </b-row>
                     </div>
                     <b-row class="mb-4">
                         <b-colxx>
-                            <button @click="() => { company.users.push({email: '', password: '', name: '', deleted: false, id: 0}) }" class="btn btn-outline-success float-right">Adicionar mais um usuário</button>
+                            <button @click="() => { company.users.push({email: '', password: '', name: '', deleted: false, id: 0}) }" class="btn btn-outline-success float-right"><i class="glyph-icon simple-icon-plus p-0"></i></button>
                         </b-colxx>
                     </b-row>
 
@@ -354,8 +370,6 @@ export default {
               price: '',
               type: ''
             });
-
-            this.company.users.push({email: '', password: '', name: '', deleted: false, id: 0});
             this.restrictions = this.company.restrictions;
         },
         async getAllProducts() {

@@ -54,7 +54,7 @@ import axios from "axios";
 
 let base = "";
 if(window.location.href.indexOf('localhost') >= 0) {
-  base = "http://192.168.0.2/orcamento_api/";
+  base = "http://localhost/orcamento_api/";
 }else{
   base = "https://api.idsafety.com.br/";
 }

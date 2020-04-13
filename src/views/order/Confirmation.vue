@@ -159,7 +159,7 @@ export default {
                     });
 
                     window.localStorage.removeItem('order');
-                    this.$router.push('/order/orders');
+                    this.$router.push(data.data.order.target);
                 }else{
                     this.uploadError = false;
                     this.$notify("error", 'Opsss...!', data.message, {

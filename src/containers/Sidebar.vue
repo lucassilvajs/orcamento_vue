@@ -255,7 +255,15 @@ export default {
 
         run() {
             const colaborador = JSON.parse(window.localStorage.getItem('user'))['user']['colaborador'];
-            this.menuItems = this.menuItems.filter( r => {if(!colaborador) {return r.id != 'bi'}else{return r}})
+            this.menuItems = this.menuItems.filter( r => {
+              if(!colaborador) {
+                // N COlaborador
+                return ['orders', 'proposal', 'bi'].indexOf(r.id) == -1
+              }
+              else{
+                return ['history'].indexOf(r.id) == -1
+              }
+            });
         }
     },
     computed: {

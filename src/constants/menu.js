@@ -13,6 +13,18 @@ const data = [
   to: "/order/orders"
 },
 {
+  id: "orders",
+  icon: "simple-icon-doc",
+  label: "Pedidos",
+  to: "/order/aproved"
+},
+{
+  id: "proposal",
+  icon: "iconsminds-file-edit",
+  label: "Propostas",
+  to: "/order/proposal"
+},
+{
   id: "sac",
   icon: "iconsminds-headset",
   label: "SAC",

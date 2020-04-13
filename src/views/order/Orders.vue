@@ -63,14 +63,19 @@ export default {
   },
   methods: {
     async getOrder() {
-      const items = await api.get('/order');
+      console.log(this.$route)
+      const orderType = this.$route.path.split('/')[2];
+      const items = await api.get('/order', {
+        params: {
+          status: orderType ? orderType : ''
+        }
+      });
       this.items = items.data.data
     },
     async getOrderFilter() {
+      const orderType = this.$route.path.split('/')[2];
       let params = this.filter;
-      if(params.status) {
-        params.status = params.status.code;
-      }
+      params.status = orderType ? orderType : ''
       const items = await api.get('/order', {
         params
       });
@@ -79,6 +84,11 @@ export default {
   },
   created(){
     this.getOrder();
+  },
+  watch: {
+    $route() {
+      this.getOrder();
+    }
   }
 }
 </script>

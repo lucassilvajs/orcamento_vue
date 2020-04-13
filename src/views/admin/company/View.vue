@@ -52,7 +52,7 @@
               <th>ID</th>
               <th>Nome</th>
               <th>Email</th>
-              <th>Tem contrato</th>
+              <th>Flag</th>
               <th>Cadastro</th>
               <th>Ações</th>
             </tr>
@@ -62,8 +62,11 @@
               <td>{{com.id}}</td>
               <td>{{com.name}}</td>
               <td>{{com.email.split(',').join(';').split(';').join(', ').toLowerCase()}}</td>
-              <td v-if="com.has_contract == 1"><span class="badge badge-success">Possui contrato</span></td>
-              <td v-else><span class="badge badge-info">Não possui contrato</span></td>
+              <td>
+                <span class="badge mb-1" :class="[{'badge-primary': com.has_contract == 0}, {'badge-success': 1 == com.has_contract}]">{{ com.has_contract == 1 ? 'Tem Contrato' : 'Sem Contrato' }}</span>
+                <span class="badge mb-1" :class="[{'badge-primary': com.pedido_compra == 0}, {'badge-success': 1 == com.pedido_compra}]">{{ com.pedido_compra == 1 ? 'PC Obrigatório' : 'PC não obrigatório' }}</span>
+                <span class="badge mb-1" :class="[{'badge-primary': com.multiple_order == 0}, {'badge-success': 1 == com.multiple_order}]">{{ com.multiple_order == 1 ? 'Carrinho' : 'Compra direta' }}</span>
+              </td>
               <td>{{com.date | date}}</td>
               <td>
                 <router-link class="btn btn-outline-info mr-1" :to="`/admin/company/edit/${com.id}`"><div class="glyph-icon simple-icon-pencil"></div></router-link>

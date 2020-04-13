@@ -9,7 +9,7 @@
   <b-row class="mb-5">
     <b-colxx xxs="12">
       <b-card class="mb-4" title="Propostas">
-        <table class="table table-striped">
+        <table class="table table-striped" v-if="items && items.length > 0">
           <thead>
             <tr>
               <th>#</th>
@@ -35,17 +35,11 @@
                 <button @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-success">
                   <div class="simple-icon-doc"/>
                 </button>
-                <router-link :to="`/admin/order/measure/${item.id}`" v-b-modal.modalright class="btn btn-outline-info" :id="`measure${item.id}`">
-                  <div class="glyph-icon simple-icon-eye"/>
-                </router-link>
-                <b-tooltip :target="`measure${item.id}`"
-                        :placement="`measure${item.id}`"
-                        title="Eye Measure">
-                </b-tooltip>
               </td>
             </tr>
           </tbody>
         </table>
+        <div v-else class="alert">Nenhuma informação foi encontrada</div>
       </b-card>
     </b-colxx>
   </b-row>

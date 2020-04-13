@@ -11,18 +11,13 @@
                 <b-form @submit.prevent="formSubmit" class="av-tooltip tooltip-label-bottom">
                     <b-form-group :label="$t('user.email')" class="has-float-label mb-4">
                         <b-form-input type="text" v-model="$v.form.email.$model" :state="!$v.form.email.$error" />
-                        <b-form-invalid-feedback v-if="!$v.form.email.required">Please enter your email address</b-form-invalid-feedback>
-                        <b-form-invalid-feedback v-else-if="!$v.form.email.email">Please enter a valid email address</b-form-invalid-feedback>
-                        <b-form-invalid-feedback v-else-if="!$v.form.email.minLength">Your email must be minimum 4 characters</b-form-invalid-feedback>
                     </b-form-group>
 
                     <b-form-group label="Senha" class="has-float-label mb-4">
                         <b-form-input type="password" v-model="$v.form.password.$model" :state="!$v.form.password.$error" />
-                        <b-form-invalid-feedback v-if="!$v.form.password.required">Please enter your password</b-form-invalid-feedback>
-                        <b-form-invalid-feedback v-else-if="!$v.form.password.minLength || !$v.form.password.maxLength">Your password must be between 4 and 16 characters</b-form-invalid-feedback>
                     </b-form-group>
                     <div class="d-flex justify-content-between align-items-center">
-                        <router-link tag="a" to="/forgot-password">Esqueceu sua senha?</router-link>
+                        <!-- <router-link tag="a" to="/forgot-password">Esqueceu sua senha?</router-link> -->
                         <b-button type="submit" variant="primary" size="lg" :disabled="processing" :class="{'btn-multiple-state btn-shadow': true,
                     'show-spinner': processing,
                     'show-success': !processing && loginError===false,
