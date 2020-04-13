@@ -16,7 +16,7 @@ const data = [
   id: "orders",
   icon: "simple-icon-doc",
   label: "Pedidos",
-  to: "/order/aproved"
+  to: "/order/approved"
 },
 {
   id: "proposal",

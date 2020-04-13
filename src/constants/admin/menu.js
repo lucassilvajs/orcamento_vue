@@ -68,28 +68,28 @@ const data = [
     ]
   },
   {
+    id: "user",
+    icon: "iconsminds-administrator",
+    label: "Usuários",
+    to: "/admin/dashboards",
+    subs: [
+      {
+        icon: "simple-icon-user",
+        label: "Ver",
+        to: "/admin/user/view"
+      },
+      {
+        icon: "simple-icon-plus",
+        label: "Adicionar",
+        to: "/admin/user/new"
+      },
+    ]
+  },
+  {
     id: "logout",
     icon: "simple-icon-logout",
     label: "Sair",
     to: "/login"
   },
-  // {
-  //   id: "user",
-  //   icon: "iconsminds-administrator",
-  //   label: "Usuários",
-  //   to: "/admin/dashboards",
-  //   subs: [
-  //     {
-  //       icon: "simple-icon-user",
-  //       label: "Ver",
-  //       to: "/admin/user/view"
-  //     },
-  //     {
-  //       icon: "simple-icon-plus",
-  //       label: "Adicionar",
-  //       to: "/admin/user/new"
-  //     },
-  //   ]
-  // },
 ];
 export default data;

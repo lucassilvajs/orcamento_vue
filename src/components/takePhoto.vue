@@ -40,7 +40,7 @@
 						</span>
 						<span class="label">Gostei</span>
 					</b-button>
-				</div>			
+				</div>
 				<button v-if="devices.length > 1" type="button" class="btn btn-outline-light" @click="changeCamera" style="z-index:10;">
 					<div class="glyph-icon iconsminds-arrow-around"></div>
 				</button>
@@ -67,12 +67,12 @@ export default {
 	data(){
 		return {
 			img: null,
-            camera: null,
-            deviceId: null,
+      camera: null,
+      deviceId: null,
 			devices: [],
 			processing: false,
 			uploadError: false
-			
+
 		}
 	},
 	props: ["target", "sac"],
@@ -148,13 +148,13 @@ export default {
 						}else{
 							order = {};
 						}
-		
+
 						order[this.target] = file.data.data;
-		
+
 						window.localStorage.setItem('order', JSON.stringify(order));
 					}
 				}
-	
+
 				if(!this.sac) {
 					const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
 					this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
@@ -186,7 +186,14 @@ export default {
 					this.img = baseURL+order[this.target]
 				}
 			}
-		}
+    },
+    changeCam(){
+      setTimeout(() => {
+        if(this.devices.length > 1){
+          this.changeCamera();
+        }
+      }, 2000);
+    }
 	},
 	watch: {
         camera: function(id) {
@@ -201,7 +208,8 @@ export default {
         }
 	},
 	created() {
-		this.checkImg()
+    this.checkImg();
+    this.changeCam();
 	}
 }
 </script>

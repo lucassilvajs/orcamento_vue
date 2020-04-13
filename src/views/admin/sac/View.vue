@@ -96,7 +96,7 @@
 
       <template slot="modal-footer">
           <div v-if="modal.status == 'Aberto'">
-            <b-button variant="success" @click="somethingModal('modalright', 'aproved')" class="mr-1">Aprovar</b-button>
+            <b-button variant="success" @click="somethingModal('modalright', 'approved')" class="mr-1">Aprovar</b-button>
             <b-button variant="secondary" @click="somethingModal('modalright', 'reproved')" class="mr-1">Reprovar</b-button>
 
           </div>

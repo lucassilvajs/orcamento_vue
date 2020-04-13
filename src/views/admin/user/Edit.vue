@@ -2,27 +2,27 @@
 <div>
     <b-row>
         <b-colxx xxs="12">
-            <h1>Novo usuário</h1>
+            <h1>Editar usuário</h1>
             <div class="separator mb-5"></div>
         </b-colxx>
     </b-row>
     <b-row>
         <b-colxx xxs="12">
-            <b-card class="mb-4" title="Novo usuário">
+            <b-card class="mb-4" title="Editar usuário">
                 <b-row>
                     <b-colxx md="4" lg="3">
                         <b-form-group label="Nome" class="has-float-label mb-4">
-                            <b-form-input v-model="user.name" type="text" placeholder="Nome" />
+                            <b-form-input v-model="user.user.name" type="text" placeholder="Nome" />
                         </b-form-group>
                     </b-colxx>
                     <b-colxx md="4" lg="3">
                         <b-form-group label="E-mail" class="has-float-label mb-4">
-                            <b-form-input v-model="user.email" type="text" placeholder="E-mail" />
+                            <b-form-input v-model="user.user.email" type="text" placeholder="E-mail" />
                         </b-form-group>
                     </b-colxx>
                     <b-colxx md="4" lg="3">
                         <b-form-group label="Senha" class="has-float-label mb-4">
-                            <b-form-input v-model="user.password" type="text" placeholder="Senha" />
+                            <b-form-input v-model="user.user.password" type="text" placeholder="Senha" />
                         </b-form-group>
                     </b-colxx>
                     <b-colxx md="4" lg="3">
@@ -34,7 +34,7 @@
                 </b-row>
                 <b-row>
                   <b-colxx>
-                    <button class="btn btn-success float-right" @click="addUser">Adicionar usuário admin</button>
+                    <button class="btn btn-success float-right" @click="editUserAdmin">Editar usuário admin</button>
                   </b-colxx>
                 </b-row>
             </b-card>
@@ -71,7 +71,7 @@ export default {
         dropzoneOptions: function() {
             const token = window.localStorage.getItem('token');
             return {
-                url: `${baseURL}saveFile/admin`,
+                url: `${baseURL}saveFile/user`,
                 thumbnailWidth: 150,
                 maxFilesize: 1,
                 headers: { "X-Auth-Token": token },
@@ -83,6 +83,22 @@ export default {
     },
     methods: {
         ...mapActions(["loading"]),
+        async pageCompany(page){
+          this.consult.companies = [];
+          const id = this.$route.params.id;
+          const params = {
+            page
+          }
+          const response = await api.get(`/admin/user/${id}`, {
+            params
+          });
+          this.consult.companies = response.data.data.companies;
+        },
+        async getUserAdmin(){
+          const id = this.$route.params.id;
+          const response = await api.get(`/admin/user/${id}`);
+          this.user = response.data.data;
+        },
         dropzoneTemplate() {
             return `<div class="dz-preview dz-file-preview mb-3">
                   <div class="d-flex flex-row "> <div class="p-0 w-30 position-relative">
@@ -125,8 +141,8 @@ export default {
         completeUpload(file) {
             this.image = JSON.parse(file.xhr.response).data;
         },
-        async addUser() {
-          const response = await api.post('admin/user', {...this.user, image: this.image});
+        async editUserAdmin() {
+          const response = await api.put('admin/user', {...this.user.user, image: this.image});
           if(response.data.status == 'success') {
             this.$notify("success", "Sucesso", response.data.message, {
                 duration: 3000,
@@ -141,6 +157,9 @@ export default {
           }
         }
     },
+    created(){
+      this.getUserAdmin();
+    }
 }
 </script>
 

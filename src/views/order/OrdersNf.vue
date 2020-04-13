@@ -39,30 +39,26 @@
     </b-row>
     <b-row>
       <b-colxx xxs="12">
-        <b-card class="mb-4" :title="`Confira ${$route.path.split('/')[2] == 'proposal' ? 'sua propostas' : 'Seus pedidos'}`">
+        <b-card class="mb-4" title="Confira seu pedidos">
           <!-- <b-table v-if="items && items.length" striped :items="items" /> -->
           <table v-if="items && items.length" class="table b-table table-striped">
             <thead>
               <tr>
-                <th>#</th>
-                <th v-if="consultor">Empresa</th>
-                <th v-if="consultor">CNPJ</th>
-                <th v-if="$route.path.split('/')[2] != 'proposal'">Nota</th>
+                <th>ID</th>
+                <th>Empresa</th>
                 <th>Valor</th>
-                <th v-if="$route.path.split('/')[2] != 'proposal'">Produto</th>
+                <th>Produto</th>
                 <th>Data</th>
                 <th>Status</th>
-                <th>Informações</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(it, index) in items" :key="index">
                 <td>{{it.id}}</td>
-                <td v-if="consultor">{{it.company}}</td>
-                <td v-if="consultor">{{it.cnpj}}</td>
-                <td v-if="$route.path.split('/')[2] != 'proposal'">{{it.nota}}</td>
+                <td>{{it.name}}</td>
                 <td>{{it.value}}</td>
-                <td v-if="$route.path.split('/')[2] != 'proposal'">{{it.product}}</td>
+                <td>{{it.product}}</td>
                 <td>{{it.date}}</td>
                 <td>{{it.status}}</td>
                 <td>
@@ -80,7 +76,7 @@
 
     <b-modal v-if="order" id="modalright" ref="modalright" :title="`Pedido #${order.id}`" modal-class="modal-right">
       <b>Data: </b>{{order.date}}<br />
-      <b>Empresa: </b>{{order.company}}<br />
+      <b>Empresa: </b>{{order.name}}<br />
       <b>Colaborador: </b>{{order.attr.info.name}}<br />
       <b>Valor: </b>{{order.value}}<br />
       <hr>
@@ -105,7 +101,7 @@
 <script>
 import vSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
-import {api, baseURL} from '@/constants/config';
+import {api} from '@/constants/config';
 export default {
   components: {
     'v-select': vSelect,
@@ -114,18 +110,12 @@ export default {
     return {
       order: null,
       items: null,
-      filter: {},
-      baseURL
-    }
-  },
-  computed: {
-    consultor() {
-      const colab = JSON.parse(window.localStorage.getItem('user'));
-      return colab.user.colaborador;
+      filter: {}
     }
   },
   methods: {
     async getOrder() {
+      console.log(this.$route)
       const orderType = this.$route.path.split('/')[2];
       const items = await api.get('/order', {
         params: {

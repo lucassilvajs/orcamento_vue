@@ -15,7 +15,7 @@
 
   <b-row class="invoice-vue" v-if="order">
     <b-colxx xxs="12" lg="6" class="mb-5">
-      <b-card v-if="order.pedido_compra" class="mb-4">
+      <b-card v-if="order.pedido_compra == '1' && response == 'approved'" class="mb-4">
         <b-card-header>
           <h3>Enviar Pedido de Compra</h3>
         </b-card-header>
@@ -27,10 +27,10 @@
             <b-form-file v-model="pc.file"  placeholder="Anexar"></b-form-file>
           </b-input-group>
           <div class="text-right">
-            <b-button variant="success" :disabled="processing" :class="{'float-right mb-3 btn-multiple-state btn-shadow': true,
-                'show-spinner': processing,
-                'show-success': !processing && uploadError===false,
-                'show-fail': !processing && uploadError }" @click="sendPedidoCompra">
+            <b-button variant="success" :disabled="processingPc" :class="{'float-right mb-3 btn-multiple-state btn-shadow': true,
+                'show-spinner': processingPc,
+                'show-success': !processingPc && uploadError===false,
+                'show-fail': !processingPc && uploadError }" @click="sendPedidoCompra">
                 <span class="spinner d-inline-block">
                     <span class="bounce1"></span>
                     <span class="bounce2"></span>
@@ -127,7 +127,6 @@
                 </div>
             </div>
             <div class="border-bottom pt-4 mb-5"></div>
-
             <div class="d-flex flex-row justify-content-between mb-5">
                 <div class="d-flex flex-column w-70 mr-2 p-4 text-semi-muted bg-semi-muted">
                     <p class="mb-0">{{order.company}}</p>
@@ -142,15 +141,11 @@
                 <thead>
                     <tr>
                         <th class="text-muted text-extra-small mb-2">ITEM</th>
-                        <th class="text-muted text-extra-small mb-2">QUANTIDADE</th>
-                        <th class="text-right text-muted text-extra-small mb-2">PREÇO</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(it, index) in order.items" :key="index">
                         <td>{{it.name}}</td>
-                        <td>1</td>
-                        <td class="text-right">{{it.price | numeroPreco}}</td>
                     </tr>
                 </tbody>
               </table>
@@ -204,6 +199,7 @@ export default {
           order: null,
           response: this.$route.params.response,
           processing: false,
+          processingPc: false,
           uploadError: false,
           feedbackSend: false,
           pcSend: false,
@@ -229,19 +225,29 @@ export default {
             this.feedbackSend = true;
         },
         async sendPedidoCompra(){
-          this.processing = true;
-          let fd = new FormData();
-          fd.append('file', this.pc.file);
-          const file = await api.post('saveFile/pc', fd);
-          const fileName = file.data.data;
-
-          const order = await api.put(`order/addPc/${this.order.order}`, {fileName, number: this.pc.number});
-          this.processing = false;
-          this.pcSend = true;
-          this.$notify("success", 'Sucesso', 'Seu pedido de compra foi inserido com sucesso.', {
+          if(!this.pc.number) {
+            this.$notify("error", 'Ops...!', 'Por favor insira o número pedido de compra.', {
               duration: 3000,
               permanent: false
-          });
+            });
+          }else{
+            this.processingPc = true;
+            if(this.pc.file) {
+              let fd = new FormData();
+              fd.append('file', this.pc.file);
+              const file = await api.post('saveFile/pc', fd);
+              const fileName = file.data.data;
+            }else{
+              const fileName = '';
+            }
+            const order = await api.put(`order/addPc/${this.order.order}`, {fileName, number: this.pc.number});
+            this.processingPc = false;
+            this.pcSend = true;
+            this.$notify("success", 'Sucesso', 'Seu pedido de compra foi inserido com sucesso.', {
+                duration: 3000,
+                permanent: false
+            });
+          }
         }
     },
     created(){

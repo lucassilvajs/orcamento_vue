@@ -6,6 +6,14 @@
           <form @submit="addSac">
             <b-row>
               <b-colxx md="6" class="mb-3">
+                <b-row v-if="companiesValue">
+                    <b-colxx>
+                        <b-form-group label="Selecione a empresa">
+                            <v-select v-model="setCompany"
+                                :options="companiesValue" dir="ltr"></v-select>
+                        </b-form-group>
+                    </b-colxx>
+                </b-row>
                 <b-row>
                   <b-colxx xxs="12" md="6">
                   </b-colxx>
@@ -40,6 +48,8 @@
   </div>
 </template>
 <script>
+import vSelect from 'vue-select';
+import 'vue-select/dist/vue-select.css';
 import {
     VueAutosuggest
 } from 'vue-autosuggest'
@@ -49,9 +59,12 @@ export default {
   components: {
     'take-photo': takePhoto,
     'vue-autosuggest': VueAutosuggest,
+    'v-select': vSelect,
 	},
   data () {
     return {
+      companiesValue: null,
+      setCompany: null,
       companies: null,
       form: {
         colaborador: '',
@@ -68,7 +81,11 @@ export default {
       e.preventDefault();
 
       let image = window.localStorage.getItem('sac');
-      const file = await api.post('sac', {...this.form, image});
+      let company = '';
+      if(this.setCompany) {
+        company = this.setCompany.code
+      }
+      const file = await api.post('sac', {...this.form, image, company});
       this.$notify("success", "Sucesso", "Sua solicitação foi enviada com sucesso", {
         duration: 3000,
         permanent: false
@@ -77,6 +94,15 @@ export default {
     },
 
     async getEmpresa() {
+      const itemsFields = await api.get('company/fields');
+      this.fields = itemsFields.data.data
+      if(this.fields.colaborador){
+        this.companies = this.fields.companies
+        this.companiesValue = [];
+        this.fields.companies.forEach((el, index) => {
+          this.companiesValue.push({code: el.idCompany, label: el.company});
+        });
+      }
       const user = JSON.parse(window.localStorage.getItem('user'));
       if(user.user.colaborador) {
         const response = await api.get(`sac/companies`);

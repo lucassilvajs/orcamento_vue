@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 import AuthRequired from "./utils/AuthRequired";
+import AuthRequiredAdmin from "./utils/AuthRequiredAdmin";
 
 Vue.use(VueRouter);
 
@@ -42,17 +43,17 @@ const routes = [
           import("./views/order/Confirmation")
       },
       {
-        path: "/order/aproved",
+        path: "/order/approved", // Aprovadas do consultor
         component: () =>
           import("./views/order/Orders")
       },
       {
-        path: "/order/proposal",
+        path: "/order/proposal", // Pendentes consultor
         component: () =>
           import("./views/order/Orders")
       },
       {
-        path: "/order/orders",
+        path: "/order/orders", // Todas do cliente
         component: () =>
           import("./views/order/Orders")
       },
@@ -130,7 +131,7 @@ const routes = [
     path: "/admin",
     component: () => import(/* webpackChunkName: "user" */ "./views/admin"),
     redirect: "/admin/dashboard",
-    beforeEnter: AuthRequired,
+    beforeEnter: AuthRequiredAdmin,
     children: [
       {
         path: "/admin/dashboard",
@@ -225,7 +226,7 @@ const routes = [
       {
         path: "/admin/user/edit/:id",
         component: () =>
-          import(/* webpackChunkName: "dashboards" */ "./views/admin/user/New")
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/user/Edit")
       },
     ]
   },

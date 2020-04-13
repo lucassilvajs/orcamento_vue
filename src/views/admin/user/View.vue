@@ -2,64 +2,62 @@
 <div>
   <b-row>
     <b-colxx xxs="12">
-      <h1>Usuários</h1>
+      <h1>Usuários do sistema</h1>
       <div class="separator mb-5"></div>
+    </b-colxx>
+  </b-row>
+  <b-row v-if="false">
+    <b-colxx md="4" lg="3">
+        <b-form-group label="Status" class="has-float-label mb-4">
+            <select v-model="filter.status" id="status" class="form-control">
+              <option value="">Todos</option>
+              <option v-for="(status, index) in data.status" :key="status" :value="index">{{status}}</option>
+            </select>
+        </b-form-group>
+    </b-colxx>
+    <b-colxx md="8" lg="9">
+        <button class="btn btn-outline-success float-right" @click="getUserAdmin()">Buscar</button>
     </b-colxx>
   </b-row>
   <b-row class="mb-5">
     <b-colxx xxs="12">
-      <b-card class="mb-4" title="Usuários">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Nome</th>
-              <th>Data</th>
-              <th>Valor</th>
-              <th>Produto</th>
-              <th>Status</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in items" :key="index">
-              <td>{{index+1}}</td>
-              <td>{{item.name}}</td>
-              <td>{{item.date}}</td>
-              <td>{{item.value}}</td>
-              <td>{{item.product}}</td>
-              <td>{{item.status}}</td>
-              <td>
-                <button @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-success">
-                  <div class="glyph-icon simple-icon-eye"/>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <b-card class="mb-4" title="Usuários do sistema">
+        <div class="table-responsive" v-if="data.user.length > 0">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody v-if="data.user">
+              <tr v-for="(user, index) in data.user" :key="index">
+                <td>{{index + 1}}</td>
+                <td>{{user.vendedor ? user.vendedor : 'Não atribuido'}}</td>
+                <td>{{user.email}}</td>
+                <td>
+                  <router-link v-if="current == user.id" :to="`/admin/user/edit/${user.id}`" class="btn btn-outline-info">
+                    <div class="glyph-icon simple-icon-pencil"></div>
+                  </router-link>
+                </td>
+              </tr>
+            </tbody>
+            <tbody v-else>
+              <tr v-for="comp in 10" :key="comp">
+                <td colspan="5" class="demo"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div v-else>
+          <div class="alert alert-info">Nenhuma solicitação foi encontrada!</div>
+        </div>
       </b-card>
     </b-colxx>
   </b-row>
-
-  <b-modal v-if="order" id="modalright" ref="modalright" :title="`Pedido #${order.id}`" modal-class="modal-right">
-      <b>Data: </b>{{order.date}}<br />
-      <b>Empresa: </b>{{order.empresa.split('-')[0]}}<br />
-      <b>Colaborador: </b>{{order.object.info.name}}<br />
-      <b>Valor: </b>{{order.value}}<br />
-      <hr>
-      <div v-for="item in order.object.lens" :key="item.code">
-        <b>{{item.type}}</b> {{item.name}}
-      </div>
-      <b>Face: </b><br />
-      <img class="w-100" :src="baseURL + order.object.face" alt="">
-      <b>Receita: </b><br />
-      <img class="w-100" :src="baseURL + order.object.face" alt="">
-      <template slot="modal-footer">
-          <b-button variant="info" @click="hideModal('modalright')">Fechar</b-button>
-      </template>
-  </b-modal>
-
-</div>
+  </div>
 </template>
 <script>
 import { api, baseURL } from '@/constants/config'
@@ -69,39 +67,69 @@ export default {
   },
   data () {
     return {
+      current: null,
+      index: null,
+      filter: {
+        status: ''
+      },
       baseURL,
-      items: null,
       data: null,
-      order: null
+      modal: {
+        title: '',
+        nota: '',
+        colaborador: '',
+        name: '',
+        date:''
+      }
     }
   },
   methods: {
-    async getOrder() {
-      const items = await api.get('/admin/order');
-      this.items = items.data.data
+    async getUserAdmin(){
+      const filter = (this.filter.status ? this.filter.status : '');
+      const response = await api.get(`admin/user/${filter}`);
+      this.data = response.data.data;
+      this.current = response.data.data.current;
     },
-    getInfoOrder(index) {
-      this.order = this.items[index]
-    },
-    hideModal (refname) {
-      this.$refs[refname].hide()
-      console.log('hide modal:: ' + refname)
+    async changeStatus(status) {
+      const response = await api.put(`admin/sac/${this.modal.id}`, {status, info: this.modal});
+      let res = response.data;
+      this.$notify(res.status, res.status == 'success' ? 'Sucesso' : 'Opsss!', res.message, {
+        duration: 3000,
+        permanent: false
+      });
 
-      if (refname === 'modalnestedinline') {
-        this.$refs['modalnested'].show()
-      }
-    },
-    somethingModal (refname) {
-      this.$refs[refname].hide()
-      console.log('something modal:: ' + refname)
+      this.data = response.data.data;
 
-      if (refname === 'modalnestedinline') {
-        this.$refs['modalnested'].show()
-      }
+
     }
   },
-  created(){
-    this.getOrder();
+  created () {
+      this.getUserAdmin();
   }
 }
 </script>
+<style>
+.demo {
+  margin: auto;
+  width: 100%;
+  height: 30px;
+  background-image: linear-gradient( 100deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0) 80% );
+  background-repeat: repeat-y;
+  background-size:50px 200px;
+  background-position: 0 0;
+}
+
+.demo:nth-child(odd) {
+  animation: shine 1s infinite;
+}
+
+.demo:nth-child(even) {
+  animation: shine 2s infinite;
+}
+
+@keyframes shine {
+  to {
+  background-position:100% 0;
+  }
+}
+</style>
