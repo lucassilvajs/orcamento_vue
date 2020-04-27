@@ -7,73 +7,73 @@ Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/",
+    path: "/app",
     component: () => import(/* webpackChunkName: "app" */ "./views/app"),
-    redirect: "/order/information",
+    redirect: "/app/order/information",
     beforeEnter: AuthRequired,
     children: [
       {
-        path: "/order/information",
+        path: "/app/order/information",
         component: () =>
           import("./views/order/Information")
       },
       {
-        path: "/order/products",
+        path: "/app/order/products",
         component: () =>
           import("./views/order/Products")
       },
       {
-        path: "/order/lens",
+        path: "/app/order/lens",
         component: () =>
           import("./views/order/Lens")
       },
       {
-        path: "/order/face",
+        path: "/app/order/face",
         component: () =>
           import("./views/order/Face")
       },
       {
-        path: "/order/recipe",
+        path: "/app/order/recipe",
         component: () =>
           import("./views/order/Recipe")
       },
       {
-        path: "/order/confirmation",
+        path: "/app/order/confirmation",
         component: () =>
           import("./views/order/Confirmation")
       },
       {
-        path: "/order/approved", // Aprovadas do consultor
+        path: "/app/order/approved", // Aprovadas do consultor
         component: () =>
           import("./views/order/Orders")
       },
       {
-        path: "/order/proposal", // Pendentes consultor
+        path: "/app/order/proposal", // Pendentes consultor
         component: () =>
           import("./views/order/Orders")
       },
       {
-        path: "/order/orders", // Todas do cliente
+        path: "/app/order/orders", // Todas do cliente
         component: () =>
           import("./views/order/Orders")
       },
       {
-        path: "/sac",
+        path: "/app/sac",
         component: () =>
           import("./views/sac/Show")
       },
       {
-        path: "/sac/view/:id",
+        path: "/app/sac/view/:id",
         component: () =>
           import("./views/sac/Show")
       },
       {
-        path: "/sac/new",
+        path: "/app/sac/new",
         component: () =>
           import("./views/sac/New")
       },
       {
-        path: "/bi/analytics",
+        path: "/app/bi/analytics",
         component: () =>
           import("./views/bi/Analytics")
       },
@@ -227,6 +227,36 @@ const routes = [
         path: "/admin/user/edit/:id",
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/user/Edit")
+      },
+      {
+        path: "/admin/make/information",
+        component: () =>
+          import("./views/admin/make/Information")
+      },
+      {
+        path: "/admin/make/products",
+        component: () =>
+          import("./views/admin/make/Products")
+      },
+      {
+        path: "/admin/make/lens",
+        component: () =>
+          import("./views/admin/make/Lens")
+      },
+      {
+        path: "/admin/make/face",
+        component: () =>
+          import("./views/admin/make/Face")
+      },
+      {
+        path: "/admin/make/recipe",
+        component: () =>
+          import("./views/admin/make/Recipe")
+      },
+      {
+        path: "/admin/make/confirmation",
+        component: () =>
+          import("./views/admin/make/Confirmation")
       },
     ]
   },

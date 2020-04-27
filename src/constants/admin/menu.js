@@ -6,6 +6,12 @@ const data = [
     to: "/admin/dashboard"
   },
   {
+    id: "make",
+    icon: "simple-icon-note",
+    label: "Fazer proposta",
+    to: "/admin/make/information"
+  },
+  {
     id: "sac",
     icon: "iconsminds-headset",
     label: "SAC",

@@ -22,7 +22,7 @@ module.exports = {
       poll: false,
       ignored: /node_modules/
     },
-    https:true
+    https:false
   },
   chainWebpack: config => {
     config.module

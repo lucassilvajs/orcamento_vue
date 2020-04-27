@@ -3,11 +3,24 @@
   <b-row>
     <b-colxx xxs="12">
       <h1>Pedidos</h1>
+      <div class="top-right-button-container">
+        <b-button-group>
+            <b-dropdown @click="targetSelectAll()" split right class="check-button" variant="primary">
+                <label class="custom-control custom-checkbox pl-4 mb-0 d-inline-block" slot="button-content">
+                    <input class="custom-control-input" type="checkbox" v-model="selectAll">
+                    <span :class="{
+    'custom-control-label' :true
+  }">&nbsp;</span>
+                </label>
+                <b-dropdown-item @click="alertAction('Deseja mesmo emitir as NFs?', 'approved','pv')">Emitir NF</b-dropdown-item>
+            </b-dropdown>
+        </b-button-group>
+      </div>
       <div class="separator mb-5"></div>
     </b-colxx>
   </b-row>
   <b-row class="mb-5">
-    <b-colxx>
+    <b-colxx class="mb-4">
       <b-card>
         <b-row>
           <b-colxx lg="3">
@@ -16,27 +29,50 @@
               </b-form-group>
           </b-colxx>
           <b-colxx lg="3">
-              <b-form-group label="Cadastro partir de:" class="has-float-label mb-4">
+              <b-form-group label="Propostas partir de:" class="has-float-label mb-4">
                 <v-date-picker mode="single" v-model="filter.start" :input-props="{ class:'form-control', placeholder: $t('form-components.date') }"></v-date-picker>
               </b-form-group>
           </b-colxx>
           <b-colxx lg="3">
-              <b-form-group label="Cadastro até:" class="has-float-label mb-4">
+              <b-form-group label="Propostas até:" class="has-float-label mb-4">
                 <v-date-picker mode="single" v-model="filter.end" :input-props="{ class:'form-control', placeholder: $t('form-components.date') }"></v-date-picker>
               </b-form-group>
           </b-colxx>
           <b-colxx lg="3">
-            <b-form-group>
-                <v-select v-model="filter.status" :options="[
-                  {label: 'Com Contrato', code: '1'},
-                  {label: 'Sem Contrato', code: '0'},
-                ]" dir="ltr" />
+            <b-form-group label="Lentes:" class="has-float-label mb-4">
+                <select v-model="filter.len" id="" class="form-control">
+                  <option value="">Todas</option>
+                  <option value="1">Solicitada</option>
+                  <option value="0">Não solicitadas</option>
+                </select>
             </b-form-group>
-              <!-- <b-form-group label="Até:" class="has-float-label mb-4">
-              </b-form-group> -->
+          </b-colxx>
+          <b-colxx lg="3">
+            <b-form-group label="Notas fiscais:" class="has-float-label mb-4">
+                <select v-model="filter.nf" id="" class="form-control">
+                  <option value="">Todas</option>
+                  <option value="1">Emitidas</option>
+                  <option value="0">Não Emitidas</option>
+                </select>
+            </b-form-group>
           </b-colxx>
           <b-colxx lg="12">
-              <button class="btn btn-outline-success float-right" @click="getCompanyFilter()">Buscar</button>
+              <b-button variant="success" :disabled="processing" :class="{'mb-3 btn-multiple-state btn-shadow ml-3 float-right': true,
+                'show-spinner': processing,
+                'show-success': !processing}" @click="getOrder">
+                <span class="spinner d-inline-block">
+                    <span class="bounce1"></span>
+                    <span class="bounce2"></span>
+                    <span class="bounce3"></span>
+                </span>
+                <span class="icon success">
+                    Buscar
+                </span>
+                <span class="icon fail">
+                    <i class="simple-icon-exclamation"></i>
+                </span>
+                <span class="label">Buscar</span>
+            </b-button>
           </b-colxx>
         </b-row>
       </b-card>
@@ -47,46 +83,90 @@
           <table class="table table-striped" v-if="items && items.length > 0">
             <thead>
               <tr>
+                <th></th>
                 <th>#</th>
-                <th>Nome</th>
-                <th>Nota</th>
-                <th>Aprovado</th>
+                <th>Empresa</th>
+                <th>CNPJ</th>
+                <th>NF</th>
+                <th>Colaborador</th>
                 <th>Valor</th>
-                <th>Produto</th>
-                <th>Status</th>
+                <th>Aprovado</th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in items" :key="index">
-                <td>{{index+1}}</td>
-                <td>{{item.name}}</td>
-                <td>{{item.nota}}</td>
-                <td>{{item.date}}</td>
-                <td>{{item.value}}</td>
-                <td>{{item.product}}</td>
-                <td>{{item.status}}</td>
+              <tr v-for="(item, index) in items" :key="index" :class="[{'son': item.son, 'parent': !item.son}]">
                 <td>
-                  <button @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-success">
+                  <div v-if="!item.nota" class="custom-control custom-checkbox pl-1 align-self-center pr-4">
+                    <div class="itemCheck mb-0 custom-control custom-checkbox">
+                      <input type="checkbox" autocomplete="off" class="custom-control-input" v-model="item.checked" :id="`check_${item.id}`">
+                      <label class="custom-control-label" :for="`check_${item.id}`"></label>
+                    </div>
+                  </div>
+                </td>
+                <td>{{100000 + parseInt(item.id)}}</td>
+                <td>{{item.empresa}}</td>
+                <td>{{item.cnpj}}</td>
+                <td>{{item.nota}}</td>
+                <td v-if="isPage('proposal')">{{item.parents.map(r => JSON.parse(r.attr).info.name).join(', ')}}</td>
+                <td v-else>{{item.name}}</td>
+                <td>{{item.value}}</td>
+                <td>{{item.date}}<br />
+                  <span v-if="item.object.measure && item.len == 1" class="badge badge-success">DP: {{item.object.measure.pupillary_distance}} / ALT: {{item.object.measure.pupillary_height}}</span>
+                  <span v-if="item.object.measure && item.len != 1" class="badge badge-danger">DP: {{item.object.measure.pupillary_distance}} / ALT: {{item.object.measure.pupillary_height}}</span>
+                </td>
+                <td>
+                  <button v-if="!item.nota" @click="() => {
+                    $swal.fire({
+                      title: `Você tem certeza?`,
+                      text: `Deseja realmente emitir essa nota?`,
+                      icon: 'info',
+                      showCancelButton: true,
+                      confirmButtonColor: '#3085d6',
+                      cancelButtonColor: '#d33',
+                      confirmButtonText: 'Sim',
+                      cancelButtonText: 'Não'
+                    }).then((result) => {
+                      if (result.value) {
+                        const order = item.son ? item.son : item.id
+                        generateNf(order)
+                      }
+                    });
+                  }" v-b-modal.modalright class="btn btn-outline-warning" :id="`gen_nf_${item.id}`">
                     <div class="simple-icon-doc"/>
                   </button>
+                  <b-tooltip :target="`gen_nf_${item.id}`"
+                          :placement="`top`"
+                          title="Gerar NF">
+                  </b-tooltip>
+                  <button @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-success" :id="`show_info_${item.id}`">
+                    <div class="simple-icon-settings"/>
+                  </button>
+                  <b-tooltip :target="`show_info_${item.id}`"
+                          :placement="`top`"
+                          title="Ver informações">
+                  </b-tooltip>
+
                   <router-link :to="`/admin/order/measure/${item.id}`" v-b-modal.modalright class="btn btn-outline-info" :id="`measure${item.id}`">
                     <div class="glyph-icon simple-icon-eye"/>
                   </router-link>
                   <b-tooltip :target="`measure${item.id}`"
-                          :placement="`measure${item.id}`"
+                          :placement="`top`"
                           title="Eye Measure">
                   </b-tooltip>
                 </td>
               </tr>
             </tbody>
           </table>
-          <b-pagination v-if="500 > 50"
+          <b-pagination v-if="total > 100"
             size="sm"
             align="center"
-            :total-rows="500"
-            :per-page="50"
-            @change="pageCompany"
+            :total-rows="total"
+            :per-page="100"
+            @change="(numbe) => {
+              filter.page = numbe;
+              getOrder();
+            }"
           />
         </div>
         <div v-else class="alert">Nenhuma informação foi encontrada</div>
@@ -99,20 +179,36 @@
       <b>Empresa: </b>{{order.empresa.split('-')[0]}}<br />
       <b>Colaborador: </b>{{order.object.info.name}}<br />
       <b>Valor: </b>{{order.value}}<br />
-      <hr>
-      <div v-for="item in order.object.lens" :key="item.code">
-        <b>{{item.type}}</b> {{item.name}}
-      </div>
       <div v-if="order.object.measure">
         <b>DP:</b> {{order.object.measure.pupillary_distance}}<br />
         <b>ALT:</b> {{order.object.measure.pupillary_height}}<br />
       </div>
+      <div v-if="order.feedback.feedback">
+        <b>Feedback: </b>{{order.feedback.feedback}}<br />
+        <b>Nota: </b><stars :disabled="true" v-model="order.feedback.rate"></stars><br />
+      </div>
       <hr>
-      <b>Face: </b><br />
-      <img class="w-100" :src="baseURL + order.object.face" alt="">
-      <b>Receita: </b><br />
-      <img class="w-100" :src="baseURL + order.object.recipe" alt="">
+      <div v-for="item in order.object.lens" :key="item.code">
+        <b>{{item.type}}</b> {{item.name}}
+      </div>
+      <div>
+        <b>Face: </b><br />
+        <img class="w-100 mb-3" :src="baseURL + order.object.face" v-if="isImage(order.object.face)" alt="">
+        <iframe height="350" v-else class="w-100 mb-3" :src="baseURL + order.object.face" frameborder="0"></iframe>
+        <b>Receita: </b><br />
+        <img class="w-100 mb-3" :src="baseURL + order.object.recipe" v-if="isImage(order.object.recipe)" alt="">
+        <iframe height="350" v-else class="w-100 mb-3" :src="baseURL + order.object.recipe" frameborder="0"></iframe>
+
+          <div v-if="items[index].len != 1" @click="changeLen(1)"><img :src="check" alt="" class="img-input"> Lente solicitada</div>
+          <div v-else><img :src="checked" alt="" class="img-input"> Lente solicitada</div>
+      </div>
+      <div>
+
+      </div>
       <template slot="modal-footer">
+          <b-button v-if="order.status == 'Pendente'" variant="success" @click="changeStatus('approved', order.id)">Aprovar</b-button>
+          <b-button v-if="order.status == 'Pendente'" variant="danger" @click="changeStatus('reproved', order.id)">Reprovar</b-button><br>
+          <b-button v-if="order.status == 'Pendente'" variant="primary" @click="reenviar(order.id)">Reenviar</b-button>
           <b-button variant="info" @click="hideModal('modalright')">Fechar</b-button>
       </template>
   </b-modal>
@@ -120,26 +216,53 @@
 </div>
 </template>
 <script>
+import check from '@/assets/img/check.svg'
+import checked from '@/assets/img/checked.svg'
 import { api, baseURL } from '@/constants/config'
-
+import Stars from '@/components/Common/Stars';
 export default {
   components: {
+    'stars': Stars
   },
   data () {
     return {
+      check,
+      checked,
       baseURL,
       filter: {},
       items: null,
       data: null,
-      order: null
+      order: null,
+      selectAll: false,
+      filter: {},
+      total: 0,
+      index: null,
+      processing: null
     }
   },
+  computed: {
+    },
   methods: {
+    isPage(page) {
+      return this.$route.path.split('/')[2] == page
+    },
+     isImage(ima){
+      let existe = ['png', 'jpeg', 'jpg', 'gif', 'svg', 'heic'].map(r => { return ima.split(';')[0].indexOf(r) }).filter(r => r >= 0);
+      return existe.length
+    },
     async getOrder() {
-      const items = await api.get('/admin/order');
-      this.items = items.data.data
+      this.processing = true;
+      const items = await api.get('/admin/order', {params: this.filter});
+      this.items = items.data.data.orders.map(r => {
+        r.checked = false;
+        return r
+      });
+
+      this.processing = false;
+      this.total = items.data.data.total
     },
     getInfoOrder(index) {
+      this.index = index;
       this.order = this.items[index]
     },
     hideModal (refname) {
@@ -157,6 +280,75 @@ export default {
       if (refname === 'modalnestedinline') {
         this.$refs['modalnested'].show()
       }
+    },
+    async alertAction(message, status, action){
+      await this.$swal.fire({
+        title: `O que você acha?`,
+        text: `${message}`,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sim',
+        cancelButtonText: 'Não',
+        showLoaderOnConfirm: true,
+      }).then((result) => {
+        if (result.value) {
+          let id = [];
+          let cnpj = '';
+          let valid = true;
+          this.items.filter(r => r.checked).forEach(el => {
+            if(cnpj == el.cnpj || cnpj == '') {
+              id.push(el.id)
+              cnpj = el.cnpj
+            }else{
+              valid = false;
+            }
+          });
+          if(valid) {
+            this.generateNf(id)
+
+          }else{
+            this.$swal.fire({
+              title: `Isso não pode!`,
+              text: `Você só pode unificar notas da mesma empresa`,
+              icon: 'warning',
+            });
+          }
+        }
+      });
+    },
+    async generateNf(idOrder) {
+      const response = await api.post(`/admin/order/generateNF`, {
+        order: idOrder
+      });
+      this.$swal.fire({
+        title: `Sucesso!`,
+        text: `Notas geradas com sucesso`,
+        icon: 'success',
+      });
+      this.getOrder();
+
+    },
+    async changeLen(len){
+      const order = this.items[this.index];
+      this.items[this.index].len = len
+      const response = await api.put(`/admin/order/${order.id}`, {
+        len
+      })
+      this.$notify("success", 'Sucesso', "Status de lente alterado com sucesso", {
+          duration: 3000,
+          permanent: false
+      });
+      this.hideModal('modalright')
+      this.getOrder();
+    },
+    targetSelectAll() {
+      this.selectAll = !this.selectAll;
+        this.items = this.items.map(r => {
+          r.checked = this.selectAll
+          return r
+        })
     }
   },
   created(){
@@ -164,3 +356,16 @@ export default {
   }
 }
 </script>
+<style>
+.img-input {
+    width: 20px
+}
+
+/* .son {
+  background: #fff;
+}
+
+.parent {
+  background: #eee;
+} */
+</style>

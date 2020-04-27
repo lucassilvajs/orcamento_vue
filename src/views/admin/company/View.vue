@@ -82,12 +82,12 @@
         </table>
         <div class="alert alert-info" v-else>Você não possui nenhum item cadastrado</div>
         <b-pagination v-if="total > 50"
-                  size="sm"
-                  align="center"
-                  :total-rows="total"
-                  :per-page="50"
-                  @change="pageCompany"
-                />
+          size="sm"
+          align="center"
+          :total-rows="total"
+          :per-page="50"
+          @change="pageCompany"
+        />
       </b-card>
     </b-colxx>
   </b-row>

@@ -15,8 +15,8 @@
 </template>
 
 <script>
-import takePhoto from '@/components/takePhoto';
-import myBreadCrumb from '@/components/breadcrumb';
+import takePhoto from '@/components/AdmintakePhoto';
+import myBreadCrumb from '@/components/adminBreadcrumb';
 export default {
     components: {
         'my-breadcrumb': myBreadCrumb,
@@ -32,7 +32,7 @@ export default {
 			}
 			order.product = item;
 			window.localStorage.setItem('order',JSON.stringify(order));
-			this.$router.push("/app/order/face");
+			this.$router.push("/admin/make/recipe");
 		}
 	}
 }

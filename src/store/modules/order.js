@@ -1,62 +1,34 @@
-import { api, currentUser } from '../../constants/config'
+import {api, baseURL} from '@/constants/config';
 export default {
   state: {
-    currentOrder: localStorage.getItem('order') != null ? JSON.parse(localStorage.getItem('order')) : null,
-    requestError: null,
-    processing: false,
+    awaitingOrders: null
   },
   getters: {
-    currentOrder: state => state.currentOrder,
-    processing: state => state.processing,
-    requestError: state => state.requestError,
-    forgotMailSuccess: state => state.forgotMailSuccess,
-    resetPasswordSuccess:state => state.resetPasswordSuccess,
+    awaitingOrders: state => state.awaitingOrders
   },
   mutations: {
-    setUser(state, payload) {
-      state.currentOrder = payload
-      state.processing = false
-      state.requestError = null
-    },
-    setSuccess(state, payload) {
-      state.currentOrder = payload
-      state.processing = false
-      state.requestError = null
-    },
-    setLogout(state) {
-      state.currentOrder = null
-      state.processing = false
-      state.requestError = null
-    },
-    setProcessing(state, payload) {
-      state.processing = payload
-      state.requestError = null
-    },
-    setError(state, payload) {
-      state.requestError = payload
-      state.currentOrder = null
-      state.processing = false
-    },
-    setForgotMailSuccess(state) {
-      state.requestError = null
-      state.currentOrder = null
-      state.processing = false
-      state.forgotMailSuccess=true
-    },
-    setResetPasswordSuccess(state) {
-      state.requestError = null
-      state.currentOrder = null
-      state.processing = false
-      state.resetPasswordSuccess=true
-    },
-    clearError(state) {
-      state.requestError = null
+    setAwaitingOrders(state, payload) {
+      state.awaitingOrders = payload
     }
   },
   actions: {
-    setInfoOrder({ commit }, payload) {
-      commit('setSuccess', payload);
-      // window.localStorage.setItem('info', JSON.stringify(info))
+    async getAwaitingOrders({commit}, payload){
+      const response = await api.get('/order', {
+        params: {
+          status: 'awaiting',
+        }
+      });
+      commit('setAwaitingOrders', response.data.data.orders.map(r => {r.item = false; return r;}));
     },
+
+    async sendAwaitingOrders({commit}, payload) {
+      let items = [];
+      payload.items.forEach(e => {
+        items.push(e.id);
+      });
+
+      const response = await api.put('/order/awaiting', {items});
+      return true;
+    }
   }
 }

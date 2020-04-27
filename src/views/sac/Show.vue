@@ -3,7 +3,7 @@
     <b-row>
       <b-colxx xxs="12">
         <b-card class="mb-4">
-          <router-link to="/sac/new" class="btn btn-success float-right">Abrir solicitação</router-link>
+          <router-link to="/app/sac/new" class="btn btn-success float-right">Abrir solicitação</router-link>
           <h4 class="card-title">Solicitações</h4>
           <table class="table" v-if="items.length">
               <thead>

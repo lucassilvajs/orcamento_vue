@@ -11,7 +11,7 @@
                             <p v-for="(field, index) in order.info" :key="index"><b>{{index == 'name' ? 'Nome': index}}: </b>{{field}}</p>
                         </div>
                         <div v-else>
-                            <p class="text-center">Você não inseriu dados do coladorador <router-link to="/app/order/information">Clique aqui</router-link> para adicionar</p>
+                            <p class="text-center">Você não inseriu dados do coladorador <router-link to="/admin/make/information">Clique aqui</router-link> para adicionar</p>
                         </div>
                     </b-colxx>
                     <b-colxx md="3" lg="3" class="">
@@ -30,7 +30,7 @@
                             <img class="w-100" :src="`${baseURL}${order.product.image}`" alt="">
                         </div>
                         <div v-else>
-                            <p class="text-center">Você ainda não selecionou o óculos <router-link to="/app/order/products">Clique aqui</router-link> para adicionar</p>
+                            <p class="text-center">Você ainda não selecionou o óculos <router-link to="/admin/make/products">Clique aqui</router-link> para adicionar</p>
                         </div>
                     </b-colxx>
                     <b-colxx md="3" lg="3" class="">
@@ -40,7 +40,7 @@
                             <iframe style="height:300px;" :src="`${baseURL}${order.face}`" v-else frameborder="0"></iframe>
                         </div>
                         <div v-else>
-                            <p class="text-center">Você ainda não anexou a face <router-link to="/app/order/face">Clique aqui</router-link> para anexar</p>
+                            <p class="text-center">Você ainda não anexou a face <router-link to="/admin/make/face">Clique aqui</router-link> para anexar</p>
                         </div>
                     </b-colxx>
                     <b-colxx md="3" lg="3" class="">
@@ -50,7 +50,7 @@
                             <iframe style="height:300px;" :src="`${baseURL}${order.recipe}`" v-else frameborder="0"></iframe>
                         </div>
                         <div v-else>
-                            <p class="text-center">Você ainda não anexou a receita <router-link to="/app/order/recipe">Clique aqui</router-link> para anexar</p>
+                            <p class="text-center">Você ainda não anexou a receita <router-link to="/admin/make/recipe">Clique aqui</router-link> para anexar</p>
                         </div>
                     </b-colxx>
                 </b-row>
@@ -61,9 +61,9 @@
         <b-colxx class="d-flex justify-content-end">
           <button class="show-success btn btn-info mb-3 btn-multiple-state btn-shadow ml-3" @click="() => {
               if(order) {
-                order.new = true;
+               order.new  = true;
               }
-              sendInfo()
+              sendInfo();
             }">
             <span class="label">Finalizar e iniciar nova solicitação</span>
             <span class="spinner d-inline-block">
@@ -75,6 +75,7 @@
               Finalizar e iniciar nova solicitação
             </span>
           </button>
+
 
             <b-button v-if="awaitingOrders.length == 0" variant="success" :disabled="processing" :class="{'mb-3 btn-multiple-state btn-shadow ml-3': true,
                 'show-spinner': processing,
@@ -105,7 +106,7 @@ import {
     mapActions
 } from 'vuex'
 import {api, baseURL} from '@/constants/config';
-import myBreadCrumb from '@/components/breadcrumb';
+import myBreadCrumb from '@/components/adminBreadcrumb';
 export default {
     components: {
         'my-breadcrumb': myBreadCrumb
@@ -121,7 +122,7 @@ export default {
     },
 
     computed: {
-        ...mapGetters(["loginError", "awaitingOrders"]),
+        ...mapGetters(["processing", "loginError", "awaitingOrders"]),
         valido: function(){
             let message = '';
             let status = true;
@@ -179,8 +180,6 @@ export default {
         return existe.length
       },
       sendInfo: async function(){
-        if(false) {
-        }else{
           if(!this.valido.status) {
               this.$notify("error", "Faltam algumas coisas", this.valido.message, {
                   duration: 3000,
@@ -192,7 +191,7 @@ export default {
             if(this.order.new) { // Verifica se o usuário necessita cadastrar multiplos pedidos antes de efetuar a proposta
               order.new = true;
             }
-            const response = await api.post('/order', order);
+            const response = await api.post('/orderadmin', order);
             let data = response.data;
             if(data.status == 'success') {
                 this.$notify("success", order.new ? 'Sucesso' : `Pedido #${data.data.order.id}`, data.message, {
@@ -213,7 +212,6 @@ export default {
 
             this.getAwaitingOrders();
           }
-        }
       },
       infoOrder: function() {
           this.order = JSON.parse(window.localStorage.getItem('order'));

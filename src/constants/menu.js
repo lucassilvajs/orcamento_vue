@@ -3,63 +3,63 @@ const data = [
   id: "order",
   icon: "simple-icon-doc",
   label: "Solicitar",
-  to: "/order/information",
+  to: "/app/order/information",
   subs: false
 },
 {
   id: "history",
   icon: "simple-icon-clock",
   label: "Histórico",
-  to: "/order/orders"
+  to: "/app/order/orders"
 },
 {
   id: "orders",
   icon: "simple-icon-doc",
   label: "Pedidos",
-  to: "/order/approved"
+  to: "/app/order/approved"
 },
 {
   id: "proposal",
   icon: "iconsminds-file-edit",
   label: "Propostas",
-  to: "/order/proposal"
+  to: "/app/order/proposal"
 },
 {
   id: "sac",
   icon: "iconsminds-headset",
   label: "SAC",
-  to: "/sac"
+  to: "/app/sac"
 },
 {
   id: "bi",
   icon: "iconsminds-monitor-analytics",
   label: "BI",
-  to: "/bi/analytics"
+  to: "/app/bi/analytics"
 },
 // {
 //   id: "dashboards",
 //   icon: "iconsminds-shop-4",
 //   label: "menu.dashboards",
-//   to: "/app/dashboards",
+//   to: "/app/app/dashboards",
 //   subs: [{
 //     icon: "simple-icon-briefcase",
 //     label: "menu.default",
-//     to: "/order"
+//     to: "/app/order"
 //   },
 //     {
 //       icon: "simple-icon-pie-chart",
 //       label: "menu.analytics",
-//       to: "/app/dashboards/analytics"
+//       to: "/app/app/dashboards/analytics"
 //     },
 //     {
 //       icon: "simple-icon-basket-loaded",
 //       label: "menu.ecommerce",
-//       to: "/app/dashboards/ecommerce"
+//       to: "/app/app/dashboards/ecommerce"
 //     },
 //     {
 //       icon: "simple-icon-doc",
 //       label: "menu.content",
-//       to: "/app/dashboards/content"
+//       to: "/app/app/dashboards/content"
 //     }
 //   ]
 // },

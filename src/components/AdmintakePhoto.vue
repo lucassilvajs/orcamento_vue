@@ -1,7 +1,7 @@
 <template>
 	<div style="width:100%">
 		<select  v-if="devices.length > 0" v-model="deviceId" name="" id="" class="d-none">
-			<option v-for="device in devices" :selectFirstDevice="true" :value="device.deviceId" :key="device.deviceId">{{device.label.indexOf('front') >= 0 ? 'Camera Frontal' : 'Camera Traseira'}}</option>
+			<option v-for="device in devices" :value="device.deviceId" :key="device.deviceId">{{device.label.indexOf('front') >= 0 ? 'Camera Frontal' : 'Camera Traseira'}}</option>
 		</select>
 			<div class="target-foto">
 			<img v-if="img && !hasImage" :src="img" alt="" style="width:100%;">
@@ -134,7 +134,7 @@ export default {
       file.readAsDataURL(e.target.files[0]);
 		},
 		async sendImage() {
-			if(this.img.length > 100){
+    	if(this.img.length > 100){
         this.processing = true;
         let file = '';
         let fileToCompress = null;
@@ -152,7 +152,7 @@ export default {
 
           ext = contentType.split('/')[1];
           // Convert it to a blob to upload
-          ext = '.'+contentType.split('/')[1];
+          ext = contentType.split('/')[1];
           var blob = this.b64toBlob(realData, contentType);
           fileToCompress = blob;
         }
@@ -166,7 +166,7 @@ export default {
             maxHeight:1024,
             quality: 0.7,
             success: async (result) => {
-              fd.append('file', result, result.name+ext);
+              fd.append('file', result, 'fileimage.'+ext);
               file = await api.post(`saveFile/${this.target}`, fd);
               if(file.data.status != 'success') {
           this.uploadError = true
@@ -196,7 +196,7 @@ export default {
             duration: 3000,
             permanent: false
           });
-          this.$router.push(`/app/order/${redirect}`);
+          this.$router.push(`/admin/make/${redirect}`);
         }
 
         if(this.sac) {
@@ -236,31 +236,23 @@ export default {
           }
         }
 
-        if(!this.sac) {
-          const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
-          this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-            duration: 3000,
-            permanent: false
-          });
-          this.$router.push(`/app/order/${redirect}`);
-        }
-
-        if(this.sac) {
-          console.log(file);
-          this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-            duration: 3000,
-            permanent: false
-          });
-
-          window.localStorage.setItem('sac', file.data.data);
-        }
         this.processing = false;
+        if(!this.sac) {
+            const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
+            this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
+              duration: 3000,
+              permanent: false
+            });
+            this.$router.push(`/admin/make/${redirect}`);
+
+          }
         }
       }else{
         const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
-        this.$router.push(`/app/order/${redirect}`);
+        this.$router.push(`/admin/make/${redirect}`);
+
       }
-		},
+    },
 		checkImg() {
 			let order = window.localStorage.getItem('order');
 			if(order){

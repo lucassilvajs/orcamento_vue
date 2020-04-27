@@ -63,7 +63,7 @@
                 <b-row>
                   <b-colxx md="4" lg="3">
                     <b-form-group label="Empresa com contrato" class="has-float-label mb-4">
-                      <select class="form-control" v-model="company.has_contract" id="">
+                      <select class="form-control" v-model="company.has_contract">
                         <option value="0">Sem contrato</option>
                         <option value="1">Com contrato</option>
                       </select>
@@ -71,7 +71,7 @@
                   </b-colxx>
                   <b-colxx md="4" lg="3">
                     <b-form-group label="Pedido de compra" class="has-float-label mb-4">
-                      <select class="form-control" v-model="company.pedido_compra" id="">
+                      <select class="form-control" v-model="company.pedido_compra">
                         <option value="0">Não obrigatório</option>
                         <option value="1">Obrigatório</option>
                       </select>
@@ -79,11 +79,17 @@
                   </b-colxx>
                   <b-colxx md="4" lg="3">
                     <b-form-group label="Multiplos pedidos" class="has-float-label mb-4">
-                      <select class="form-control" v-model="company.multiple_order" id="">
+                      <select class="form-control" v-model="company.multiple_order">
                         <option value="0">Compra direta</option>
                         <option value="1">Multiplos pedidos</option>
                       </select>
                     </b-form-group>
+                    <!-- <b-form-group v-if="company.multiple_order == 1" label="Multiplos pedidos" class="has-float-label mb-4">
+                      <select class="form-control" v-model="company.multiple_time">
+                        <option value="7">Toda segunda</option>
+                        <option value="1">Multiplos pedidos</option>
+                      </select>
+                    </b-form-group> -->
                   </b-colxx>
                 </b-row>
             </b-card>

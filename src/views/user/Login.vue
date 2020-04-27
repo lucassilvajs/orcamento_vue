@@ -108,8 +108,8 @@ export default {
             if (val && val.token && val.token.length > 0) {
                 // setTimeout(() => {
                 //     }, 200);
-                  this.$router.push(`/`);
                 if(!val.user.level) {
+                  this.$router.push(`/app`);
                 }else{
                   this.$router.push(`/${val.user.level}`);
                 }

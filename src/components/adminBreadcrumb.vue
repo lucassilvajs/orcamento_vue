@@ -24,27 +24,27 @@ export default {
             itemsOrder: [
                 {
                     text: 'Dados do Colaborador',
-                    link: '/app/order/information'
+                    link: '/admin/make/information'
                 },
                 {
                     text: 'Selecionar produto',
-                    link: '/app/order/products'
+                    link: '/admin/make/products'
                 },
                 {
                     text: 'Selecionar lentes',
-                    link: '/app/order/lens'
+                    link: '/admin/make/lens'
                 },
                 {
                     text: 'Capturar face',
-                    link: '/app/order/face'
+                    link: '/admin/make/face'
                 },
                 {
                     text: 'Capturar receita',
-                    link: '/app/order/recipe'
+                    link: '/admin/make/recipe'
                 },
                 {
                     text: 'Confirmação dos dados',
-                    link: '/app/order/confirmation'
+                    link: '/admin/make/confirmation'
                 },
             ],
         }

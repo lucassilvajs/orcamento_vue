@@ -90,7 +90,7 @@ export default {
         duration: 3000,
         permanent: false
       });
-      this.$router.push('/sac');
+      this.$router.push('/app/sac');
     },
 
     async getEmpresa() {

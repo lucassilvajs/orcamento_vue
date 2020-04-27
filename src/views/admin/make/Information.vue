@@ -48,7 +48,7 @@
 
 import vSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
-import myBreadCrumb from '@/components/breadcrumb';
+import myBreadCrumb from '@/components/adminBreadcrumb';
 import {api} from '@/constants/config';
 export default {
     components: {
@@ -93,10 +93,10 @@ export default {
             order.info = form;
             if(this.company) order.company = this.company;
             window.localStorage.setItem('order', JSON.stringify(order));
-            this.$router.push("/app/order/products");
+            this.$router.push("/admin/make/products");
         },
         getItemsAdd: async function() {
-          const itemsFields = await api.get('company/fields');
+          const itemsFields = await api.get('admin/company/fields');
           this.fields = itemsFields.data.data
           if(this.fields.colaborador){
             this.companies = this.fields.companies

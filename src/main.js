@@ -28,6 +28,10 @@ import 'v-calendar/lib/v-calendar.min.css'
 import VueScrollTo from 'vue-scrollto'
 import firebase from 'firebase/app'
 import 'firebase/auth'
+import VueSweetalert2 from 'vue-sweetalert2';
+
+// If you don't need the styles, do not connect
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 // import Vuelidate from 'vuelidate'
 // Vue.use(Vuelidate);
@@ -35,6 +39,7 @@ import 'firebase/auth'
 
 Vue.use(BootstrapVue);
 Vue.use(VueI18n);
+Vue.use(VueSweetalert2);
 
 const messages = { en: en, es: es };
 const locale = (localStorage.getItem('currentLanguage') && localeOptions.filter(x => x.id === localStorage.getItem('currentLanguage')).length > 0) ? localStorage.getItem('currentLanguage') : defaultLocale;

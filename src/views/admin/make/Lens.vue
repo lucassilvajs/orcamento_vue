@@ -62,26 +62,14 @@
                         <div class="col-sm-12 col-md-4">
                             <h4>Tratamento</h4>
                             <table class="table w-100 table-hover">
-                                <tr v-for="(tratamento, index) in tratament.tratament" :key="index">
-                                    <td  @click="() => {
-                                        tratament.tratament = tratament.tratament.map( (re) => {
-                                            re.checked = false;
-                                            return re
-                                        });
-                                        tratamento.checked = !tratamento.checked
-                                    }">{{tratamento.name}}</td>
+                                <tr v-for="(tratament, index) in tratament.tratament" :key="index">
+                                    <td  @click="tratament.checked = !tratament.checked">{{tratament.name}}</td>
                                     <td class="float-right">
-                                        <label :for="`tratamento_${index}`" class="pointer">
-                                            <img v-if="!tratamento.checked" :src="check" alt="" class="img-input">
+                                        <label :for="`tratament_${index}`" class="pointer">
+                                            <img v-if="!tratament.checked" :src="check" alt="" class="img-input">
                                             <img v-else :src="checked" alt="" class="img-input">
                                         </label>
-                                        <input type="checkbox"  @change="() => {
-                                            tratament.tratament = tratament.tratament.map( (re) => {
-                                                re.checked = false;
-                                                return re
-                                            })
-                                            tratamento.checked = !tratamento.checked
-                                        }" name="" :id="`tratamento_${index}`" class="d-none">
+                                        <input type="checkbox" @change="tratament.checked = !tratament.checked" name="" :id="`tratament_${index}`" class="d-none">
                                     </td>
                                 </tr>
                             </table>
@@ -98,7 +86,7 @@
 </template>
 
 <script>
-import myBreadCrumb from '@/components/breadcrumb';
+import myBreadCrumb from '@/components/adminBreadcrumb';
 import check from '@/assets/img/check.svg'
 import checked from '@/assets/img/checked.svg'
 import {api} from '@/constants/config';
@@ -115,36 +103,34 @@ export default {
         'my-breadcrumb': myBreadCrumb,
 	},
 	methods: {
-        addTratament: function(){
-            let cons = this.tratament;
-            if(this.tratament['lens'].filter(r => r.checked).length == 0){
-              this.$notify("error", "Opsss...", "Você precisa selecionar uma lente", {
-                  duration: 3000,
-                  permanent: false
-              });
-            }else{
-              let save = [];
-              ["lens", "diopter", "tratament"].forEach( (el) => {
-                  save.push(this.tratament[el].map( (r) => {
-                      if(r.checked) return r
-                  }).filter(r => r))
-              });
+    addTratament: function(){
+        let cons = this.tratament;
+        let save = [];
+        ["lens", "diopter", "tratament"].forEach( (el) => {
+            save.push(this.tratament[el].map( (r) => {
+                if(r.checked) return r
+            }).filter(r => r))
+        });
 
-              let order = window.localStorage.getItem('order');
-              if(order){
-                  order = JSON.parse(order);
-              }else{
-                  order = {}
-              }
+        let order = window.localStorage.getItem('order');
+        if(order){
+            order = JSON.parse(order);
+        }else{
+            order = {}
+        }
 
-              order.lens = save;
-              window.localStorage.setItem('order', JSON.stringify(order));
-              this.$router.push("/app/order/face");
-            }
-        },
-        getLens: async function()
+        order.lens = save;
+        window.localStorage.setItem('order', JSON.stringify(order));
+        this.$router.push("/admin/make/face");
+    },
+    getLens: async function()
 		{
-			const lens = await api.get("/lens");
+      let order = JSON.parse(window.localStorage.getItem('order'));
+			const lens = await api.get("/lens", {
+        params: {
+          company: order.company
+        }
+      });
 			this.tratament = lens.data.data
 		}
 	},

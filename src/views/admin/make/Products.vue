@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import myBreadCrumb from '@/components/breadcrumb';
+import myBreadCrumb from '@/components/adminBreadcrumb';
 import {api, baseURL} from '@/constants/config';
 export default {
 	data() {
@@ -79,7 +79,7 @@ export default {
 				image: this.products.data[index].color.filter(color => color.name == this.products.data[index].colorSelected)[0].image
 			};
 			window.localStorage.setItem('order',JSON.stringify(order));
-			this.$router.push("/app/order/lens");
+			this.$router.push("/admin/make/lens");
 		},
 
 		getProducts: async function()
@@ -89,7 +89,7 @@ export default {
       let company = '';
       console.log(order)
       console.log(user)
-      if(user.user.colaborador) {
+      if(true) {
         if(!order || !order.company) {
           this.$notify("error", 'Opsss.!!!', "Por favor, selecione uma empresa para buscarmos a relação de produto disponível", {
             duration: 5000,

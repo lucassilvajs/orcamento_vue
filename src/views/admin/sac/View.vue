@@ -30,6 +30,7 @@
                 <th>Nota</th>
                 <th>Colaborador</th>
                 <th>Empresa</th>
+                <th>CNPJ</th>
                 <th>Data</th>
                 <th>Status</th>
                 <th>Ações</th>
@@ -41,6 +42,7 @@
                 <td>{{sac.nota}}</td>
                 <td>{{sac.colaborador}}</td>
                 <td>{{sac.name}}</td>
+                <td>{{sac.cnpj}}</td>
                 <td>{{sac.date | date}}</td>
                 <td> <span :style="{background:sac.color}" style="color:#fff; padding:5px 7px; border-radius:3px;">{{sac.status}}</span> </td>
                 <td>

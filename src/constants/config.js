@@ -80,6 +80,22 @@ axiosInstance.interceptors.request.use(
 );
 
 export const api = {
+
+  file(endpoint, body) {
+    axios.post( endpoint,
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }
+    ).then(function(){
+      console.log('SUCCESS!!');
+    })
+    .catch(function(){
+      console.log('FAILURE!!');
+    });
+  },
   get(endpoint, parameter = '') {
     return axiosInstance.get(endpoint, parameter);
   },

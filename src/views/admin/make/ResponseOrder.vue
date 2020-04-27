@@ -19,7 +19,7 @@
         <b-card-header>
           <h3>Enviar Pedido de Compra</h3>
         </b-card-header>
-        <b-card-body v-if="!pcSend && !hasPC ">
+        <b-card-body v-if="!pcSend">
           <b-form-group label="Número do pedido" class="has-float-label mb-4">
               <b-form-input type="text" v-model="pc.number" />
           </b-form-group>
@@ -137,18 +137,17 @@
                 </div>
             </div>
 
-              <table v-for="(ord, ind) in order.orders" :key="ind" class="table table-borderless">
+              <table class="table table-borderless">
                 <thead>
-                    <tr v-if="ind == 0">
+                    <tr>
                         <th class="text-muted text-extra-small mb-2">ITEM</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(it, index) in ord.items" :key="index">
+                    <tr v-for="(it, index) in order.items" :key="index">
                         <td>{{it.name}}</td>
                     </tr>
                 </tbody>
-                <hr>
               </table>
             </div>
 
@@ -204,7 +203,6 @@ export default {
           uploadError: false,
           feedbackSend: false,
           pcSend: false,
-          hasPC: false,
         }
     },
     methods: {
@@ -212,10 +210,6 @@ export default {
             const response = await api.get(`/proposta/${this.$route.params.hash}/${this.$route.params.response}`);
             if(response.data.status == 'success') {
                 this.order = response.data.data;
-                if(JSON.parse(this.order.attr).pc && JSON.parse(this.order.attr).pc.number){
-                  this.hasPC = true
-                }
-
                 if(response.data.data.resp) {
                     this.$notify("error", 'Opsss...!', 'Esse pedido já teve a solicitação respondida.', {
                         duration: 3000,
@@ -226,7 +220,7 @@ export default {
         },
         async sendFeedback() {
             this.processing = true;
-            await api.post('feedback', {rate: this.rate, feedback: this.feedback, order: this.order});
+            await api.post('feedback', {rate: this.rate, feedback: this.feedback});
             this.processing = false;
             this.feedbackSend = true;
         },
@@ -238,14 +232,13 @@ export default {
             });
           }else{
             this.processingPc = true;
-            let fileName = '';
             if(this.pc.file) {
               let fd = new FormData();
               fd.append('file', this.pc.file);
               const file = await api.post('saveFile/pc', fd);
-              fileName = file.data.data;
+              const fileName = file.data.data;
             }else{
-              fileName = '';
+              const fileName = '';
             }
             const order = await api.put(`order/addPc/${this.order.order}`, {fileName, number: this.pc.number});
             this.processingPc = false;
