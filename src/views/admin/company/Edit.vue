@@ -46,7 +46,7 @@
                         <img v-if="company.image" :src="`${baseURL}${company.image}`" :alt="company.name" class="w-100">
                     </b-colxx>
                     <b-colxx md="4" lg="3">
-                        <b-form-group label="E-mail Primario" class="has-float-label mb-4">
+                        <b-form-group label="E-mail(s) para aprovar/reprovar" class="has-float-label mb-4">
                             <b-form-input v-model="company.email" type="text" placeholder="E-mail" />
                         </b-form-group>
                         <b-form-group label="Vendedor" class="has-float-label mb-4">
@@ -84,12 +84,9 @@
                         <option value="1">Multiplos pedidos</option>
                       </select>
                     </b-form-group>
-                    <!-- <b-form-group v-if="company.multiple_order == 1" label="Multiplos pedidos" class="has-float-label mb-4">
-                      <select class="form-control" v-model="company.multiple_time">
-                        <option value="7">Toda segunda</option>
-                        <option value="1">Multiplos pedidos</option>
-                      </select>
-                    </b-form-group> -->
+                    <b-form-group v-if="company.multiple_order == 1" label="Período de envio" class="has-float-label mb-4">
+                      <b-form-input v-model="company.days_sent" type="text" placeholder="Nome da empresa" />
+                    </b-form-group>
                   </b-colxx>
                 </b-row>
             </b-card>
