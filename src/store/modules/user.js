@@ -104,9 +104,6 @@ export default {
           }
         )
     },
-
-
-
     /*
        return await auth.(resetPasswordCode, newPassword)
         .then(user => user)

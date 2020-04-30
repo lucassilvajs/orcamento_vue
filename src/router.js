@@ -65,7 +65,7 @@ const routes = [
       {
         path: "/app/sac/view/:id",
         component: () =>
-          import("./views/sac/Show")
+          import("./views/sac/View")
       },
       {
         path: "/app/sac/new",

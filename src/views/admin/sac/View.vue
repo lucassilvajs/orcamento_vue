@@ -29,6 +29,7 @@
                 <th>#</th>
                 <th>Nota</th>
                 <th>Colaborador</th>
+                <th>Solicitante</th>
                 <th>Empresa</th>
                 <th>CNPJ</th>
                 <th>Data</th>
@@ -41,6 +42,7 @@
                 <td>{{sac.id}}</td>
                 <td>{{sac.nota}}</td>
                 <td>{{sac.colaborador}}</td>
+                <td>{{sac.solicitante}}</td>
                 <td>{{sac.name}}</td>
                 <td>{{sac.cnpj}}</td>
                 <td>{{sac.date | date}}</td>
@@ -67,6 +69,7 @@
       <b>Colaborador: </b>{{modal.colaborador}}<br />
       <b>empresa: </b>{{modal.name.split('-')[0]}}<br />
       <b>Solicitação: </b>{{modal.date | date}}<br />
+      <b>O que aconteceu:</b> {{modal.about}} <br />
       <b>Nota:</b> <br />
       <img class="w-100" :src="baseURL + modal.image" alt="">
       <hr class="my-3">

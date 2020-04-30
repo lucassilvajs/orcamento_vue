@@ -10,7 +10,7 @@
         :key="`conversation${index}`"
       >
         <a class="d-flex" href="#" @click.prevent="selectConversation(conversation)">
-          <img
+          <img data-image="imagem"
             :alt="otherUser(conversation.users).title"
             :src="otherUser(conversation.users).img"
             class="img-thumbnail border-0 rounded-circle mr-3 list-thumbnail align-self-center xsmall"
@@ -40,7 +40,7 @@ export default {
       this.$emit('select-conversation', otherUser, conversation.messages)
     },
     otherUser (users) {
-      var otherUserId = users.find(x => x !== this.currentUser.id)
+      var otherUserId = users.find(x => x !== this.currentUser.user.id)
       return this.contacts.find(x => x.id === otherUserId)
     }
   },

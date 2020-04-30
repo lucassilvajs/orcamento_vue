@@ -69,7 +69,7 @@
                 </b-row>
             </b-card>
 
-            <b-card class="mb-4" title="Tamanho">
+            <b-card class="mb-4" title="Tamanho" v-if="product.type == 1">
                 <b-row>
                     <b-colxx lg="3">
                         <div class="alert alert-info"><i class="glyph-icon simple-icon-info"></i> Insira uma medida e tecle Enter</div>

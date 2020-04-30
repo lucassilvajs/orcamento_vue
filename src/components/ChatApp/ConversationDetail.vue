@@ -30,7 +30,7 @@
       ref="chatArea"
     >
       <div v-for="(message, index) in messages" :key="`message${index}`">
-        <b-card
+        <b-card style="max-width:500px;"
           no-body
           :class="{
             'd-inline-block mb-3': true,
@@ -82,6 +82,8 @@
               </div>
             </div>
             <div class="chat-text-left">
+              <img v-if="message.attachment && message.type == 'image'" :src="message.attachment" alt="Anexo" class="w-100">
+              <iframe v-if="message.attachment && message.type == 'file'" :src="message.attachment" frameborder="0" class="w-100"></iframe>
               <p class="mb-0 text-semi-muted">{{ message.text }}</p>
             </div>
           </b-card-body>

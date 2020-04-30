@@ -81,6 +81,9 @@
                           <div class="simple-icon-pencil"/>
                         </button>
                       </span>
+                      <a v-if="it.rastreio" target="_blank" :href="`https://www.linkcorreios.com.br/${it.rastreio.codigoRastreamento}`" class="btn btn-success">
+                          <div class="simple-icon-envelope"/>
+                      </a>
                       <!-- <span @click="pc.order = it.id">
                         <button v-if="it.status == 'Aprovado' && !it.attr.pc && it.pedidoCompra != 222 && !consultor" class="btn btn-outline-warning" v-b-modal.modalright1>
                           <div class="simple-icon-doc"/>

@@ -7,20 +7,16 @@
 			<img v-if="img && !hasImage" :src="img" alt="" style="width:100%;">
 
       <iframe v-if="hasImage" :src="img" frameborder="0" style="width:100%; height:400px"></iframe>
-      <!-- <button type="button" class="btn btn-light btn-sm changeCam" @click="changeCamera" style="z-index:10;">
-				<div class="glyph-icon iconsminds-arrow-around"></div>
-			</button> -->
-			<vue-web-cam v-if="!img" ref="web"
-				:device-id="deviceId"
-				@started="onStarted"
-				@stopped="onStopped"
-				@error="onError"
-				@cameras="onCameras"
-				@camera-change="onCameraChange"
-			/>
+      <div class="area">
+        <video v-if="!img" autoplay="true" id="webCamera" >
+        </video>
+
+        <img id="imagemConvertida"/>
+        <p id="caminhoImagem" class="caminho-imagem"><a href="" target="_blank"></a></p>
+      </div>
 			<div class="controlls">
 				<div class="checkPicture" v-if="img">
-					<button type="button" class="btn btn-danger mr-2" @click="img = false">
+					<button type="button" class="btn btn-danger mr-2" @click="() => {img = false; loadCamera()}">
 						<div class="d-inline glyph-icon simple-icon-dislike"></div>
 						Tirar Outra
 					</button>
@@ -43,13 +39,10 @@
 						<span class="label">Gostei</span>
 					</b-button>
 				</div>
-				<button v-if="devices.length > 1" type="button" class="btn btn-outline-light" @click="changeCamera" style="z-index:10;">
-					<div class="glyph-icon iconsminds-arrow-around"></div>
-				</button>
 				<button type="button" v-if="img" class="btn btn-outline-light mr-2" @click="img = false">
 					<div class="glyph-icon simple-icon-trash"></div>
 				</button>
-				<button type="button" v-else class="btn btn-outline-light mr-2" @click="showCam">
+				<button type="button" v-else class="btn btn-outline-light mr-2" @click="takeSnapShot">
 					<div class="glyph-icon simple-icon-camera"></div>
 				</button>
 				<label class="btn btn-outline-light ml-2">
@@ -278,29 +271,89 @@ export default {
       }, 2000);
     },
     b64toBlob(b64Data, contentType, sliceSize) {
-        contentType = contentType || '';
-        sliceSize = sliceSize || 512;
+      contentType = contentType || '';
+      sliceSize = sliceSize || 512;
 
-        var byteCharacters = atob(b64Data);
-        var byteArrays = [];
+      var byteCharacters = atob(b64Data);
+      var byteArrays = [];
 
-        for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-            var slice = byteCharacters.slice(offset, offset + sliceSize);
+      for (var offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+          var slice = byteCharacters.slice(offset, offset + sliceSize);
 
-            var byteNumbers = new Array(slice.length);
-            for (var i = 0; i < slice.length; i++) {
-                byteNumbers[i] = slice.charCodeAt(i);
+          var byteNumbers = new Array(slice.length);
+          for (var i = 0; i < slice.length; i++) {
+              byteNumbers[i] = slice.charCodeAt(i);
+          }
+
+
+          var byteArray = new Uint8Array(byteNumbers);
+
+          byteArrays.push(byteArray);
+      }
+
+      var blob = new Blob(byteArrays, {type: contentType});
+      return blob;
+    },
+    takeSnapShot(){
+    //Captura elemento de vídeo
+      var video = document.querySelector("#webCamera");
+
+      //Criando um canvas que vai guardar a imagem temporariamente
+      var canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      var ctx = canvas.getContext('2d');
+
+      //Desenhando e convertendo as dimensões
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      //Criando o JPG
+      this.img = canvas.toDataURL('image/jpeg'); //O resultado é um BASE64 de uma imagem.
+
+      // sendSnapShot(dataURI); //Gerar Imagem e Salvar Caminho no Banco
+    },
+    loadCamera(){
+      setTimeout(() => {
+        //Captura elemento de vídeo
+        var video = document.querySelector("#webCamera");
+          //As opções abaixo são necessárias para o funcionamento correto no iOS
+          video.setAttribute('autoplay', '');
+          video.setAttribute('muted', '');
+          video.setAttribute('playsinline', '');
+            //--
+
+        if (navigator.mediaDevices.getUserMedia === undefined) {
+          navigator.mediaDevices.getUserMedia = function(constraints) {
+            var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+            if (!getUserMedia) {
+              return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
             }
-
-
-            var byteArray = new Uint8Array(byteNumbers);
-
-            byteArrays.push(byteArray);
+            return new Promise(function(resolve, reject) {
+              getUserMedia.call(navigator, constraints, resolve, reject);
+            });
+          }
         }
 
-        var blob = new Blob(byteArrays, {type: contentType});
-        return blob;
-      }
+        if (navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices.getUserMedia({audio: false, video: {facingMode: 'environment'}})
+          .then( function(stream) {
+            //Definir o elemento vídeo a carregar o capturado pela webcam
+            video.srcObject = stream;
+          })
+          .catch((error) => {
+            this.$notify("info", "Isso é necessário", "Por favor habilite o acesso a sua câmera, para prosseguirmos com as medições", {
+              duration: 3000,
+              permanent: false
+            });
+          });
+        }else{
+          this.$notify("danger", "Opsss", "O seu navegador não é compativel para fazer a medição, por favor atualize ou anexe sua imagem", {
+              duration: 3000,
+              permanent: false
+            });
+        }
+      }, 500);
+    }
 	},
 	watch: {
         camera: function(id) {
@@ -324,6 +377,7 @@ export default {
 	created() {
     this.checkImg();
     this.changeCam();
+    this.loadCamera();
 	}
 }
 </script>
@@ -362,4 +416,9 @@ export default {
 		right:15px;
 		top:15px;
 	}
+
+  #webCamera{
+    width:100%;
+    height: 500px;
+  }
 </style>

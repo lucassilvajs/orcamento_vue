@@ -11,6 +11,7 @@
                       <th>#</th>
                       <th>Colaborador</th>
                       <th>Data</th>
+                      <th>Status</th>
                       <th>Ações</th>
                   </tr>
               </thead>
@@ -19,6 +20,7 @@
                       <td>{{index + 1}}</td>
                       <td>{{item.colaborador}}</td>
                       <td>{{item.date | date}}</td>
+                      <td><span class="badge" :style="[{background: item.color}]">{{item.status}}</span></td>
                       <td>
                         <button  @click="getInfoSAC(index)" v-b-modal.modalright class="btn btn-outline-success btn-sm">
                           <div class="glyph-icon simple-icon-eye"/>

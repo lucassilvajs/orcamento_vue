@@ -57,11 +57,11 @@
                 <b-button variant="secondary" @click="hideModal('modalbackdrop')">Fechar</b-button>
             </template>
         </b-modal>
-            <div class="position-relative d-inline-block">
+            <div class="position-relative d-inline-block" v-if="awaitingOrders">
                 <b-dropdown variant="empty" size="sm" right toggle-class="header-icon notificationButton" menu-class="position-absolute mt-3 notificationDropdown" no-caret>
                     <template slot="button-content">
                         <i class="simple-icon-bell" />
-                        <span v-if="awaitingOrders.length > 0" class="count">{{awaitingOrders.length > 0 ? 1 : 0}}</span>
+                        <span v-if="awaitingOrders && awaitingOrders.length > 0" class="count">{{awaitingOrders.length > 0 ? 1 : 0}}</span>
                     </template>
                     <vue-perfect-scrollbar :settings="{ suppressScrollX: true, wheelPropagation: false }">
                         <div v-if="awaitingOrders.length > 0">
