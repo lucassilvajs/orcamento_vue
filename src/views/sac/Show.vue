@@ -25,6 +25,9 @@
                         <button  @click="getInfoSAC(index)" v-b-modal.modalright class="btn btn-outline-success btn-sm">
                           <div class="glyph-icon simple-icon-eye"/>
                         </button>
+                        <router-link v-if="false" :to="`/app/sac/view/${item.id}`" class="btn btn-outline-info btn-sm">
+                          <i class="glyph-icon iconsminds-speach-bubble"></i>
+                        </router-link>
                       </td>
                   </tr>
               </tbody>
@@ -74,6 +77,14 @@ export default {
     getInfoSAC(index) {
       this.modal = this.items[index];
     },
+    hideModal (refname) {
+          this.$refs[refname].hide()
+          console.log('hide modal:: ' + refname)
+
+          if (refname === 'modalnestedinline') {
+            this.$refs['modalnested'].show()
+          }
+        },
   },
   created(){
     this.getOrder();

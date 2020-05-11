@@ -15,13 +15,14 @@ export const localeOptions = [
 ]
 
 export const firebaseConfig = {
-  apiKey: "AIzaSyDe94G7L-3soXVSpVbsYlB5DfYH2L91aTU",
-  authDomain: "piaf-vue-login.firebaseapp.com",
-  databaseURL: "https://piaf-vue-login.firebaseio.com",
-  projectId: "piaf-vue-login",
-  storageBucket: "piaf-vue-login.appspot.com",
-  messagingSenderId: "557576321564",
-  appId: "1:557576321564:web:bc2ce73477aff5c2197dd9"
+  apiKey: "AIzaSyBv16fh1gsBGZRAqVBUdIHSD8isR5VSxrw",
+  authDomain: "idsafety-1ac31.firebaseapp.com",
+  databaseURL: "https://idsafety-1ac31.firebaseio.com",
+  projectId: "idsafety-1ac31",
+  storageBucket: "idsafety-1ac31.appspot.com",
+  messagingSenderId: "39691086084",
+  appId: "1:39691086084:web:2ce228488bf7a2c9748851",
+  measurementId: "G-TE13GVCH26"
 };
 
 

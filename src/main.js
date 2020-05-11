@@ -26,8 +26,6 @@ import VueLineClamp from 'vue-line-clamp'
 import VCalendar from 'v-calendar'
 import 'v-calendar/lib/v-calendar.min.css'
 import VueScrollTo from 'vue-scrollto'
-import firebase from 'firebase/app'
-import 'firebase/auth'
 import VueSweetalert2 from 'vue-sweetalert2';
 
 // If you don't need the styles, do not connect
@@ -73,9 +71,6 @@ Vue.use(VCalendar, {
   popoverDirection: 'bottom'
 });
 Vue.use(VueScrollTo);
-
-firebase.initializeApp(firebaseConfig);
-
 Vue.config.productionTip = false
 
 Vue.filter("numeroPreco", valor => {
@@ -97,6 +92,11 @@ Vue.filter("capitalize", valor => {
 Vue.filter("date", valor => {
   let d = new Date(valor)
   return d.toLocaleDateString('pt-BR');
+});
+
+Vue.filter("datetime", valor => {
+  let d = new Date(valor)
+  return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR');
 });
 
 export default new Vue({

@@ -110,13 +110,7 @@ export default {
         .catch(error => error);
     */
     signOut({ commit }) {
-      firebase
-        .auth()
-        .signOut()
-        .then(() => {
-          localStorage.removeItem('user')
-          commit('setLogout')
-        }, _error => { })
+      localStorage.removeItem('user')
     }
   }
 }

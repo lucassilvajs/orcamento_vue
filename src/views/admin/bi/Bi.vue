@@ -16,47 +16,62 @@
       <b-card title="Metas">
       <b-row>
         <b-colxx class="col-md-8 col-xs-12">
-        <div v-for="(s,index) in data.metrics" :key="index" class="mb-4">
-          <p class="mb-2">
-            {{ s.label }}
-            <span class="float-right text-muted">{{s.total.toFixed(2)}}/{{s.objective.toFixed(2)}}</span>
-          </p>
-          <b-progress :value="(s.total / s.objective) * 100"></b-progress>
-        </div>
+          <div v-for="(s,index) in data.metrics" :key="index" class="mb-4">
+            <p class="mb-2">
+              {{ s.label }}
+              <span class="float-right text-muted">{{s.total.toFixed(2)}}/{{s.objective.toFixed(2)}}</span>
+            </p>
+            <b-progress :value="(s.total / s.objective) * 100"></b-progress>
+          </div>
         </b-colxx>
         <b-colxx class="d-flex justify-content-center align-items-center">
-        <div class="area-price w-100">
-          <span>Faturamento:</span>
-          <h2>{{data.metrics.sales.total | numeroPreco}}</h2>
-          <div class="metrics d-flex justify-content-between">
+          <div class="area-price w-100">
+            <span>Faturamento:</span>
+            <h2>{{data.metrics.sales.total | numeroPreco}}</h2>
+            <div class="metrics d-flex justify-content-between">
 
-          <span class="item">Ano Anterior <br />
-            <span class="valor" :class="[
-              {'text-success': data.metrics.sales.progressSalesLastYear >= 0},
-              {'text-danger': data.metrics.sales.progressSalesLastYear <= 0}
-            ]">{{ parseInt(data.metrics.sales.progressSalesLastYear)}}%</span>
-            <i class="glyph-icon p-0" id="tool-month" :class="[
-              {'simple-icon-arrow-up-circle': data.metrics.sales.progressSalesLastYear >= 0},
-              {'simple-icon-arrow-down-circle': data.metrics.sales.progressSalesLastYear < 0}
-            ]"></i>
-            <b-tooltip target="tool-month"
-              placement="top"
-              :title="`Faturado no ano anterior ${(data.metrics.sales.totalLastYear).toLocaleString('pt-BR', {style: 'currency', 'currency': 'BRL'})}`">
-            </b-tooltip>
-          </span>
+            <span class="item">Ano Anterior <br />
+              <span class="valor" :class="[
+                {'text-success': data.metrics.sales.progressSalesLastYear >= 0},
+                {'text-danger': data.metrics.sales.progressSalesLastYear <= 0}
+              ]">{{ parseInt(data.metrics.sales.progressSalesLastYear)}}%</span>
+              <i class="glyph-icon p-0" id="tool-month" :class="[
+                {'simple-icon-arrow-up-circle': data.metrics.sales.progressSalesLastYear >= 0},
+                {'simple-icon-arrow-down-circle': data.metrics.sales.progressSalesLastYear < 0}
+              ]"></i>
+              <b-tooltip target="tool-month"
+                placement="top"
+                :title="`Faturado no ano anterior ${(data.metrics.sales.totalLastYear).toLocaleString('pt-BR', {style: 'currency', 'currency': 'BRL'})}`">
+              </b-tooltip>
+            </span>
 
-          <span class="item">Meta mês<br />
-            <span class="valor" :class="[
-              {'text-success': data.metrics.sales.progressSales >= 0},
-              {'text-danger': data.metrics.sales.progressSales < 0}
-            ]">{{parseInt(data.metrics.sales.progressSales)}}% </span>
-            <i class="glyph-icon p-0" :class="[
-              {'simple-icon-arrow-up-circle': data.metrics.sales.progressSales >= 0},
-              {'simple-icon-arrow-down-circle': data.metrics.sales.progressSales < 0}
-            ]"></i>
-          </span>
+            <span class="item">Meta mês<br />
+              <span class="valor" :class="[
+                {'text-success': data.metrics.sales.progressSales >= 0},
+                {'text-danger': data.metrics.sales.progressSales < 0}
+              ]">{{parseInt(data.metrics.sales.progressSales)}}% </span>
+              <i class="glyph-icon p-0" :class="[
+                {'simple-icon-arrow-up-circle': data.metrics.sales.progressSales >= 0},
+                {'simple-icon-arrow-down-circle': data.metrics.sales.progressSales < 0}
+              ]"></i>
+            </span>
+            </div>
           </div>
-        </div>
+        </b-colxx>
+      </b-row>
+      <b-row class="mt-5">
+        <b-colxx>
+          <select v-model="mes" name="" id="" class="form-control float-right">
+          <option v-for="(month, index) in [{m:'Janeiro', i: '1'}, {m:'Fevereiro', i: '2'}, {m:'Março', i: '3'}, {m:'Abril', i: '4'}, {m:'Maio', i: '5'}, {m:'Junho', i: '6'}, {m:'Julho', i: '7'}, {m:'Agosto', i: '8'}, {m:'Setembro', i: '9'}, {m:'Outubro', i: '10'}, {m:'Novembro', i: '11'}, {m:'Dezembro', i: '12'},]" :value="month.i" :key="index">{{month.m}}</option>
+        </select>
+        </b-colxx>
+        <b-colxx>
+          <select v-model="ano" class="form-control float-right">
+          <option v-for="y in years()" :key="y" :value="y">{{y}}</option>
+        </select>
+        </b-colxx>
+        <b-colxx>
+          <button class="btn btn-outline-success btn-sm float-right" @click="getBiDinamic">Buscar</button>
         </b-colxx>
       </b-row>
       </b-card>
@@ -287,6 +302,8 @@ export default {
   },
   data() {
     return {
+      mes: 1,
+      ano: 2020,
       consult_select: 0,
       values:  [
     {
@@ -358,9 +375,31 @@ export default {
       metasCompany: 0
     }
   },
+  computed: {
+    },
   methods: {
+    years() {
+      const d = new Date();
+      let years = [];
+      for(let i=2015; i <= d.getFullYear(); i++){
+        years.push(i);
+      }
+
+      return years;
+    },
     async getBI() {
       const response = await api.get('admin/bi');
+      this.data = response.data.data
+
+      const list = await api.get('admin/bi/list');
+      this.list = list.data.data
+    },
+    async getBiDinamic() {
+      const response = await api.get('admin/bi', {
+        params: {
+          date: `${this.ano}-${this.mes}`
+        }
+      });
       this.data = response.data.data
 
       const list = await api.get('admin/bi/list');

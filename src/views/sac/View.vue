@@ -2,19 +2,50 @@
 <div>
     <b-row class="app-row">
         <b-colxx xxs="12" class="chat-app">
-            <conversation-detail v-if="isLoadContacts && isLoadConversations && otherUser!=null" key="conversation" :current-user='currentUser' :other-user='otherUser' :messages='conversationMessages' />
+
+            <div v-if="message.attachment" class="file-area d-flex justify-content-center align-items-center flex-column">
+              <div class="pre-view">
+                <span class="pre-close mr-4" @click="message.attachment = ''">X</span>
+                Pre visualização
+              </div>
+              <div class="file">
+                <i class="simple-icon-doc"></i>
+              </div>
+              <p class="text-white pt-2">{{message.attachment.name}}</p>
+            </div>
+            <conversation-detail :logged="this.$route.path.split('/')[1]" v-if="isLoadContacts && isLoadConversations && otherUser!=null" key="conversation" :current-user='currentUser' :other-user='otherUser' :messages='conversationMessages' />
             <div v-else class="loading" key="conversationLoading"></div>
         </b-colxx>
     </b-row>
     <div class="chat-input-container d-flex justify-content-between align-items-center">
-        <b-input class="flex-grow-1" type="text" placeholder="Envie sua mensagem" v-model="message" @keyup.native.enter="sendMessage" />
+        <b-input class="flex-grow-1" type="text" placeholder="Envie sua mensagem" v-model="message.text" @keyup.native.enter="sendMessage" />
         <div>
-            <b-button variant="outline-primary" class="icon-button large ml-1">
-                <i class="simple-icon-paper-clip" />
-            </b-button>
+            <input type="file" name="" @change="setFileMessage" id="send-attachment" class="d-none">
+            <label for="send-attachment" type="button" class="btn icon-button large ml-1 btn-outline-primary">
+              <i class="simple-icon-paper-clip"></i>
+            </label>
             <b-button variant="primary" class="icon-button large ml-1" @click="sendMessage">
                 <i class="simple-icon-arrow-right" />
             </b-button>
+
+            <b-button variant="primary" :disabled="processing || message.text.trim().lenght == 0" :class="{'icon-button large ml-1': true,
+                'show-spinner': processing,
+                'show-success': !processing}" @click="sendMessage">
+                <span class="spinner d-inline-block">
+                    <span class="bounce1"></span>
+                    <span class="bounce2"></span>
+                    <span class="bounce3"></span>
+                </span>
+                <span class="icon success">
+                    <i class="simple-icon-arrow-right" />
+                </span>
+                <span class="icon fail">
+                    <i class="simple-icon-exclamation"></i>
+                </span>
+                <span class="label"><i class="simple-icon-arrow-right" /></span>
+            </b-button>
+
+
         </div>
     </div>
     <application-menu>
@@ -23,19 +54,21 @@
                 <div class="pt-4 spaced-content pb-0 mt-2">
 
                 </div>
-                <div class="px-2" v-if="true">
-                  <b>Título: </b>Meu óculos quebrado <br />
-                  <b>Nota: </b>123456
+                <div class="px-2" v-if="sac">
+                  <span style="padding:4px 6px; color:#fff; font-weight:bold; margin:9px 0;" :style="{background: sac.color}">{{sac.status}}</span><br /><br>
+                  <div v-if="sac.colaborador"><b>Colaborador: </b>{{sac.colaborador}} <br /></div>
+                  <div v-if="sac.number"><b>Nota: </b>{{sac.number}} <br /></div>
+                  <img class="w-100" :src="baseURL+sac.image" :alt="sac.colaborador">
                 </div>
                 <div v-else class="loading" key="conversationListLoading"></div>
             </b-tab>
-            <b-tab title="Solicitações" title-item-class="w-50 text-center" no-body class="chat-app-tab-pane">
+            <!-- <b-tab title="Solicitações" title-item-class="w-50 text-center" no-body class="chat-app-tab-pane">
                 <div class="pt-4 spaced-content pb-0 mt-2">
 
                 </div>
                 <contact-list v-if="isLoadContacts" key="contactList" :data="contactsSearchResult" />
                 <div v-else class="loading" key="contactListLoading"></div>
-            </b-tab>
+            </b-tab> -->
         </b-tabs>
     </application-menu>
 </div>
@@ -45,12 +78,15 @@
 import {
     mapGetters,
     mapActions
-} from 'vuex'
-import ApplicationMenu from '@/components/Common/ApplicationMenu'
-import ContactList from '@/components/ChatApp/ContactList'
-import ConversationList from '@/components/ChatApp/ConversationList'
-import ConversationDetail from '@/components/ChatApp/ConversationDetail'
-
+} from 'vuex';
+import Firebase from 'firebase';
+import {api, baseURL, firebaseConfig} from '@/constants/config';
+import ApplicationMenu from '@/components/Common/ApplicationMenu';
+import ContactList from '@/components/ChatApp/ContactList';
+import ConversationList from '@/components/ChatApp/ConversationList';
+import ConversationDetail from '@/components/ChatApp/ConversationDetail';
+import Compressor from 'compressorjs';
+const fireApp = Firebase.initializeApp(firebaseConfig);
 export default {
     components: {
         'application-menu': ApplicationMenu,
@@ -61,7 +97,14 @@ export default {
     data() {
         return {
             tabIndex: 0,
-            message: '',
+            processing: false,
+            sac: null,
+            message: {
+              text: '',
+              attachment: ''
+            },
+            conversationMessages: [],
+            file: '',
             searchKey: '',
             isLoadCurrentConversation: false,
             otherUser: {
@@ -70,36 +113,6 @@ export default {
               "date": "Today",
               "id": "2"
             },
-            conversationMessages: [
-              {
-                  "sender": "1",
-                  "time": "23:59",
-                  "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at sem ac tellus pellentesque porttitor condimentum quis lacus."
-              },
-              {
-                  "sender": "1",
-                  "time": "23:59",
-                  "attachment": "https://api.idsafety.com.br/public/upload/face/35117b7f4423adbde977b6a2ac5c0cf2.jpgjpeg",
-                  "type": "image"
-              },
-              {
-                "sender": "2",
-                  "time": "23:59",
-                  "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at sem ac tellus pellentesque porttitor condimentum quis lacus.",
-                  "attachment": "https://api.idsafety.com.br/public/upload/recipe/d6cbc756dcff868fb357caee49a813da.pdf",
-                  "type": "file"
-              },
-              {
-                  "sender": "2",
-                  "time": "23:59",
-                  "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at sem ac tellus pellentesque porttitor condimentum quis lacus."
-              },
-              {
-                  "sender": "1",
-                  "time": "23:59",
-                  "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at sem ac tellus pellentesque porttitor condimentum quis lacus."
-              }
-            ],
             currentUser: {
               "title": "Cliente",
               "img": "/assets/img/profile-pic-l-5.jpg",
@@ -112,23 +125,120 @@ export default {
         }
     },
     computed: {
-        ...mapGetters(['error', 'contacts', 'conversations'])
+        ...mapGetters(['error', 'contacts', 'conversations']),
     },
     methods: {
         ...mapActions(['getContacts', 'searchContacts', 'getConversations']),
-        selectConversation(otherUser, messages) {
-            this.otherUser = otherUser
-            this.conversationMessages = messages
+        generateSerial(len) {
+            var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+            var string_length = 10;
+            var randomstring = '';
+
+            for (var x=0;x<string_length;x++) {
+
+                var letterOrNumber = Math.floor(Math.random() * 2);
+                if (letterOrNumber == 0) {
+                    var newNum = Math.floor(Math.random() * 9);
+                    randomstring += newNum;
+                } else {
+                    var rnum = Math.floor(Math.random() * chars.length);
+                    randomstring += chars.substring(rnum,rnum+1);
+                }
+
+            }
+            return randomstring;
         },
-        sendMessage() {
+        async sendMessage() {
+          this.processing = true;
           const date = new Date()
-          let message = {
-            sender: "1",
-            time: date.getHours() + ':' + date.getMinutes(),
-            text: this.message
+          let type = '';
+          let ext = '';
+          if(this.message.attachment) {
+            let fileType = this.message.attachment.type.split('/');
+            type = fileType[0] == 'image' ? 'image' : 'file'
+            ext = fileType[fileType.length - 1]
           }
-          this.conversationMessages.push(message)
-          this.message = ''
+          let message = {
+            sender: this.$route.path.split('/')[1],
+            time: date.getTime(),
+            text: this.message.text,
+            attachment: this.file,
+            type,
+            ext
+          }
+
+          message.attachment = '';
+          let idSend = JSON.parse(window.localStorage.getItem('user')).id;
+          console.log(type);
+          const sac = this.$route.params.id;
+          let fd = new FormData();
+          if(this.message.attachment && type == 'image') {
+            new Compressor(this.message.attachment, {
+              maxWidth: 1024,
+              maxHeight:1024,
+              quality: 0.7,
+              success: async (result) => {
+                fd.append('file', result, 'file.'+ext);
+                const response = await api.post(`saveFile/attachment`, fd)
+                message.attachment = response.data.data
+                message.type = 'image';
+                fireApp.database().ref(`/sac/${sac}/`).push({...message, idSend});
+              }
+            })
+          }else if(this.message.attachment && type != 'image'){
+            fd.append('file', this.message.attachment);
+            const response = await api.post(`saveFile/attachment`, fd)
+            message.attachment = response.data.data
+            message.type = 'file';
+            fireApp.database().ref(`/sac/${sac}/`).push({...message, idSend});
+          }else{
+            message = {
+              time: message.time,
+              sender: message.sender,
+              text: message.text,
+              idUserSend: idSend
+            }
+            fireApp.database().ref(`/sac/${sac}/`).push({...message, idSend});
+          }
+
+          console.log(message);
+
+
+          this.message.attachment = '';
+          this.message.text = '';
+          this.file = '';
+          this.processing = false;
+
+        },
+        setFileMessage(e){
+          this.message.attachment = '';
+			    var file = new FileReader();
+          file.onload = (el) => {
+            this.file = el.target.result
+          };
+          this.message.attachment = e.target.files[0];
+          file.readAsDataURL(e.target.files[0]);
+        },
+        getconversationMessages(){
+          const sac = this.$route.params.id;
+          fireApp.database().ref(`/sac/${sac}/`).on('value', (snapshot) => {
+            console.log(snapshot.val());
+            this.conversationMessages = snapshot.val();
+          });
+        },
+        async getSac(){
+          const sac = this.$route.params.id;
+          const response = await api.get(`sac`);
+          if(response.data.status != 'success') {
+            this.$notify(response.data.status, "Opsss...", response.data.message, {
+              duration: 3000,
+              permanent: false
+            });
+
+            this.$route.push('/app/sac');
+          }else{
+            this.sac = response.data.data.filter(r => r.id == sac)[0];
+          }
         }
     },
     mounted() {
@@ -138,6 +248,8 @@ export default {
         })
         this.getConversations(this.currentUser.id)
         document.body.classList.add("no-footer");
+        this.getconversationMessages();
+        this.getSac();
     },
     beforeDestroy() {
         document.body.classList.remove("no-footer");
@@ -155,3 +267,44 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.file-area{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 5;
+  background: #afafaf;
+}
+
+.file-area .file {
+      background: #00b3b7;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+    color: #eee;
+}
+
+.pre-view{
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 15px;
+  background: #00b3b7;
+  width: 45%;
+  color: #fff;
+  font-size: 1.25rem;
+}
+
+.pre-close {
+  color: #eee;
+  cursor:pointer;
+}
+
+.pre-close:hover{
+  color: #fff;
+}
+</style>

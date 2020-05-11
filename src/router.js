@@ -141,10 +141,10 @@ const routes = [
       {
         path: "/admin/sac",
         component: () =>
-          import(/* webpackChunkName: "dashboards" */ "./views/admin/sac/View")
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/sac/Show")
       },
       {
-        path: "/admin/sac/:id",
+        path: "/admin/sac/view/:id",
         component: () =>
         import(/* webpackChunkName: "dashboards" */ "./views/admin/sac/View")
       },
