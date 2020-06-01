@@ -46,6 +46,7 @@
                 <thead>
                   <tr>
                     <th>#</th>
+                    <th>Colaborador</th>
                     <th v-if="consultor">Empresa</th>
                     <th v-if="consultor">CNPJ</th>
                     <th v-if="$route.path.split('/')[2] != 'proposal'">Nota</th>
@@ -59,6 +60,7 @@
                 <tbody>
                   <tr v-for="(it, index) in items" :key="index">
                     <td>{{it.id}}</td>
+                    <td>{{it.name}}</td>
                     <td v-if="consultor">{{it.company}}</td>
                     <td v-if="consultor">{{it.cnpj}}</td>
                     <td v-if="$route.path.split('/')[2] != 'proposal'">{{it.nota}}</td>
@@ -81,7 +83,7 @@
                           <div class="simple-icon-pencil"/>
                         </button>
                       </span>
-                      <a v-if="it.rastreio" target="_blank" :href="`https://www.linkcorreios.com.br/${it.rastreio.codigoRastreamento}`" class="btn btn-success">
+                      <a v-if="it.rastreio && false" target="_blank" :href="`https://www.linkcorreios.com.br/${it.rastreio.codigoRastreamento}`" class="btn btn-success">
                           <div class="simple-icon-envelope"/>
                       </a>
                       <!-- <span @click="pc.order = it.id">

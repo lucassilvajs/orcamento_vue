@@ -64,25 +64,6 @@ export default {
               }).filter(r => r));
             }
 
-            console.log(save)
-            // console.log(this.tratament.map((element) => {
-            //   return element[0].map(el => {
-            //     return el.checked
-            //   });
-            // } ));
-            // if(this.tratament['lens'].filter(r => r.checked).length == 0){
-            //   this.$notify("error", "Opsss...", "Você precisa selecionar uma lente", {
-            //       duration: 3000,
-            //       permanent: false
-            //   });
-            // }else{
-            //   let save = [];
-            //   ["lens", "diopter", "tratament"].forEach( (el) => {
-            //       save.push(this.tratament[el].map( (r) => {
-            //           if(r.checked) return r
-            //       }).filter(r => r))
-            //   });
-
               let order = window.localStorage.getItem('order');
               if(order){
                   order = JSON.parse(order);
@@ -96,10 +77,15 @@ export default {
             // }
         },
         getLens: async function()
-		{
-			const lens = await api.get("/lens");
-			this.tratament = lens.data.data
-		}
+        {
+          let {company} = JSON.parse(window.localStorage.getItem('order'));
+          const lens = await api.get("/lens", {
+            params: {
+              company
+            }
+          });
+          this.tratament = lens.data.data
+        }
 	},
 	created() {
         this.getLens();

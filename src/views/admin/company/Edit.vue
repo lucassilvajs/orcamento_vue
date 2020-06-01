@@ -157,6 +157,22 @@
                                   :title="(restrictions.colors.indexOf(`${pro.id}_${colors.name}`) >= 0 ? 'Permitir' : 'Restringir')+` variação`" ></b-tooltip>
                               </div>
                             </div>
+
+
+                            <div class="sizes" v-for="(attr, iAttr) in pro.variation.attributes" :key="iAttr">
+                              <p class="mb-0">{{attr.title}}</p>
+                              <div class="d-flex justify-content-between align-items-center my-2 area py-1" v-for="(val, iVal) in attr.value" :key="iVal">
+                                <span> {{val.name}}</span>
+
+                                 <div v-if="true" class="text-success cursor-pointer">
+                                  <i class="glyph-icon simple-icon-check p-0"></i>
+                                </div>
+
+                                <div v-else class="text-danger cursor-pointer">
+                                  <i class="glyph-icon simple-icon-trash p-0"></i>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                       </b-card-body>
                     </b-card>

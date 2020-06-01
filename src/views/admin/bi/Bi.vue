@@ -19,7 +19,7 @@
           <div v-for="(s,index) in data.metrics" :key="index" class="mb-4">
             <p class="mb-2">
               {{ s.label }}
-              <span class="float-right text-muted">{{s.total.toFixed(2)}}/{{s.objective.toFixed(2)}}</span>
+              <span class="float-right text-muted" v-if="s.objective > 5">{{s.total.toFixed(2)}}/{{s.objective.toFixed(2)}}</span>
             </p>
             <b-progress :value="(s.total / s.objective) * 100"></b-progress>
           </div>
@@ -62,7 +62,18 @@
       <b-row class="mt-5">
         <b-colxx>
           <select v-model="mes" name="" id="" class="form-control float-right">
-          <option v-for="(month, index) in [{m:'Janeiro', i: '1'}, {m:'Fevereiro', i: '2'}, {m:'Março', i: '3'}, {m:'Abril', i: '4'}, {m:'Maio', i: '5'}, {m:'Junho', i: '6'}, {m:'Julho', i: '7'}, {m:'Agosto', i: '8'}, {m:'Setembro', i: '9'}, {m:'Outubro', i: '10'}, {m:'Novembro', i: '11'}, {m:'Dezembro', i: '12'},]" :value="month.i" :key="index">{{month.m}}</option>
+          <option v-for="(month, index) in [{m:'Janeiro', i: '1'},
+            {m:'Fevereiro', i: '2'},
+            {m:'Março', i: '3'},
+            {m:'Abril', i: '4'},
+            {m:'Maio', i: '5'},
+            {m:'Junho', i: '6'},
+            {m:'Julho', i: '7'},
+            {m:'Agosto', i: '8'},
+            {m:'Setembro', i: '9'},
+            {m:'Outubro', i: '10'},
+            {m:'Novembro', i: '11'},
+            {m:'Dezembro', i: '12'}]" :value="month.i" :key="index">{{month.m}}</option>
         </select>
         </b-colxx>
         <b-colxx>
@@ -303,33 +314,8 @@ export default {
   data() {
     return {
       mes: 1,
-      ano: 2020,
+      ano: 2015,
       consult_select: 0,
-      values:  [
-    {
-      id: 18,
-      title: "Bebinca",
-      img: "/assets/img/bebinca-thumb.jpg",
-      category: "Desserts",
-      status: "PROCESSED",
-      statusColor: "secondary",
-      description: "Homemade cheesecake with fresh berries and mint",
-      sales: 574,
-      stock: 16,
-      date: "17.02.2020"
-    },
-    {
-      id: 18,
-      title: "Bebinca",
-      img: "/assets/img/bebinca-thumb.jpg",
-      category: "Desserts",
-      status: "PROCESSED",
-      statusColor: "secondary",
-      description: "Homemade cheesecake with fresh berries and mint",
-      sales: 574,
-      stock: 16,
-      date: "17.02.2020"
-    }],
       glideIconsOption: {
         gap: 5,
         perView: 3,
@@ -376,8 +362,13 @@ export default {
     }
   },
   computed: {
-    },
+  },
   methods: {
+    getmes() {
+      const d = new Date();
+      this.mes = d.getMonth()+1;
+      this.ano = d.getFullYear();
+    },
     years() {
       const d = new Date();
       let years = [];
@@ -465,6 +456,7 @@ export default {
   },
   created() {
     this.getBI();
+    this.getmes();
   }
 }
 </script>

@@ -15,6 +15,7 @@
                 <b-dropdown-item @click="alertAction('Deseja mesmo aprovar e emitir o PV das propostas selecionadas?', 'approved','pv')">Aprovar e emitir PV</b-dropdown-item>
                 <b-dropdown-item @click="alertAction('Deseja mesmo reprovar as propostas selecionadas?','reproved','pv_nf')">Reprovar</b-dropdown-item>
                 <b-dropdown-item @click="alertAction('Deseja mesmo reenviar as propostas selecionadas?','reproved','resend')">Reenviar</b-dropdown-item>
+                <b-dropdown-item @click="alertActionDelete()">Deletar pedidos</b-dropdown-item>
             </b-dropdown>
         </b-button-group>
     </div>
@@ -97,6 +98,7 @@
                   <button @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-success">
                     <div class="simple-icon-doc"/>
                   </button>
+                  <button class="btn btn-outline-danger" @click="deleteOrder(item.id)"><div class="simple-icon-trash"/></button>
                 </td>
               </tr>
             </tbody>
@@ -213,6 +215,79 @@ export default {
         this.$refs['modalnested'].show()
       }
     },
+
+    async deleteOrder(id){
+      this.$swal.fire({
+        title: "Você está certo disso?",
+        text: "Você deseja realmente deletar esse pedido?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: 'Deletar',
+        confirmButtonColor: '#d33',
+        cancelButtonText: "Cancelar",
+        showLoaderOnConfirm: true,
+        preConfirm: async (login) => {
+            id = [id];
+
+            if(id.length > 0){
+              const response = await api.put('/admin/order/multidelete', {id});
+              return response.data;
+            }else{
+              return {
+                status: 'error',
+                title: "Você não selecionou nenhum pedido"
+              }
+            }
+
+        },
+        allowOutsideClick: () => !this.$swal.isLoading()
+      }).then((result) => {
+        this.$swal.fire({
+          text: result.value.message,
+          icon: result.value.status == 'success' ? 'success' : 'warning'
+        });
+        this.getOrder();
+      })
+    },
+
+    async alertActionDelete(){
+      this.$swal.fire({
+        title: "Você está certo disso?",
+        text: "Você deseja realmente deletar os pedidos selecionados",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: 'Deletar',
+        confirmButtonColor: '#d33',
+        cancelButtonText: "Cancelar",
+        showLoaderOnConfirm: true,
+        preConfirm: async (login) => {
+            let id = [];
+            this.items.filter(r => r.checked).forEach(el => {
+              id.push(el.id)
+            });
+
+            if(id.length > 0){
+              const response = await api.put('/admin/order/multidelete', {id});
+              return response.data;
+            }else{
+              return {
+                status: 'error',
+                title: "Você não selecionou nenhum pedido"
+              }
+            }
+
+        },
+        allowOutsideClick: () => !this.$swal.isLoading()
+      }).then((result) => {
+        this.$swal.fire({
+          text: result.value.message,
+          icon: result.value.status == 'success' ? 'success' : 'warning'
+        });
+        this.getOrder();
+      })
+
+    },
+
     async alertAction(message, status, action){
       await this.$swal.fire({
         title: `O que você acha?`,
