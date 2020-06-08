@@ -62,7 +62,7 @@ export default {
 	},
 	methods: {
 		setProduct: function (index) {
-			if(!this.products.data[index].colorSelected || !this.products.data[index].sizeSelected){
+			if((!this.products.data[index].colorSelected || !this.products.data[index].sizeSelected) && (!this.products.data[index].attributes)){
 				this.$notify("error", 'Opsss.!!!', "Você precisa selecionar o tamanho e a cor do seu óculos", {
 					duration: 3000,
 					permanent: false
@@ -79,7 +79,7 @@ export default {
 				name: this.products.data[index].name,
 				color: this.products.data[index].colorSelected,
 				size: this.products.data[index].sizeSelected,
-        image: this.products.data[index].color.filter(color => color.name == this.products.data[index].colorSelected)[0].image,
+        image: this.products.data[index].colorSelected ? this.products.data[index].color.filter(color => color.name == this.products.data[index].colorSelected)[0].image : '',
         attributes: this.products.data[index].attributes
 			};
 			window.localStorage.setItem('order',JSON.stringify(order));

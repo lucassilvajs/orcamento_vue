@@ -131,6 +131,9 @@
       <div v-for="item in order.attr.lens" :key="item.code">
         <b>{{item.type}}</b> {{item.name}}
       </div>
+      <div v-for="attr in order.attr.product.attributes" :key="attr.label">
+        <b>{{attr.label}}: </b>{{attr.select}}
+      </div>
       <div v-if="order.attr.measure">
         <b>DP:</b> {{order.attr.measure.pupillary_distance}}<br />
         <b>ALT:</b> {{order.attr.measure.pupillary_height}}<br />

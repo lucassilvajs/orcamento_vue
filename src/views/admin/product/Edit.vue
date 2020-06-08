@@ -82,6 +82,49 @@
                     </b-colxx>
                 </b-row>
             </b-card>
+
+            <b-card class="mb-4" title="Atributos">
+                {{product}}
+                <b-row v-for="(attr, index) in product.attributes" :key="index">
+                    <b-colxx>
+                        <b-form-group label="Nome do Atributo" class="has-float-label mb-4">
+                            <b-form-input v-model="product.attr[index].name" type="text" placeholder="Nome do Produto" />
+                        </b-form-group>
+                    </b-colxx>
+                    <b-colxx>
+                        <b-form-group label="Descrição" class="has-float-label mb-4">
+                            <b-form-input v-model="product.attr[index].label" type="text" placeholder="Nome do Produto" />
+                        </b-form-group>
+                    </b-colxx>
+                    <b-colxx>
+                        <b-form-group label="Valores" class="has-float-label mb-4">
+                        </b-form-group>
+                    </b-colxx>
+                    <div width="80">
+                        <button class="btn btn-danger float-right">-</button>
+                    </div>
+                </b-row>
+                <b-row>
+                    <b-colxx>
+                        <b-form-group label="Nome do Atributo" class="has-float-label mb-4">
+                            <b-form-input type="text" placeholder="Nome do Produto" />
+                        </b-form-group>
+                    </b-colxx>
+                    <b-colxx>
+                        <b-form-group label="Descrição" class="has-float-label mb-4">
+                            <b-form-input type="text" placeholder="Nome do Produto" />
+                        </b-form-group>
+                    </b-colxx>
+                    <b-colxx>
+                        <b-form-group label="Valores" class="has-float-label mb-4">
+                            <input-tag></input-tag>
+                        </b-form-group>
+                    </b-colxx>
+                    <div width="80">
+                        <button class="btn btn-success float-right">+</button>
+                    </div>
+                </b-row>
+            </b-card>
         </b-colxx>
         <b-colxx>
             <button class="btn btn-success float-right" @click="editProduct">Editar Produto</button>
@@ -221,7 +264,6 @@ export default {
             this.product = response.data.data;
         },
         editColor(index){
-          console.log('INdex', index)
           let i = this.product.colors[index];
           this.color = i
           this.color.index = index;
