@@ -392,7 +392,12 @@ export default {
             this.restrictions = this.company.restrictions;
         },
         async getAllProducts() {
-          const response = await api.get('admin/product');
+          let company = this.$route.params.id;
+          const response = await api.get('admin/product', {
+            params: {
+              company
+            }
+          });
           let vv = this.company
           this.allProduct = response.data.data.map(function(r) {
             if(vv.dynamic[r.id]){

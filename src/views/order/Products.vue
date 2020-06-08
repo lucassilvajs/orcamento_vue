@@ -15,13 +15,13 @@
 							<form @submit.prevent="setProduct(i)">
 								<p class="mb-2 card-subtitle">{{pro.name}}</p>
 								<div class="separator mb-2"></div>
-									<select v-model="pro.sizeSelected" name="" id="" class="form-control mb-2">
+									<select v-if="pro.size" v-model="pro.sizeSelected" name="" id="" class="form-control mb-2">
 										<option value="">Selecione o tamanho</option>
 										<option v-for="(s, ci) in pro.size" :key="ci">
 											{{s}} MM
 										</option>
 									</select>
-									<select v-model="pro.colorSelected" name="" id="" class="form-control">
+									<select v-if="pro.color" v-model="pro.colorSelected" name="" id="" class="form-control">
 										<option value="">Selecione a cor</option>
 										<option v-for="(color, ci) in pro.color" :key="ci">
 											{{color.name}}
