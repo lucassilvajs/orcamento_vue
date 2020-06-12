@@ -1,5 +1,6 @@
 <template>
 	<div style="width:100%">
+
 		<select  v-if="devices.length > 0" v-model="deviceId" name="" id="" class="d-none">
 			<option v-for="device in devices" :selectFirstDevice="true" :value="device.deviceId" :key="device.deviceId">{{device.label.indexOf('front') >= 0 ? 'Camera Frontal' : 'Camera Traseira'}}</option>
 		</select>
@@ -8,6 +9,9 @@
 
       <iframe v-if="hasImage" :src="img" frameborder="0" style="width:100%; height:400px"></iframe>
       <div class="area">
+        <div class="counter">
+          <span class="count">{{timeAwait}}</span>
+        </div>
         <video v-if="!img" autoplay="true" id="webCamera" >
         </video>
 
@@ -69,6 +73,7 @@ export default {
 			uploadError: false,
       hasImage: false,
       fileObject: null,
+      timeAwait: 5
 		}
 	},
 	props: ["target", "sac"],
@@ -79,6 +84,9 @@ export default {
 	computed: {
         device: function() {
             return this.devices.find(n => n.deviceId === this.deviceId);
+        },
+        totem() {
+          return JSON.parse(window.localStorage.getItem('user')).user.totem;
         }
     },
 	methods: {
@@ -296,19 +304,45 @@ export default {
     },
     takeSnapShot(){
     //Captura elemento de vídeo
-      var video = document.querySelector("#webCamera");
 
-      //Criando um canvas que vai guardar a imagem temporariamente
-      var canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      var ctx = canvas.getContext('2d');
+      document.querySelector('.count').classList.add('flash');
+      const timer = JSON.parse(window.localStorage.getItem('user')).user.totem
+      console.log(timer)
+      if(!timer) {
+        console.log('f')
+        this.timeAwait = 0;
+        document.querySelector('.counter').classList.add('d-none');
+        document.querySelector('.counter').classList.remove('d-flex');
+      }else{
+        console.log('t')
+        this.timeAwait = 5;
+        document.querySelector('.counter').classList.remove('d-flex');
+        document.querySelector('.counter').classList.add('d-flex');
+      }
 
-      //Desenhando e convertendo as dimensões
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      let inter = setInterval(() => {
+        this.timeAwait -= 1;
+      }, 1000);
+      setTimeout(() => {
+        clearInterval(inter);
 
-      //Criando o JPG
-      this.img = canvas.toDataURL('image/jpeg'); //O resultado é um BASE64 de uma imagem.
+        var video = document.querySelector("#webCamera");
+        //Criando um canvas que vai guardar a imagem temporariamente
+        var canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        var ctx = canvas.getContext('2d');
+  
+        //Desenhando e convertendo as dimensões
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  
+        //Criando o JPG
+        this.img = canvas.toDataURL('image/jpeg'); //O resultado é um BASE64 de uma imagem.
+        document.querySelector('.counter').classList.add('d-none');
+        document.querySelector('.counter').classList.remove('d-flex');
+      }, this.timeAwait * 1000);
+
+
 
       // sendSnapShot(dataURI); //Gerar Imagem e Salvar Caminho no Banco
     },
@@ -420,5 +454,50 @@ export default {
   #webCamera{
     width:100%;
     height: 500px;
+  }
+
+  .square-face {
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    border: 2px solid #fff;
+    top: 30px;
+    left: 100px;
+  }
+
+  span.count {
+    color: #fff;
+    text-align: center;
+    display: block;
+    font-size: 15rem;
+  }
+
+  .counter {
+    width: 500px;
+    height: 500px;
+    display: none;
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .flash {
+    animation-name: flash;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes flash {
+    0% {font-size: 15rem; opacity: 1;}
+    99% {font-size:3rem; opacity: .4;}
+    100% {font-size: 15rem; opacity: 1;}
+  }
+
+
+  @media screen and (max-width: 600px) {
+    .square-face {
+      display: none;
+    }
   }
 </style>

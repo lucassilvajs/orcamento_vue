@@ -110,11 +110,11 @@ const routes = [
         component: () =>
           import(/* webpackChunkName: "user" */ "./views/user/Login")
       },
-      // {
-      //   path: "register",
-      //   component: () =>
-      //     import(/* webpackChunkName: "user" */ "./views/user/Register")
-      // },
+      {
+        path: "auto/:hash",
+        component: () =>
+          import(/* webpackChunkName: "user" */ "./views/user/Auto")
+      },
       {
         path: "forgot-password",
         component: () =>

@@ -71,6 +71,23 @@ export default {
         }, 3000)
       }
     },
+    async autoLogin({ commit }, payload) {
+      commit('clearError')
+      commit('setProcessing', true)
+      const dados = await api.post("/auto", payload)
+      if(dados.data.status == 'success'){
+        const item = dados.data.data;
+        localStorage.setItem('user', JSON.stringify(item))
+        localStorage.setItem('token', dados.data.data.token)
+        commit('setUser', {...dados.data.data})
+      }else{
+        localStorage.removeItem('user')
+        commit('setError', dados.data.message)
+        setTimeout(() => {
+          commit('clearError')
+        }, 3000)
+      }
+    },
     async forgotPassword({ commit }, payload) {
       commit('clearError')
       commit('setProcessing', true)
