@@ -28,10 +28,10 @@
 											{{color.name}}
 										</option>
 									</select>
-                  <select v-for="(attr, iAttr) in pro.attributes" v-model="pro.attributes[iAttr].select" :key="attr.name" class="form-control mb-2">
-                    <option value="">Selecione...</option>
-                    <option v-for="(val, iVal) in attr.value" :value="val.name" :key="iVal">{{val.name}}</option>
-                  </select>
+									<select v-for="(attr, iAttr) in pro.attributes" v-model="pro.attributes[iAttr].select" :key="attr.name" class="form-control mb-2">
+										<option value="">Selecione...</option>
+										<option v-for="(val, iVal) in attr.value" :value="val.name" :key="iVal">{{val.name}}</option>
+									</select>
 								<div class="separator my-2"></div>
 								<button class="btn btn-outline-success float-right w-100">Adicionar</button>
 							</form>

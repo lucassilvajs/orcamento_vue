@@ -1,6 +1,9 @@
 <template>
-	<div style="width:100%">
-
+	<div style="width:100%; position:relative;">
+    <div v-if="!img && token" class="position-absolute w-100 text-white pt-2" style="z-index:1;">
+      <h3 v-if="target == 'face'" class="text-center" style="text-shadow:2px 2px 5px rgba(0,0,0,.5);">Olhe fixamente para a câmera e<br />mantenha os olhos aberto no momento da captura</h3>
+      <h3 v-if="target == 'recipe'" class="text-center" style="text-shadow:2px 2px 5px rgba(0,0,0,.5);">Por favor certifique-se de que a receita está legível.</h3>
+    </div>
 		<select  v-if="devices.length > 0" v-model="deviceId" name="" id="" class="d-none">
 			<option v-for="device in devices" :selectFirstDevice="true" :value="device.deviceId" :key="device.deviceId">{{device.label.indexOf('front') >= 0 ? 'Camera Frontal' : 'Camera Traseira'}}</option>
 		</select>
@@ -332,10 +335,10 @@ export default {
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         var ctx = canvas.getContext('2d');
-  
+
         //Desenhando e convertendo as dimensões
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  
+
         //Criando o JPG
         this.img = canvas.toDataURL('image/jpeg'); //O resultado é um BASE64 de uma imagem.
         document.querySelector('.counter').classList.add('d-none');
