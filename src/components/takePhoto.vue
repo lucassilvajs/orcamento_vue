@@ -1,8 +1,10 @@
 <template>
 	<div style="width:100%; position:relative;">
-    <div v-if="!img && token" class="position-absolute w-100 text-white pt-2" style="z-index:1;">
-      <h3 v-if="target == 'face'" class="text-center" style="text-shadow:2px 2px 5px rgba(0,0,0,.5);">Olhe fixamente para a câmera e<br />mantenha os olhos aberto no momento da captura</h3>
-      <h3 v-if="target == 'recipe'" class="text-center" style="text-shadow:2px 2px 5px rgba(0,0,0,.5);">Por favor certifique-se de que a receita está legível.</h3>
+    <div v-if="!img && totem && showMessage" class="text-center message-action" style="z-index:1; position: relative; width: 500px;margin: 0 auto; height:70px;">
+      <span v-if="target == 'face'" class="arrow-up" style="left:-30px;">↑</span>
+      <h3 v-if="target == 'face'" class="d-inline-block">Olhe fixamente para a câmera e<br />mantenha os olhos aberto no momento da captura</h3>
+      <h3 v-if="target == 'recipe'" class="d-inline-block">Por favor certifique-se de que a receita <br/> está legível e completa.</h3>
+      <span v-if="target == 'face'" class="arrow-up" style="right:-30px;">↑</span>
     </div>
 		<select  v-if="devices.length > 0" v-model="deviceId" name="" id="" class="d-none">
 			<option v-for="device in devices" :selectFirstDevice="true" :value="device.deviceId" :key="device.deviceId">{{device.label.indexOf('front') >= 0 ? 'Camera Frontal' : 'Camera Traseira'}}</option>
@@ -76,7 +78,8 @@ export default {
 			uploadError: false,
       hasImage: false,
       fileObject: null,
-      timeAwait: 5
+      timeAwait: 5,
+      showMessage: false
 		}
 	},
 	props: ["target", "sac"],
@@ -166,53 +169,53 @@ export default {
         if(fileToCompress.type.split('/')[0] == 'image'){
           let imageCompress = null;
           new Compressor(fileToCompress, {
-            maxWidth: 1024,
-            maxHeight:1024,
-            quality: 0.7,
+            maxWidth: 1300,
+            maxHeight:1300,
+            quality: 0.85,
             success: async (result) => {
               fd.append('file', result, result.name+ext);
               file = await api.post(`saveFile/${this.target}`, fd);
               if(file.data.status != 'success') {
-          this.uploadError = true
-          setTimeout(() => {
-            this.uploadError = false
-          }, 3500);
-        }
+                this.uploadError = true
+                setTimeout(() => {
+                  this.uploadError = false
+                }, 3500);
+              }
 
-        if(!this.sac){
-          if(file.data.status == 'success') {
-            let order = window.localStorage.getItem('order');
-            if(order) {
-              order = JSON.parse(order)
-            }else{
-              order = {};
-            }
+              if(!this.sac){
+                if(file.data.status == 'success') {
+                  let order = window.localStorage.getItem('order');
+                  if(order) {
+                    order = JSON.parse(order)
+                  }else{
+                    order = {};
+                  }
 
-            order[this.target] = file.data.data;
+                  order[this.target] = file.data.data;
 
-            window.localStorage.setItem('order', JSON.stringify(order));
-          }
-        }
+                  window.localStorage.setItem('order', JSON.stringify(order));
+                }
+              }
 
-        if(!this.sac) {
-          const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
-          this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-            duration: 3000,
-            permanent: false
-          });
-          this.$router.push(`/app/order/${redirect}`);
-        }
+              if(!this.sac) {
+                const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
+                this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
+                  duration: 3000,
+                  permanent: false
+                });
+                this.$router.push(`/app/order/${redirect}`);
+              }
 
-        if(this.sac) {
-          console.log(file);
-          this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-            duration: 3000,
-            permanent: false
-          });
+              if(this.sac) {
+                console.log(file);
+                this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
+                  duration: 3000,
+                  permanent: false
+                });
 
-          window.localStorage.setItem('sac', file.data.data);
-        }
-        this.processing = false;
+                window.localStorage.setItem('sac', file.data.data);
+              }
+              this.processing = false;
             }
           });
         }else{
@@ -310,14 +313,12 @@ export default {
 
       document.querySelector('.count').classList.add('flash');
       const timer = JSON.parse(window.localStorage.getItem('user')).user.totem
-      console.log(timer)
       if(!timer) {
-        console.log('f')
         this.timeAwait = 0;
         document.querySelector('.counter').classList.add('d-none');
         document.querySelector('.counter').classList.remove('d-flex');
       }else{
-        console.log('t')
+        this.showMessage = true;
         this.timeAwait = 5;
         document.querySelector('.counter').classList.remove('d-flex');
         document.querySelector('.counter').classList.add('d-flex');
@@ -328,7 +329,7 @@ export default {
       }, 1000);
       setTimeout(() => {
         clearInterval(inter);
-
+        this.showMessage = false;
         var video = document.querySelector("#webCamera");
         //Criando um canvas que vai guardar a imagem temporariamente
         var canvas = document.createElement('canvas');
@@ -491,12 +492,35 @@ export default {
     animation-iteration-count: infinite;
   }
 
+  .arrow-up {
+    animation-name: arrow-up;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    position: absolute;
+    font-size: 3.5rem;
+    color: #a00;
+  }
+
+  .message-action{
+  }
+
+  .message-action h3 {
+    color: #a00;
+    font-weight: bold;
+  }
+
   @keyframes flash {
     0% {font-size: 15rem; opacity: 1;}
     99% {font-size:3rem; opacity: .4;}
     100% {font-size: 15rem; opacity: 1;}
   }
 
+
+  @keyframes arrow-up {
+    0% {top:0; }
+    50% {top:-20px;}
+    100% {top:0; }
+  }
 
   @media screen and (max-width: 600px) {
     .square-face {

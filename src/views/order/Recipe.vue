@@ -4,12 +4,12 @@
      <b-row>
       <b-colxx xxs="12">
         <b-card class="mb-4" title="Imagem da receita">
+			<b-alert variant="info" class="text-center mx-auto" fade show dismissible>Estamos tentando acessar a sua <b>câmera</b> de seu navegador.<br />Caso apareça algum alerta, permita que tenhamos acesso à sua câmera.</b-alert>
+			<b-row :style="{'marginTop': (totem ? 'calc( 100vh - 1000px )' : '0px') }">
+				<take-photo target="recipe"/>
+			</b-row>
         </b-card>
       </b-colxx>
-    </b-row>
-	<b-alert variant="info" class="text-center mx-auto" fade show dismissible>Estamos tentando acessar a sua <b>câmera</b> de seu navegador.<br />Caso apareça algum alerta, permita que tenhamos acesso à sua câmera.</b-alert>
-	<b-row>
-		<take-photo target="recipe"/>
     </b-row>
   </div>
 </template>
@@ -21,6 +21,11 @@ export default {
     components: {
 		'my-breadcrumb': myBreadCrumb,
 		'take-photo': takePhoto,
+	},
+	computed: {
+		totem() {
+          return JSON.parse(window.localStorage.getItem('user')).user.totem;
+        }
 	},
 	methods: {
 		setProduct: function (item) {
