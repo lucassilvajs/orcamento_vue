@@ -106,7 +106,7 @@
                   </div>
                 </td>
                 <td>{{100000 + parseInt(item.id)}}</td>
-                <td>{{item.empresa}}</td>
+                <td>{{item.empresa}} <span v-if="item.pedido_compra == 1 && !item.object.pc" class="badge badge-danger">PC Pendente</span></td>
                 <td>{{item.cnpj}}</td>
                 <td>{{item.nota}}</td>
                 <td v-if="isPage('proposal')">{{item.parents.map(r => JSON.parse(r.attr).info.name).join(', ')}}</td>
@@ -117,7 +117,8 @@
                   <span v-if="item.object.measure && item.len != 1" class="badge badge-danger">DP: {{item.object.measure.pupillary_distance}} / ALT: {{item.object.measure.pupillary_height}}</span>
                 </td>
                 <td>
-                  <button v-if="!item.nota" @click="() => {
+                  <b-dropdown id="ddown1" text="Ações" variant="outline-primary">
+                      <b-dropdown-item v-if="!item.nota" @click="() => {
                     $swal.fire({
                       title: `Você tem certeza?`,
                       text: `Deseja realmente emitir essa nota?`,
@@ -133,30 +134,14 @@
                         generateNf(order)
                       }
                     });
-                  }" v-b-modal.modalright class="btn btn-outline-warning" :id="`gen_nf_${item.id}`">
-                    <div class="simple-icon-doc"/>
-                  </button>
-                  <b-tooltip :target="`gen_nf_${item.id}`"
-                          :placement="`top`"
-                          title="Gerar NF">
-                  </b-tooltip>
-                  <button @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-success" :id="`show_info_${item.id}`">
-                    <div class="simple-icon-settings"/>
-                  </button>
-                  <b-tooltip :target="`show_info_${item.id}`"
-                          :placement="`top`"
-                          title="Ver informações">
-                  </b-tooltip>
-
-
-                  <router-link :to="`/admin/order/measure/${item.id}`" v-b-modal.modalright class="btn btn-outline-info" :id="`measure${item.id}`">
-                    <div class="glyph-icon simple-icon-eye"/>
-                  </router-link>
-                  <b-tooltip :target="`measure${item.id}`"
-                          :placement="`top`"
-                          title="Eye Measure">
-                  </b-tooltip>
-                  <button class="btn btn-outline-danger" @click="deleteOrder(item.id)"><div class="simple-icon-trash"/></button>
+                  }">Gerar Nota Fiscal</b-dropdown-item>
+                      <b-dropdown-item @click="getInfoOrder(index)" v-b-modal.modalright>Informações do pedido</b-dropdown-item>
+                      <b-dropdown-item>
+                        <router-link :to="`/admin/order/measure/${item.id}`" :id="`measure${item.id}`">Eye Measure</router-link>
+                        </b-dropdown-item>
+                      <b-dropdown-divider></b-dropdown-divider>
+                      <b-dropdown-item @click="deleteOrder(item.id)">Excluir Pedido</b-dropdown-item>
+                  </b-dropdown>
                 </td>
               </tr>
             </tbody>
@@ -189,6 +174,10 @@
       <div v-if="order.feedback.feedback">
         <b>Feedback: </b>{{order.feedback.feedback}}<br />
         <b>Nota: </b><stars :disabled="true" v-model="order.feedback.rate"></stars><br />
+      </div>
+      <div v-if="order.object.pc">
+        <b>PC: </b>{{order.object.pc.number}}<br />
+        <a :href="baseURL + order.object.pc.file" target="_blank" class="btn btn-outline-info">Ver</a><br />
       </div>
       <hr>
       <div v-for="item in order.object.lens" :key="item.code">

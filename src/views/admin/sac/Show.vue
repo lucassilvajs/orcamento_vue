@@ -97,6 +97,10 @@
 
       <div class="feedback mt-5"  v-if="modal.status == 'Aberto'">
         <p>Você gostaria de enviar enviar algo ao cliente?</p>
+
+        <b-form-group v-if="!modal.order_id" label="Número do pedido" class="has-float-label mb-2">
+          <b-form-input type="text" v-model="modal.idOrder" />
+        </b-form-group>
         <b-form-group label="Informação" class="has-float-label mb-2">
           <textarea v-model="modal.info" rows="3" class="form-control"></textarea>
         </b-form-group>

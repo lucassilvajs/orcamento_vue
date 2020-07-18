@@ -55,6 +55,12 @@
     </b-colxx>
     <b-colxx xxs="12">
       <b-card class="mb-4" title="Propostas">
+        <p><b>Selecionados</b>: {{
+          items.filter(r => r.checked).length
+        }} <br /><b>Total</b>: {{
+          sum_array(items.filter(r => r.checked).map(sr => sr.parents.map(r => r.total).reduce(function(total, num){
+                    return (parseFloat(total) + parseFloat(num))
+                  }))) | numeroPreco }}</p>
         <div v-if="items && items.length > 0">
           <table class="table table-striped">
             <thead>
@@ -95,9 +101,10 @@
                   }) | numeroPreco}}</td>
                 <td>{{item.multiple == 'pending' ? 'Proposta agendada' : item.status}}</td>
                 <td>
-                  <button @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-success">
+                  <!-- <button @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-success">
                     <div class="simple-icon-doc"/>
-                  </button>
+                  </button> -->
+                  <router-link class="btn btn-outline-success" :to="`/admin/proposal/edit/${item.id}`"><div class="simple-icon-doc"/></router-link>
                   <button class="btn btn-outline-danger" @click="deleteOrder(item.id)"><div class="simple-icon-trash"/></button>
                 </td>
               </tr>
@@ -354,7 +361,15 @@ export default {
           r.checked = this.selectAll
           return r
         })
-    }
+    },
+    sum_array(arr) {
+        let total = 0;
+        arr.forEach(e => {
+          total += Number(e)
+        });
+
+        return total;
+      },
   },
   created(){
     this.getOrder();

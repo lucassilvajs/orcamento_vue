@@ -48,6 +48,7 @@
                   <router-link :to="`/admin/consult/edit/${consult.id}`" class="btn btn-outline-info">
                     <div class="glyph-icon simple-icon-pencil"></div>
                   </router-link>
+                  <button @click="deleteConsult(`Você tem certeza que deseja excluir o/a consultor(a) ${consult.vendedor}`, consult.id)" class="btn btn-outline-danger"><i class="simple-icon-trash"></i> </button>
                 </td>
               </tr>
             </tbody>
@@ -133,9 +134,30 @@ export default {
       });
 
       this.data = response.data.data;
-
-
-    }
+    },
+    async deleteConsult(message, consultor){
+      await this.$swal.fire({
+        title: `O que você acha?`,
+        text: `${message}`,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sim',
+        cancelButtonText: 'Não',
+        showLoaderOnConfirm: true,
+      }).then(async (result) => {
+        if(result.value) {
+          const consult = await api.delete(`admin/consult/${consultor}`);
+          const res = consult.data;
+          this.$notify(res.status, res.status == 'success' ? 'Sucesso' : 'Opsss!', res.message, {
+            duration: 3000,
+            permanent: false
+          });
+          this.getSac();
+        }
+      });
+    },
   },
   created () {
       this.getSac();

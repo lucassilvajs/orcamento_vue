@@ -159,6 +159,11 @@ const routes = [
           import(/* webpackChunkName: "dashboards" */ "./views/admin/proposal/View")
       },
       {
+        path: "/admin/proposal/edit/:id",
+        component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/proposal/Edit")
+      },
+      {
         path: "/admin/order/measure/:id",
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/order/Measure")

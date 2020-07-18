@@ -61,111 +61,84 @@
           </div>
         </b-card-body>
       </b-card>
-        <b-card v-if="!feedbackSend">
-            <b-card-header>
-                <div v-if="response != 'approved'">
-                    <h3>Proposta recusada!</h3>
-                    <p>Para nós da ID Safety é muito importante o seu feedback, conte para nós a razão de você recusar nossa proposta</p>
-                </div>
-                <div v-else>
-                    <h3>Proposta aprovada!</h3>
-                    <p>Para nós da ID Safety é muito importante o seu feedback</p>
-                </div>
-            </b-card-header>
-            <b-card-body>
-                <b-form @submit.prevent="formSubmit" class="av-tooltip tooltip-label-bottom">
-                    <b-form-group label="Conte para nós o motivo da sua decisão">
-                        <b-textarea v-model="feedback"></b-textarea>
-                    </b-form-group>
-                    <b-form-group label="Que nota você da para nós?">
-                        <stars v-model="rate"></stars>
-                    </b-form-group>
-                    <b-button variant="success" :disabled="processing" :class="{'float-right mb-3 btn-multiple-state btn-shadow': true,
-                        'show-spinner': processing,
-                        'show-success': !processing && uploadError===false,
-                        'show-fail': !processing && uploadError }" @click="sendFeedback">
-                        <span class="spinner d-inline-block">
-                            <span class="bounce1"></span>
-                            <span class="bounce2"></span>
-                            <span class="bounce3"></span>
-                        </span>
-                        <span class="icon success">
-                            Enviar feedback
-                        </span>
-                        <span class="icon fail">
-                            <i class="simple-icon-exclamation"></i>
-                        </span>
-                        <span class="label">Enviar feedback</span>
-                    </b-button>
-                </b-form>
-            </b-card-body>
-        </b-card>
-        <b-card v-else>
-            <div class="d-flex justify-content-center align-items-center w-100">
-                <div class="svg-box">
-                    <svg class="circular green-stroke">
-                        <circle class="path" cx="75" cy="75" r="50" fill="none" stroke-width="5" stroke-miterlimit="10"/>
-                    </svg>
-                    <svg class="checkmark green-stroke">
-                        <g transform="matrix(0.79961,8.65821e-32,8.39584e-32,0.79961,-489.57,-205.679)">
-                            <path class="checkmark__check" fill="none" d="M616.306,283.025L634.087,300.805L673.361,261.53"/>
-                        </g>
-                    </svg>
-                </div>
+
+      <b-card v-if="order.orders.length">
+        <b-alert show variant="success">Gostaria de fazer uma aprovação parcial?<br /> Selecione as solicitações que você gostaria de aprovar</b-alert>
+
+        <div class="row mb-3 list-head">
+          <div class="col d-flex align-items-center">
+            <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
+              <div class="itemCheck mb-0 custom-control custom-checkbox">
+                <input type="checkbox" autocomplete="off" class="custom-control-input" v-model="statusCheck" :id="`check_all`" @change="selectAll">
+                <label class="custom-control-label" :for="`check_all`">Selecionar todos</label>
+              </div>
             </div>
-            <h3 class="text-success text-center">Feedback enviado com sucesso, muito obrigado!</h3>
-        </b-card>
+          </div>
+        </div>
+        <div class="row justify-content-between mb-1 list-body" v-for="(myorder, index) in order.orders" :key="index">
+          <div style="max-width:10%;">
+            <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
+              <div class="itemCheck mb-0 custom-control custom-checkbox">
+                <input type="checkbox" autocomplete="off" class="custom-control-input" v-model="myorder.checked"  :id="`mycheck_${index}`">
+                <label class="custom-control-label" :for="`mycheck_${index}`"></label>
+              </div>
+            </div>
+          </div>
+          <div style="max-width:35%;">
+            <span>{{myorder.attributes.info.name}} <br /> </span>
+            <span v-for="(item, itemIndex) in myorder.items" :key="itemIndex">{{item.name}} - <span class="small-price">{{item.price | numeroPreco}}</span><br /></span>
+          </div>
+          <div style="max-width:35%;">
+            <div v-for="(inf, id) in myorder.attributes.info" :key="id">
+              <span v-if="inf && id != 'name'"> {{id}}:{{inf | capitalize}} <br /></span>
+            </div>
+          </div>
+          <div style="max-width:20%;">
+            <div class="small-price text-right pr-1">
+              {{myorder.attributes.price | numeroPreco}}
+            </div>
+          </div>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col">
+            Total:
+          </div>
+          <div class="col text-right">{{ sum_array(order.orders.filter(r => r.checked).map(r => r.attributes.price)) | numeroPreco }}</div>
+        </div>
+
+          <button class="btn btn-block btn-success mt-3" @click="approveSelected">Aprovar selecionados <span class="badge badge-light">{{order.orders.filter(r => r.checked).length}}</span></button>
+
+      </b-card>
     </b-colxx>
 
     <b-colxx xxs="12" lg="6" class="mb-5">
-        <b-card class="mb-5 invoice-contents" no-body>
-           <b-card-body class="d-flex flex-column justify-content-between">
-            <div class="d-flex flex-column">
-            <div class="d-flex flex-row justify-content-between pt-2 pb-2">
-                <div class="d-flex align-self-center">
-                    <img src="https://test.idsafety.com.br/assets/img/logo.png" />
-                </div>
-            </div>
-            <div class="border-bottom pt-4 mb-5"></div>
+      <b-card class="mb-5 invoice-contents" no-body>
+        <b-card-body class="d-flex flex-column justify-content-between">
+          <div class="d-flex flex-column">
             <div class="d-flex flex-row justify-content-between mb-5">
-                <div class="d-flex flex-column w-70 mr-2 p-4 text-semi-muted bg-semi-muted">
-                    <p class="mb-0">{{order.company}}</p>
-                </div>
-                <div class="d-flex w-30 flex-column text-right p-4 text-semi-muted bg-semi-muted">
-                    <p class="mb-0">Pedido #{{order.order}}</p>
-                    <p class="mb-0">{{order.date | date}}</p>
-                </div>
+              <div class="d-flex flex-column w-70 mr-2 p-4 text-semi-muted bg-semi-muted">
+                <p class="mb-0">{{order.company}}</p>
+              </div>
+              <div class="d-flex w-30 flex-column text-right p-4 text-semi-muted bg-semi-muted">
+                <p class="mb-0">Pedido #{{order.order}}</p>
+                <p class="mb-0">{{order.date | date}}</p>
+              </div>
             </div>
-
-              <table v-for="(ord, ind) in order.orders" :key="ind" class="table table-borderless">
-                <thead>
-                    <tr v-if="ind == 0">
-                        <th class="text-muted text-extra-small mb-2">ITEM</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(it, index) in ord.items" :key="index">
-                        <td>{{it.name}}</td>
-                    </tr>
-                </tbody>
-                <hr>
-              </table>
-            </div>
-
-            <div class="d-flex flex-column">
-              <div class="border-bottom pt-3 mb-5"></div>
-              <table class="table table-borderless d-flex justify-content-end">
-                  <tbody>
-                      <tr class="font-weight-bold">
-                          <td class="text-semi-muted">Total :</td>
-                          <td class="text-right">{{order.total | numeroPreco}}</td>
-                      </tr>
-                  </tbody>
-              </table>
           </div>
-
-           </b-card-body>
-        </b-card>
+          <div class="d-flex flex-column">
+            <div class="border-bottom pt-3 mb-5"></div>
+            <table class="table table-borderless d-flex justify-content-end">
+              <tbody>
+                <tr class="font-weight-bold">
+                  <td class="text-semi-muted">Total :</td>
+                  <td class="text-right">{{order.total | numeroPreco}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </b-card-body>
+      </b-card>
     </b-colxx>
   </b-row>
 
@@ -191,6 +164,8 @@ export default {
     },
     data(){
         return {
+          approvedPart: {},
+          statusCheck: false,
           pc: {
             file: null,
             number: null
@@ -208,13 +183,30 @@ export default {
         }
     },
     methods: {
-        async getOrder() {
+      sum_array(arr) {
+        let total = 0;
+        arr.forEach(e => {
+          total += Number(e)
+        });
+
+        return total;
+      },
+      async getOrder() {
             const response = await api.get(`/proposta/${this.$route.params.hash}/${this.$route.params.response}`);
             if(response.data.status == 'success') {
                 this.order = response.data.data;
                 if(JSON.parse(this.order.attr).pc && JSON.parse(this.order.attr).pc.number){
                   this.hasPC = true
                 }
+
+                this.order.orders = this.order.orders.map(r => {
+                  r.checked = true;
+                  return r;
+                });
+
+                console.log('-=-=-=-=-=-=-')
+                console.log(this.order.orders)
+                console.log('-=-=-=-=-=-=-')
 
                 if(response.data.data.resp) {
                     this.$notify("error", 'Opsss...!', 'Esse pedido já teve a solicitação respondida.', {
@@ -255,7 +247,25 @@ export default {
                 permanent: false
             });
           }
-        }
+        },
+        selectAll(){
+          this.order.orders = this.order.orders.map(r => {
+            r.checked = this.statusCheck;
+            return r
+          });
+        },
+        approveSelected(){
+          let checked = this.order.orders.filter(r => r.checked);
+          console.log(checked)
+        },
+        changed(ind){
+          this.order.orders = this.order.orders.map((r,i) => {
+            if(ind == i) {
+              r.checked = !r.checked;
+            }
+            return r
+          });
+        },
     },
     created(){
         this.getOrder();
@@ -305,4 +315,35 @@ export default {
 .checkmark path {
     animation: 1s draw-check ease-out;
 }
+
+.item-cart {
+  border-radius: 5px;
+  border: 1px solid rgba(100,100,100,.3);
+}
+
+.item-cart h4 {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.item-cart h5 {
+  font-size: .9rem;
+}
+
+.list-head {
+  font-weight: bold;
+}
+
+.list-body {
+  padding: 5px 0;
+  font-size: .75rem;
+}
+
+.list-body:nth-child(odd){
+  background: #f5f5f5;
+}
+.list-body{
+  background: #dfdfdf;
+}
+
 </style>

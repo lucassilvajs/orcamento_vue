@@ -50,7 +50,7 @@
                     <th v-if="consultor">Empresa</th>
                     <th v-if="consultor">CNPJ</th>
                     <th v-if="$route.path.split('/')[2] != 'proposal'">Nota</th>
-                    <th>Valor</th>
+                    <th v-if="!totem">Valor</th>
                     <th v-if="$route.path.split('/')[2] != 'proposal'">Produto</th>
                     <th>Data</th>
                     <th>Status</th>
@@ -83,7 +83,7 @@
                           <div class="simple-icon-pencil"/>
                         </button>
                       </span>
-                      <a v-if="it.rastreio && false" target="_blank" :href="`https://www.linkcorreios.com.br/${it.rastreio.codigoRastreamento}`" class="btn btn-success">
+                      <a v-if="it.rastreio && it.rastreio.codigoRastreamento" target="_blank" :href="`https://www.linkcorreios.com.br/${it.rastreio.codigoRastreamento}`" class="btn btn-success">
                           <div class="simple-icon-envelope"/>
                       </a>
                       <!-- <span @click="pc.order = it.id">
@@ -96,7 +96,7 @@
                   </tr>
                 </tbody>
               </table>
-              <b-pagination v-if="total > 20"
+              <b-pagination v-if="false && total > 20"
                 size="sm"
                 align="center"
                 :total-rows="total"
@@ -116,7 +116,7 @@
       <b>Data: </b>{{order.date}}<br />
       <b>Empresa: </b>{{order.company}}<br />
       <b>Colaborador: </b>{{order.attr.info.name}}<br />
-      <b>Valor: </b>{{order.value}}<br />
+      <span v-if="!totem"><b>Valor: </b>{{order.value}}<br /></span>
       <div v-if="order.attr.pc">
         <b>Pedido de compra: </b>{{order.attr.pc.number}}<br />
         <a v-if="order.attr.pc && order.attr.pc.file" :href="baseURL+order.attr.pc.file" class="btn btn-success btn-sm ">
@@ -250,6 +250,9 @@ export default {
     consultor() {
       const colab = JSON.parse(window.localStorage.getItem('user'));
       return colab.user.colaborador;
+    },
+    totem() {
+      return JSON.parse(window.localStorage.getItem('user')).user.totem;
     }
   },
   methods: {
