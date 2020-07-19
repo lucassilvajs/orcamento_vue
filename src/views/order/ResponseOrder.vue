@@ -67,37 +67,45 @@
 
         <div class="row mb-3 list-head">
           <div class="col d-flex align-items-center">
-            <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
-              <div class="itemCheck mb-0 custom-control custom-checkbox">
-                <input type="checkbox" autocomplete="off" class="custom-control-input" v-model="statusCheck" :id="`check_all`" @change="selectAll">
-                <label class="custom-control-label" :for="`check_all`">Selecionar todos</label>
-              </div>
-            </div>
+            <button class="btn btn-outline-dark btn-sm" @click="() => {
+              statusCheck = !statusCheck;
+              order.orders = order.orders.map(r => {r.checked = statusCheck; return r;}
+            )}"> {{statusCheck ? 'Desmarcar' : 'Marcar'}} todos
+            </button>
           </div>
         </div>
-        <div class="row justify-content-between mb-1 list-body" v-for="(myorder, index) in order.orders" :key="index">
-          <div style="max-width:10%;">
-            <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
-              <div class="itemCheck mb-0 custom-control custom-checkbox">
-                <input type="checkbox" autocomplete="off" class="custom-control-input" v-model="myorder.checked"  :id="`mycheck_${index}`">
-                <label class="custom-control-label" :for="`mycheck_${index}`"></label>
-              </div>
-            </div>
-          </div>
-          <div style="max-width:35%;">
-            <span>{{myorder.attributes.info.name}} <br /> </span>
-            <span v-for="(item, itemIndex) in myorder.items" :key="itemIndex">{{item.name}} - <span class="small-price">{{item.price | numeroPreco}}</span><br /></span>
-          </div>
-          <div style="max-width:35%;">
-            <div v-for="(inf, id) in myorder.attributes.info" :key="id">
-              <span v-if="inf && id != 'name'"> {{id}}:{{inf | capitalize}} <br /></span>
-            </div>
-          </div>
-          <div style="max-width:20%;">
-            <div class="small-price text-right pr-1">
-              {{myorder.attributes.price | numeroPreco}}
-            </div>
-          </div>
+
+        <div style="max-height:45vh; overflow-y:scroll">
+          <table class="table">
+            <tbody>
+              <tr v-for="(ord, ordIndex) in order.orders" :key="ordIndex">
+                <td>
+                  <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
+                    <div class="itemCheck mb-0 custom-control custom-checkbox">
+                      <input type="checkbox" autocomplete="off" class="custom-control-input" :checked="ord.checked" @change="() => {
+                        order.orders = order.orders.map((e,i) => {
+                          if(i == ordIndex) {
+                            e.checked = !e.checked
+                          }
+                          return e
+                        })
+                      }" :id="`check_${ordIndex}`">
+                      <label class="custom-control-label" :for="`check_${ordIndex}`"></label>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span v-for="(item, itIndex) in ord.attributes.info" :key="itIndex">
+                    {{itIndex == 'name' ? 'Nome' : itIndex}}: {{item}}<br /></span>
+                </td>
+                <td>
+                  <span v-for="(item, itIndex) in ord.attributes.lens" :key="itIndex">
+                    {{item.name}} - <b>{{item.price | numeroPreco}}</b><br /></span>
+                </td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
         <div class="row mt-3">
@@ -106,8 +114,23 @@
           </div>
           <div class="col text-right">{{ sum_array(order.orders.filter(r => r.checked).map(r => r.attributes.price)) | numeroPreco }}</div>
         </div>
-
-          <button class="btn btn-block btn-success mt-3" @click="approveSelected">Aprovar selecionados <span class="badge badge-light">{{order.orders.filter(r => r.checked).length}}</span></button>
+          <b-button variant="success" :disabled="processing" :class="{'btn-block my-3 btn-multiple-state btn-shadow': true,
+              'show-spinner': processing,
+              'show-success': !processing && uploadError===false,
+              'show-fail': !processing && uploadError }" @click="approveSelected">
+              <span class="spinner d-inline-block">
+                  <span class="bounce1"></span>
+                  <span class="bounce2"></span>
+                  <span class="bounce3"></span>
+              </span>
+              <span class="icon success">
+                  Aprovar selecionados <span class="badge badge-light">{{order.orders.filter(r => r.checked).length}}</span>
+              </span>
+              <span class="icon fail">
+                  <i class="simple-icon-exclamation"></i>
+              </span>
+              <span class="label">Aprovar selecionados <span class="badge badge-light">{{order.orders.filter(r => r.checked).length}}</span></span>
+          </b-button>
 
       </b-card>
     </b-colxx>
@@ -139,6 +162,61 @@
           </div>
         </b-card-body>
       </b-card>
+
+      <b-card v-if="!feedbackSend">
+            <b-card-header>
+                <div v-if="response != 'approved'">
+                    <h3>Proposta recusada!</h3>
+                    <p>Para nós da ID Safety é muito importante o seu feedback, conte para nós a razão de você recusar nossa proposta</p>
+                </div>
+                <div v-else>
+                    <h3>Proposta aprovada!</h3>
+                    <p>Para nós da ID Safety é muito importante o seu feedback</p>
+                </div>
+            </b-card-header>
+            <b-card-body>
+                <b-form @submit.prevent="formSubmit" class="av-tooltip tooltip-label-bottom">
+                    <b-form-group label="Conte para nós o motivo da sua decisão">
+                        <b-textarea v-model="feedback"></b-textarea>
+                    </b-form-group>
+                    <b-form-group label="Que nota você da para nós?">
+                        <stars v-model="rate"></stars>
+                    </b-form-group>
+                    <b-button variant="success" :disabled="processing" :class="{'float-right mb-3 btn-multiple-state btn-shadow': true,
+                        'show-spinner': processing,
+                        'show-success': !processing && uploadError===false,
+                        'show-fail': !processing && uploadError }" @click="sendFeedback">
+                        <span class="spinner d-inline-block">
+                            <span class="bounce1"></span>
+                            <span class="bounce2"></span>
+                            <span class="bounce3"></span>
+                        </span>
+                        <span class="icon success">
+                            Enviar feedback
+                        </span>
+                        <span class="icon fail">
+                            <i class="simple-icon-exclamation"></i>
+                        </span>
+                        <span class="label">Enviar feedback</span>
+                    </b-button>
+                </b-form>
+            </b-card-body>
+        </b-card>
+        <b-card v-else>
+            <div class="d-flex justify-content-center align-items-center w-100">
+                <div class="svg-box">
+                    <svg class="circular green-stroke">
+                        <circle class="path" cx="75" cy="75" r="50" fill="none" stroke-width="5" stroke-miterlimit="10"/>
+                    </svg>
+                    <svg class="checkmark green-stroke">
+                        <g transform="matrix(0.79961,8.65821e-32,8.39584e-32,0.79961,-489.57,-205.679)">
+                            <path class="checkmark__check" fill="none" d="M616.306,283.025L634.087,300.805L673.361,261.53"/>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+            <h3 class="text-success text-center">Feedback enviado com sucesso, muito obrigado!</h3>
+        </b-card>
     </b-colxx>
   </b-row>
 
@@ -199,14 +277,6 @@ export default {
                   this.hasPC = true
                 }
 
-                this.order.orders = this.order.orders.map(r => {
-                  r.checked = true;
-                  return r;
-                });
-
-                console.log('-=-=-=-=-=-=-')
-                console.log(this.order.orders)
-                console.log('-=-=-=-=-=-=-')
 
                 if(response.data.data.resp) {
                     this.$notify("error", 'Opsss...!', 'Esse pedido já teve a solicitação respondida.', {
@@ -248,15 +318,36 @@ export default {
             });
           }
         },
-        selectAll(){
-          this.order.orders = this.order.orders.map(r => {
-            r.checked = this.statusCheck;
-            return r
+        changeAll(){
+          console.log(this.order.orders)
+          let checked = this.order.orders.map(r => {
+            r.checked = this.statusCheck; return r
           });
-        },
-        approveSelected(){
-          let checked = this.order.orders.filter(r => r.checked);
           console.log(checked)
+        },
+        async approveSelected(){
+          this.processing = true;
+          let checked = this.order.orders.filter(r => r.checked).map(r => r.order_id);
+
+          const split = await api.post('/order/split', {checked});
+          this.$swal.fire({
+            title: split.data.status == 'success' ? 'Sucesso' : 'Ops...!',
+            text: split.data.message,
+            icon: split.data.status,
+          }).then(async (result) => {
+            if (result.value) {
+              if(split.data.dest) {
+                this.$router.push(`/proposta/${split.data.dest}/approved`);
+                this.getOrder();
+              }
+
+            }
+          });
+          this.processing = false;
+
+
+
+
         },
         changed(ind){
           this.order.orders = this.order.orders.map((r,i) => {
@@ -268,7 +359,7 @@ export default {
         },
     },
     created(){
-        this.getOrder();
+      this.getOrder();
     }
 }
 </script>

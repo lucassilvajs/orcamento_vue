@@ -76,6 +76,12 @@
             </b-button>
           </b-colxx>
         </b-row>
+        <p><b>Selecionados</b>: {{
+          items.filter(r => r.checked).length
+        }} <br /><b>Total</b>: {{
+          sum_array(items.filter(r => r.checked).map(sr => sr.parents.map(r => r.total).reduce(function(total, num){
+                    return (parseFloat(total) + parseFloat(num))
+                  }))) | numeroPreco }}</p>
       </b-card>
     </b-colxx>
     <b-colxx xxs="12">
@@ -343,6 +349,14 @@ export default {
       })
 
     },
+    sum_array(arr) {
+        let total = 0;
+        arr.forEach(e => {
+          total += Number(e)
+        });
+
+        return total;
+      },
 
     async alertAction(message, status, action){
       await this.$swal.fire({
@@ -416,7 +430,8 @@ export default {
   },
   created(){
     this.getOrder();
-  }
+  },
+
 }
 </script>
 <style>

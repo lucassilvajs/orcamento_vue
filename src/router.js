@@ -53,6 +53,11 @@ const routes = [
           import("./views/order/Orders")
       },
       {
+        path: "/app/order/edit/:id", // Editar do consultor
+        component: () =>
+          import("./views/proposal/Edit")
+      },
+      {
         path: "/app/order/orders", // Todas do cliente
         component: () =>
           import("./views/order/Orders")

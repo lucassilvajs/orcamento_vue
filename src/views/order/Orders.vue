@@ -2,7 +2,7 @@
   <div>
     <b-row>
       <b-colxx>
-        <b-card v-if="false" class="mb-4">
+        <b-card class="mb-4">
           <b-row>
             <b-colxx lg="3">
                 <b-form-group label="Pedido / Nota / Colaborador:" class="has-float-label mb-4">
@@ -21,18 +21,53 @@
             </b-colxx>
             <b-colxx lg="3">
               <b-form-group>
-                  <v-select v-model="filter.status" :options="[
-                    {label: 'Pendente', code: 'pending'},
-                    {label: 'Aprovado', code: 'approved'},
-                    {label: 'Recusado', code: 'reproved'},
-                  ]" dir="ltr" />
+                <select name="" id="" class="form-control" v-model="filter.status">
+                  <option checked value="">Todos</option>
+                  <option v-for="sel in [{label: 'Pendente', code: 'pending'},{label: 'Recusado', code: 'reproved'}]" :value="sel.code" :key="sel.code">{{sel.label}}</option>
+                </select>
               </b-form-group>
                 <!-- <b-form-group label="Até:" class="has-float-label mb-4">
                 </b-form-group> -->
             </b-colxx>
-            <b-colxx lg="12">
-                <button class="btn btn-outline-success float-right" @click="getOrderFilter()">Buscar</button>
+            <b-colxx lg="12" class="d-flex justify-content-end align-items-center">
+                <!-- <button class="show-success btn btn-info mb-3 btn-multiple-state btn-shadow ml-3" @click="getOrderFilter()">
+            <span class="label">Buscar</span>
+            <span class="spinner d-inline-block">
+              <span class="bounce1"></span>
+              <span class="bounce2"></span>
+              <span class="bounce3"></span>
+            </span>
+            <span class="icon success">
+              Buscar
+            </span>
+          </button> -->
+              <b-button  variant="success" :disabled="processing" :class="{'mb-3 btn-multiple-state btn-shadow ml-3': true,
+                'show-spinner': processing,
+                'show-success': !processing && uploadError===false,
+                'show-fail': !processing && uploadError }" @click="getOrderFilter()">
+                <span class="spinner d-inline-block">
+                    <span class="bounce1"></span>
+                    <span class="bounce2"></span>
+                    <span class="bounce3"></span>
+                </span>
+                <span class="icon success">
+                    Buscar
+                </span>
+                <span class="icon fail">
+                    <i class="simple-icon-exclamation"></i>
+                </span>
+                <span class="label">Buscar</span>
+              </b-button>
             </b-colxx>
+          </b-row>
+          <b-row>
+          <p><b>Selecionados</b>: {{
+          items.filter(r => r.checked).length
+        }} <br /><b>Total</b>: {{
+          sum_array(items.filter(r => r.checked).map(sr => sr.parents.map(r => r.total).reduce(function(total, num){
+                    return (parseFloat(total) + parseFloat(num))
+                  }))) | numeroPreco }}</p>
+
           </b-row>
         </b-card>
       </b-colxx>
@@ -45,6 +80,14 @@
               <table class="table b-table table-striped">
                 <thead>
                   <tr>
+                    <th>
+                      <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
+                        <div class="itemCheck mb-0 custom-control custom-checkbox">
+                          <input type="checkbox" autocomplete="off" class="custom-control-input" v-model="selectAll" @change="allSelect"  :id="`check_all`">
+                          <label class="custom-control-label" :for="`check_all`"></label>
+                        </div>
+                      </div>
+                    </th>
                     <th>#</th>
                     <th>Colaborador</th>
                     <th v-if="consultor">Empresa</th>
@@ -59,6 +102,14 @@
                 </thead>
                 <tbody>
                   <tr v-for="(it, index) in items" :key="index">
+                    <td>
+                      <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
+                        <div class="itemCheck mb-0 custom-control custom-checkbox">
+                          <input type="checkbox" autocomplete="off" class="custom-control-input" v-model="it.checked" :id="`check_${index}`">
+                          <label class="custom-control-label" :for="`check_${index}`"></label>
+                        </div>
+                      </div>
+                    </td>
                     <td>{{it.id}}</td>
                     <td>{{it.name}}</td>
                     <td v-if="consultor">{{it.company}}</td>
@@ -69,9 +120,12 @@
                     <td>{{it.date}}</td>
                     <td>{{it.multiple == 'pending' ? 'Proposta agendada' : it.status}}</td>
                     <td>
-                      <button @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-info">
+                      <button v-if="!consultor" @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-info">
                         <div class="simple-icon-eye"/>
                       </button>
+                      <router-link class="btn btn-outline-info" :to="`/app/order/edit/${it.id}`">
+                        <div class="simple-icon-eye"/>
+                      </router-link>
                       <button v-if="it.status != 'Aprovado' && it.status != 'Aguardando'" @click="swalsendOrder(it.id)" v-b-modal.modalright class="d-none btn btn-outline-success">
                         <div class="simple-icon-doc"/>
                       </button>
@@ -234,6 +288,7 @@ export default {
   data () {
     return {
       pc:{},
+      selectAll: false,
       feedback:'',
       order: null,
       items: null,
@@ -275,13 +330,15 @@ export default {
       console.log(index)
     },
     async getOrderFilter() {
+      this.processing = true;
       const orderType = this.$route.path.split('/')[3];
       let params = this.filter;
       params.status = orderType ? orderType : ''
       const items = await api.get('/order', {
         params
       });
-      this.items = items.data.data
+      this.items = items.data.data.orders
+      this.processing = false;
     },
     async swalsendOrder(id) {
       await this.$swal.fire({
@@ -361,6 +418,17 @@ export default {
         this.$refs['modalnested'].show()
       }
     },
+    sum_array(arr) {
+      let total = 0;
+      arr.forEach(e => {
+        total += Number(e)
+      });
+
+      return total;
+    },
+    allSelect(){
+      this.items = this.items.map(r => {r.checked = this.selectAll; return r});
+    }
 
   },
   created(){
