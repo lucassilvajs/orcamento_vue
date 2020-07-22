@@ -62,7 +62,7 @@
     </b-row>
     <b-row>
         <b-colxx class="d-flex justify-content-end">
-          <button class="show-success btn btn-info mb-3 btn-multiple-state btn-shadow ml-3" @click="() => {
+          <button v-if="!hasMultiple" class="show-success btn btn-info mb-3 btn-multiple-state btn-shadow ml-3" @click="() => {
               if(order) {
                 order.new = true;
               }
@@ -174,6 +174,9 @@ export default {
                 message
             }
         },
+        hasMultiple: function(){
+          return JSON.parse(window.localStorage.getItem('user')).user.multiple_order;
+        }
     },
     methods: {
       ...mapActions(['getAwaitingOrders']),

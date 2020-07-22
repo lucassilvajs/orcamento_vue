@@ -20,12 +20,12 @@
                 </b-form-group>
             </b-colxx>
             <b-colxx lg="3">
-              <b-form-group>
+              <!-- <b-form-group>
                 <select name="" id="" class="form-control" v-model="filter.status">
                   <option checked value="">Todos</option>
                   <option v-for="sel in [{label: 'Pendente', code: 'pending'},{label: 'Recusado', code: 'reproved'}]" :value="sel.code" :key="sel.code">{{sel.label}}</option>
                 </select>
-              </b-form-group>
+              </b-form-group> -->
                 <!-- <b-form-group label="Até:" class="has-float-label mb-4">
                 </b-form-group> -->
             </b-colxx>
@@ -83,8 +83,12 @@
                     <th>
                       <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
                         <div class="itemCheck mb-0 custom-control custom-checkbox">
-                          <input type="checkbox" autocomplete="off" class="custom-control-input" v-model="selectAll" @change="allSelect"  :id="`check_all`">
-                          <label class="custom-control-label" :for="`check_all`"></label>
+                          <input type="checkbox" autocomplete="off" class="custom-control-input" :id="`check_all`">
+                          <label class="custom-control-label" :for="`check_all`"  @click="() => {
+                              statusCheck = !statusCheck;
+                              items = items.map(r => {r.checked = statusCheck; return r;}
+                            )}">
+                          </label>
                         </div>
                       </div>
                     </th>
@@ -105,7 +109,14 @@
                     <td>
                       <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
                         <div class="itemCheck mb-0 custom-control custom-checkbox">
-                          <input type="checkbox" autocomplete="off" class="custom-control-input" v-model="it.checked" :id="`check_${index}`">
+                          <input type="checkbox" autocomplete="off" class="custom-control-input"  :checked="it.checked" @change="() => {
+                              items = items.map((e,i) => {
+                                if(i == index) {
+                                  e.checked = !e.checked
+                                }
+                                return e
+                              })
+                            }" :id="`check_${index}`">
                           <label class="custom-control-label" :for="`check_${index}`"></label>
                         </div>
                       </div>
@@ -123,9 +134,12 @@
                       <button v-if="!consultor" @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-info">
                         <div class="simple-icon-eye"/>
                       </button>
-                      <router-link class="btn btn-outline-info" :to="`/app/order/edit/${it.id}`">
-                        <div class="simple-icon-eye"/>
-                      </router-link>
+                      <b-dropdown v-else id="ddown1" text="Ações" variant="outline-secondary">
+                          <b-dropdown-item @click="link(`/app/order/edit/${it.id}`)">
+                              Editar
+                          </b-dropdown-item>
+                          <b-dropdown-item @click="resend(it.id)">Reenviar proposta</b-dropdown-item>
+                      </b-dropdown>
                       <button v-if="it.status != 'Aprovado' && it.status != 'Aguardando'" @click="swalsendOrder(it.id)" v-b-modal.modalright class="d-none btn btn-outline-success">
                         <div class="simple-icon-doc"/>
                       </button>
@@ -289,6 +303,7 @@ export default {
     return {
       pc:{},
       selectAll: false,
+      statusCheck: false,
       feedback:'',
       order: null,
       items: null,
@@ -311,6 +326,9 @@ export default {
     }
   },
   methods: {
+    link(url){
+      this.$router.push(`${url}`);
+    },
     isImage(ima){
       let existe = ['png', 'jpeg', 'jpg', 'gif', 'svg', 'heic'].map(r => { return ima.split(';')[0].indexOf(r) }).filter(r => r >= 0);
       return existe.length
@@ -322,7 +340,10 @@ export default {
           status: orderType ? orderType : ''
         }
       });
-      this.items = items.data.data.orders;
+      this.items = items.data.data.orders.map(r => {
+        r.checked = false;
+        return r;
+      });
       this.total = items.data.data.total
     },
     getInfoOrder(index) {
@@ -331,7 +352,7 @@ export default {
     },
     async getOrderFilter() {
       this.processing = true;
-      const orderType = this.$route.path.split('/')[3];
+      const orderType = this.filter.status ? this.filter.status : this.$route.path.split('/')[3];
       let params = this.filter;
       params.status = orderType ? orderType : ''
       const items = await api.get('/order', {

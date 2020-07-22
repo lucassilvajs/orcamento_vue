@@ -27,7 +27,7 @@
             <b-form-file v-model="pc.file"  placeholder="Anexar"></b-form-file>
           </b-input-group>
           <div class="text-right">
-            <b-button variant="success" :disabled="processingPc" :class="{'float-right mb-3 btn-multiple-state btn-shadow': true,
+            <b-button variant="success" v-if="order.orders.length == 1" :disabled="processingPc" :class="{'float-right mb-3 btn-multiple-state btn-shadow': true,
                 'show-spinner': processingPc,
                 'show-success': !processingPc && uploadError===false,
                 'show-fail': !processingPc && uploadError }" @click="sendPedidoCompra">
@@ -62,7 +62,7 @@
         </b-card-body>
       </b-card>
 
-      <b-card v-if="order.orders.length">
+      <b-card v-if="order.orders.length > 1">
         <b-alert show variant="success">Gostaria de fazer uma aprovação parcial?<br /> Selecione as solicitações que você gostaria de aprovar</b-alert>
 
         <div class="row mb-3 list-head">
@@ -124,19 +124,19 @@
                   <span class="bounce3"></span>
               </span>
               <span class="icon success">
-                  Aprovar selecionados <span class="badge badge-light">{{order.orders.filter(r => r.checked).length}}</span>
+                  Aprovar {{order.pedido_compra ? 'e enviar pedido de compra' : ''}} <span class="badge badge-light">{{order.orders.filter(r => r.checked).length}}</span>
               </span>
               <span class="icon fail">
                   <i class="simple-icon-exclamation"></i>
               </span>
-              <span class="label">Aprovar selecionados <span class="badge badge-light">{{order.orders.filter(r => r.checked).length}}</span></span>
+              <span class="label">Aprovar {{order.pedido_compra ? 'e enviar pedido de compra' : ''}} <span class="badge badge-light">{{order.orders.filter(r => r.checked).length}}</span></span>
           </b-button>
 
       </b-card>
     </b-colxx>
 
     <b-colxx xxs="12" lg="6" class="mb-5">
-      <b-card class="mb-5 invoice-contents" no-body>
+      <b-card v-if="false" class="mb-5 invoice-contents" no-body>
         <b-card-body class="d-flex flex-column justify-content-between">
           <div class="d-flex flex-column">
             <div class="d-flex flex-row justify-content-between mb-5">
@@ -292,7 +292,7 @@ export default {
             this.processing = false;
             this.feedbackSend = true;
         },
-        async sendPedidoCompra(){
+        async sendPedidoCompra(typeRequest = false){ //typeRequest é true quandoa função é chamada pelo proprio sistema e não pelo evento (click)
           if(!this.pc.number) {
             this.$notify("error", 'Ops...!', 'Por favor insira o número pedido de compra.', {
               duration: 3000,
@@ -312,11 +312,17 @@ export default {
             const order = await api.put(`order/addPc/${this.order.order}`, {fileName, number: this.pc.number});
             this.processingPc = false;
             this.pcSend = true;
-            this.$notify("success", 'Sucesso', 'Seu pedido de compra foi inserido com sucesso.', {
-                duration: 3000,
-                permanent: false
-            });
+
+            if(!typeRequest) {
+              this.$notify("success", 'Sucesso', 'Seu pedido de compra foi inserido com sucesso.', {
+                  duration: 3000,
+                  permanent: false
+              });
+            }
+
+            return order
           }
+
         },
         changeAll(){
           console.log(this.order.orders)
@@ -326,8 +332,31 @@ export default {
           console.log(checked)
         },
         async approveSelected(){
-          this.processing = true;
           let checked = this.order.orders.filter(r => r.checked).map(r => r.order_id);
+
+          if(checked.length == 0) {
+            this.$swal.fire({
+              title: 'Ops...!',
+              text: "Por favor, selecione pelo menos uma solicitação!",
+              icon: 'error',
+            });
+            return false
+          }
+          if(this.order.pedido_compra && (!this.pc.number && !this.pc.file) ) {
+            this.$swal.fire({
+              title: 'Ops...!',
+              text: "Por favor, adicione o pedido de compra!",
+              icon: 'error',
+            });
+            return false;
+          }
+
+          if(this.order.pedido_compra &&  (this.pc.number || this.pc.file)){
+            await this.sendPedidoCompra();
+          }
+
+
+          this.processing = true;
 
           const split = await api.post('/order/split', {checked});
           this.$swal.fire({
@@ -336,18 +365,10 @@ export default {
             icon: split.data.status,
           }).then(async (result) => {
             if (result.value) {
-              if(split.data.dest) {
-                this.$router.push(`/proposta/${split.data.dest}/approved`);
-                this.getOrder();
-              }
-
             }
           });
           this.processing = false;
-
-
-
-
+          this.getOrder();
         },
         changed(ind){
           this.order.orders = this.order.orders.map((r,i) => {

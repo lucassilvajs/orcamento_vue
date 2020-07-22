@@ -1,25 +1,13 @@
 <template>
 	<div style="width:100%; position:relative;">
-    <div v-if="!img && totem && showMessage" class="text-center message-action" style="z-index:1; position: relative; width: 500px;margin: 0 auto; height:70px;">
-      <span v-if="target == 'face'" class="arrow-up" style="left:-30px;">↑</span>
-      <h3 v-if="target == 'face'" class="d-inline-block">Olhe fixamente para a câmera e<br />mantenha os olhos aberto no momento da captura</h3>
-      <h3 v-if="target == 'recipe'" class="d-inline-block">Por favor certifique-se de que a receita <br/> está legível e completa.</h3>
-      <span v-if="target == 'face'" class="arrow-up" style="right:-30px;">↑</span>
-    </div>
-		<select  v-if="devices.length > 0" v-model="deviceId" name="" id="" class="d-none">
-			<option v-for="device in devices" :selectFirstDevice="true" :value="device.deviceId" :key="device.deviceId">{{device.label.indexOf('front') >= 0 ? 'Camera Frontal' : 'Camera Traseira'}}</option>
-		</select>
 			<div class="target-foto">
 			<img v-if="img && !hasImage" :src="img" alt="" style="width:100%;">
-
       <iframe v-if="hasImage" :src="img" frameborder="0" style="width:100%; height:400px"></iframe>
       <div class="area">
         <div class="counter">
           <span class="count">{{timeAwait}}</span>
         </div>
-        <video v-if="!img" autoplay="true" id="webCamera" >
-        </video>
-
+        <video v-if="!img" autoplay="true" id="webCamera" ></video>
         <img id="imagemConvertida"/>
         <p id="caminhoImagem" class="caminho-imagem"><a href="" target="_blank"></a></p>
       </div>
@@ -79,14 +67,15 @@ export default {
       hasImage: false,
       fileObject: null,
       timeAwait: 5,
-      showMessage: false
+      showMessage: false,
+      value: 0
 		}
 	},
 	props: ["target", "sac"],
 	components: {
     	'vue-web-cam': WebCam
 	},
-	name: 'take-photo',
+	name: 'take-photo-default',
 	computed: {
         device: function() {
             return this.devices.find(n => n.deviceId === this.deviceId);
@@ -96,6 +85,10 @@ export default {
         }
     },
 	methods: {
+    emitirInformacao(){
+      this.value++;
+      this.$emit('emitindo', this.value)
+    },
 		showCam: function() {
       this.img = this.$refs.web.capture();
       this.fileObject = false;
@@ -175,6 +168,7 @@ export default {
             success: async (result) => {
               fd.append('file', result, result.name+ext);
               file = await api.post(`saveFile/${this.target}`, fd);
+              this.$emit('photoInfo', file.data)
               if(file.data.status != 'success') {
                 this.uploadError = true
                 setTimeout(() => {
@@ -182,45 +176,13 @@ export default {
                 }, 3500);
               }
 
-              if(!this.sac){
-                if(file.data.status == 'success') {
-                  let order = window.localStorage.getItem('order');
-                  if(order) {
-                    order = JSON.parse(order)
-                  }else{
-                    order = {};
-                  }
-
-                  order[this.target] = file.data.data;
-
-                  window.localStorage.setItem('order', JSON.stringify(order));
-                }
-              }
-
-              if(!this.sac) {
-                const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
-                this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-                  duration: 3000,
-                  permanent: false
-                });
-                this.$router.push(`/app/order/${redirect}`);
-              }
-
-              if(this.sac) {
-                console.log(file);
-                this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-                  duration: 3000,
-                  permanent: false
-                });
-
-                window.localStorage.setItem('sac', file.data.data);
-              }
               this.processing = false;
             }
           });
         }else{
           fd.append('file', fileToCompress, 'file.'+ext);
           file = await api.post(`saveFile/${this.target}`, fd);
+          this.$emit('photoInfo', file.data)
           if(file.data.status != 'success') {
           this.uploadError = true
           setTimeout(() => {
@@ -228,45 +190,11 @@ export default {
           }, 3500);
         }
 
-        if(!this.sac){
-          if(file.data.status == 'success') {
-            let order = window.localStorage.getItem('order');
-            if(order) {
-              order = JSON.parse(order)
-            }else{
-              order = {};
-            }
-
-            order[this.target] = file.data.data;
-
-            window.localStorage.setItem('order', JSON.stringify(order));
-          }
-        }
-
-        if(!this.sac) {
-          const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
-          this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-            duration: 3000,
-            permanent: false
-          });
-          this.$router.push(`/app/order/${redirect}`);
-        }
-
-        if(this.sac) {
-          console.log(file);
-          this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-            duration: 3000,
-            permanent: false
-          });
-
-          window.localStorage.setItem('sac', file.data.data);
-        }
         this.processing = false;
+
         }
-      }else{
-        const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
-        this.$router.push(`/app/order/${redirect}`);
       }
+
 		},
 		checkImg() {
 			let order = window.localStorage.getItem('order');
@@ -346,8 +274,6 @@ export default {
         document.querySelector('.counter').classList.remove('d-flex');
       }, this.timeAwait * 1000);
 
-
-
       // sendSnapShot(dataURI); //Gerar Imagem e Salvar Caminho no Banco
     },
     loadCamera(){
@@ -406,9 +332,7 @@ export default {
         },
         img: function(ima) {
           this.hasImage = false;
-          console.log(ima.split(';')[0]);
           let existe = ['png', 'jpeg', 'jpg', 'gif', 'svg', 'heic'].map(r => { return ima.split(';')[0].indexOf(r) }).filter(r => r >= 0);
-          console.log(existe)
           this.hasImage = !existe.length
         }
 	},
