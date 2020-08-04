@@ -46,9 +46,10 @@
                 <td>{{sac.name}}</td>
                 <td>{{sac.cnpj}}</td>
                 <td>{{sac.date | date}}</td>
-                <td> <span :style="{background:sac.color}" style="color:#fff; padding:5px 7px; border-radius:3px;">{{sac.status}}</span> </td>
                 <td>
-                    <button @click="getInfoSAC(index)" v-b-modal.modalright class="btn btn-outline-success">
+                  <span :style="{background:sac.color}" style="color:#fff; padding:5px 7px; border-radius:3px;">{{sac.status}}</span> </td>
+                <td>
+                    <button @click="getInfoSAC(index)" v-b-modal.r class="btn btn-outline-success">
                         <div class="glyph-icon simple-icon-eye"/>
                     </button>
                 </td>
@@ -68,7 +69,7 @@
     </b-colxx>
   </b-row>
 
-  <b-modal id="modalright" ref="modalright" :title="`SAC #${modal.id}`" modal-class="modal-right">
+  <b-modal id="r" ref="r" :title="`SAC #${modal.id}`" modal-class="modal-right">
     <div v-if="true">
       <b>Nota: </b>{{modal.nota}}<br />
       <b>Colaborador: </b>{{modal.colaborador}}<br />
@@ -76,7 +77,10 @@
       <b>Solicitação: </b>{{modal.date | date}}<br />
       <b>O que aconteceu:</b> {{modal.about}} <br />
       <b>Nota:</b> <br />
-      <img class="w-100" :src="baseURL + modal.image" alt="">
+      <div v-for="(img, i) in modal.image" :key="i">
+        <img target="_blank" v-if="['jpg', 'jpeg', 'png', 'gif', 'svg'].indexOf(img.split('.')[img.split('.').length - 1]) >= 0" :src="baseURL+img" class="w-100 mt-3" alt="">
+        <iframe v-else class="w-100 mt-3" :src="baseURL + img" frameborder="0"></iframe>
+      </div>
       <hr class="my-3">
       <div v-if="modal.order_id">
         <h3>Informações do pedido</h3>
@@ -110,11 +114,11 @@
 
       <template slot="modal-footer">
           <div v-if="modal.status == 'Aberto'">
-            <b-button variant="success" @click="somethingModal('modalright', 'approved')" class="mr-1">Aprovar</b-button>
-            <b-button variant="secondary" @click="somethingModal('modalright', 'reproved')" class="mr-1">Reprovar</b-button>
+            <b-button variant="success" @click="changeStatus('approved')" class="mr-1">Aprovar</b-button>
+            <b-button variant="secondary" @click="changeStatus('reproved')" class="mr-1">Reprovar</b-button>
 
           </div>
-          <b-button variant="info" @click="hideModal('modalright')">Fechar</b-button>
+          <b-button variant="info" @click="hideModal('r')">Fechar</b-button>
       </template>
   </b-modal>
 
@@ -148,10 +152,22 @@ export default {
       const filter = (this.filter.status ? this.filter.status : '');
       const response = await api.get(`admin/sac/${filter}`);
       this.data = response.data.data;
+      this.data.sac = this.data.sac.map(r => {
+        let image = [];
+
+        try {
+          image = JSON.parse(r.image)
+        } catch (error) {
+          image.push(r.image)
+        }
+
+        r.image = image
+        return r;
+      })
     },
     getInfoSAC(index) {
-      this.modal = this.data.sac[index];
       this.index = index;
+      this.modal = this.data.sac[this.index];
     },
     hideModal (refname) {
       this.$refs[refname].hide()
@@ -161,26 +177,45 @@ export default {
         this.$refs['modalnested'].show()
       }
     },
-    somethingModal (refname, status='') {
-      if(status != '') {
-        this.changeStatus(status);
-      }
+    somethingModal (refname) {
       this.$refs[refname].hide()
-      console.log('something modal:: ' + refname)
 
       if (refname === 'modalnestedinline') {
         this.$refs['modalnested'].show()
       }
     },
     async changeStatus(status) {
-      const response = await api.put(`admin/sac/${this.modal.id}`, {status, info: this.modal});
-      let res = response.data;
-      this.$notify(res.status, res.status == 'success' ? 'Sucesso' : 'Opsss!', res.message, {
-        duration: 3000,
-        permanent: false
+       await this.$swal.fire({
+        title: `O que você acha?`,
+        text: `Você realmente deseja ${status == 'approved' ? 'aprovar' :  'reprovar'} essa solicitação?`,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sim',
+        cancelButtonText: 'Não',
+        showLoaderOnConfirm: true,
+      }).then(async (result) => {
+        if(result.value) {
+          if(status != '') {
+            const response = await api.put(`admin/sac/${this.modal.id}`, {status, info: this.modal});
+            let res = response.data;
+            this.$notify(res.status, res.status == 'success' ? 'Sucesso' : 'Opsss!', res.message, {
+              duration: 3000,
+              permanent: false
+            });
+            await this.getSac();
+
+            this.modal = this.data.sac[this.index];
+
+            if(res.status == 'success') {
+              this.somethingModal('modalright')
+            }
+          }
+        }
+
       });
 
-      this.data = response.data.data;
 
 
     }

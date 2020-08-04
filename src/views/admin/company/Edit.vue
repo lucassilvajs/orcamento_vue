@@ -88,17 +88,38 @@
                       <b-form-input v-model="company.days_sent" type="text" placeholder="Nome da empresa" />
                     </b-form-group>
                   </b-colxx>
+                  <b-colxx md="4" lg="3">
+                    <b-form-group label="PDF Anexo" class="has-float-label mb-4">
+                      <select class="form-control" v-model="company.attachment">
+                        <option value="0">Não enviar</option>
+                        <option value="1">Enviar</option>
+                      </select>
+                    </b-form-group>
+                  </b-colxx>
                 </b-row>
             </b-card>
             <b-card class="mb-4" title="Tabela de preços dinamica" v-if="allProduct">
                 <div class="alert alert-info">Para manter o preço original você pode deixar o campo do valor zerado</div>
                 <b-row>
                     <b-colxx md="3" lg="3" v-for="(pro, index) in allProduct" :key="index">
-                        {{pro.name}}
-                        <b-input-group class="mb-3">
-                            <Money class="form-control" v-model="pro.value" :disabled="true" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
-                            <Money class="form-control" v-model="pro.valueD" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
-                        </b-input-group>
+                        <div v-if="pro.name.indexOf('EPI STEALTH') >= 0">
+                          <div v-for="(attr, attrIndex) in pro.variation.attributes[0].values" :key="attrIndex">
+                            {{pro.name}} {{attr}}
+                            <b-input-group class="mb-3" >
+                                <Money class="form-control" v-model="pro.variation.attributes[0].price[attrIndex]" :disabled="true" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
+
+                                <Money class="form-control" v-model="pro.variation.valueDA[attrIndex]" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
+                            </b-input-group>
+                          </div>
+                        </div>
+                        <div v-else>
+                          {{pro.name}}
+                          <b-input-group class="mb-3">
+                              <Money class="form-control" v-model="pro.value" :disabled="true" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
+
+                              <Money class="form-control" v-model="pro.valueDA" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
+                          </b-input-group>
+                        </div>
                     </b-colxx>
                 </b-row>
             </b-card>

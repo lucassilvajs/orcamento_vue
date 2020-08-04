@@ -44,7 +44,10 @@
         <b>Colaborador: </b>{{modal.colaborador}}<br />
         <b>Solicitação: </b>{{modal.date | date}}<br />
         <b>Imagem:</b> <br />
-        <img class="w-100" :src="baseURL + modal.image" alt="">
+        <div v-for="(img, i) in modal.image" :key="i">
+          <img target="_blank" v-if="['jpg', 'jpeg', 'png', 'gif', 'svg'].indexOf(img.split('.')[img.split('.').length - 1]) >= 0" :src="baseURL+img" class="w-100 mt-3" alt="">
+          <iframe v-else class="w-100 mt-3" :src="baseURL + img" frameborder="0"></iframe>
+        </div>
         <template slot="modal-footer">
           <b-button variant="info" @click="hideModal('modalright')">Fechar</b-button>
         </template>
@@ -72,7 +75,16 @@ export default {
   methods: {
     async getOrder() {
       const items = await api.get('/sac');
-      this.items = items.data.data
+      this.items = items.data.data.map(r => {
+        let image = [];
+        try {
+          image = JSON.parse(r.image)
+        } catch (e) {
+          image.push(r.image)
+        }
+        r.image = image;
+        return r
+      })
     },
     getInfoSAC(index) {
       this.modal = this.items[index];

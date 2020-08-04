@@ -21,7 +21,8 @@
                             <p v-if="order.product.size"><b>Tamanho: </b>{{order.product.size}}</p>
                             <p v-if="order.product.color"><b>Cor: </b>{{order.product.color}}</p>
                             <div v-if="order.product.attributes">
-                              <p v-for="(attr, iAttr) in order.product.attributes" :key="iAttr">- <b>{{attr.select}}</b></p>
+                              {{order.product.attributes}}
+                              <!-- <p v-for="(attr, iAttr) in order.product.attributes" :key="iAttr">- <b>{{attr.select}}</b></p> -->
                             </div>
                             <hr />
                             <div v-if="order.lens">

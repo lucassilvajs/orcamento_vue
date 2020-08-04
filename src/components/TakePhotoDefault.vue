@@ -71,7 +71,7 @@ export default {
       value: 0
 		}
 	},
-	props: ["target", "sac"],
+	props: ["target", "sac", "clearAfterEmit"],
 	components: {
     	'vue-web-cam': WebCam
 	},
@@ -134,6 +134,7 @@ export default {
       file.readAsDataURL(e.target.files[0]);
 		},
 		async sendImage() {
+      this.processing = false;
 			if(this.img.length > 100){
         this.processing = true;
         let file = '';
@@ -169,6 +170,9 @@ export default {
               fd.append('file', result, result.name+ext);
               file = await api.post(`saveFile/${this.target}`, fd);
               this.$emit('photoInfo', file.data)
+                if(this.clearAfterEmit) {
+                  this.img = false; this.loadCamera(); this.fileObject = null;
+                }
               if(file.data.status != 'success') {
                 this.uploadError = true
                 setTimeout(() => {
@@ -183,17 +187,19 @@ export default {
           fd.append('file', fileToCompress, 'file.'+ext);
           file = await api.post(`saveFile/${this.target}`, fd);
           this.$emit('photoInfo', file.data)
+          if(this.clearAfterEmit) {
+            this.img = false; this.loadCamera(); this.fileObject = null;
+          }
           if(file.data.status != 'success') {
-          this.uploadError = true
-          setTimeout(() => {
-            this.uploadError = false
-          }, 3500);
-        }
+            this.processing = false;
+            this.uploadError = true
+            setTimeout(() => {
+              this.uploadError = false
+            }, 3500);
+          }
 
-        this.processing = false;
-
         }
-      }
+    }
 
 		},
 		checkImg() {
@@ -331,7 +337,9 @@ export default {
             }
         },
         img: function(ima) {
+          this.processing = false;
           this.hasImage = false;
+          if(!ima || ima.indexOf(';') === -1) return false;
           let existe = ['png', 'jpeg', 'jpg', 'gif', 'svg', 'heic'].map(r => { return ima.split(';')[0].indexOf(r) }).filter(r => r >= 0);
           this.hasImage = !existe.length
         }

@@ -30,10 +30,23 @@
                     <textarea v-model="form.sobre" placeholder="Conte-nos o que aconteceu" rows="4" class="form-control mb-3"></textarea>
                   </b-colxx>
                 </b-row>
+                <b-row v-if="imgList">
+                  <b-colxx xxs="4" v-for="(img, ind) in imgList" :key="ind">
+                    <b-card class="p-0 img">
+                      <a :href="baseURL + img.data">
+                        <img target="_blank" v-if="['jpg', 'jpeg', 'png', 'gif', 'svg'].indexOf(img.data.split('.')[img.data.split('.').length - 1]) >= 0" :src="baseURL+img.data" class="w-100" alt="">
+                        <div v-else class="pdf-file">
+                          <i class="simple-icon-doc"></i>
+                          <span style="font-size:.8rem;">Documento</span>
+                        </div>
+                      </a>
+                    </b-card>
+                  </b-colxx>
+                </b-row>
               </b-colxx>
               <b-colxx md="6">
                 <label for="">Envie uma foto</label>
-                <take-photo style="max-width:500px;" sac="1" target="sac"/>
+                <take-photo-default @photoInfo="getInfoPhoto" :clearAfterEmit="true" style="max-width:500px;" sac="1" target="sac"/>
               </b-colxx>
             </b-row>
             <b-row>
@@ -53,11 +66,11 @@ import 'vue-select/dist/vue-select.css';
 import {
     VueAutosuggest
 } from 'vue-autosuggest'
-import {api} from '@/constants/config';
-import takePhoto from '@/components/takePhoto';
+import {api, baseURL} from '@/constants/config';
+import takePhoto from '@/components/TakePhotoDefault';
 export default {
   components: {
-    'take-photo': takePhoto,
+    'take-photo-default': takePhoto,
     'vue-autosuggest': VueAutosuggest,
     'v-select': vSelect,
 	},
@@ -66,6 +79,7 @@ export default {
       companiesValue: null,
       setCompany: null,
       companies: null,
+      imgList: [],
       form: {
         colaborador: '',
         nota: '',
@@ -74,13 +88,17 @@ export default {
       vueAutosuggestForm: {
         selected: {}
       },
+      baseURL
     }
   },
   methods: {
+    async getInfoPhoto(img){
+      this.imgList.push(img)
+    },
     async addSac(e) {
       e.preventDefault();
 
-      let image = window.localStorage.getItem('sac');
+      let image = this.imgList;
       let company = '';
       if(this.setCompany) {
         company = this.setCompany.code
@@ -142,3 +160,14 @@ export default {
   }
 }
 </script>
+<style scoped>
+.img .card-body {
+  padding: 10px;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: #a00;
+}
+</style>

@@ -5,14 +5,14 @@
           <div class="d-flex justify-content-between">
             <h1>Edição de pedido</h1>
             <div class="controllers">
-              <button v-if="orders && orders.lenght >= 2" class="btn btn-outline-dark" @click="splitOrder">Dividir pedidos</button>
+              <!-- <button v-if="orders && orders.lenght >= 2" class="btn btn-outline-dark" @click="splitOrder">Dividir pedidos</button>
               <b-button-group class="mb-2">
                 <b-dropdown variant="success" right text="Alterar status">
                     <b-dropdown-item :disabled="orders[0].order_status == 'pending'" @click="changeStatus('pending')">Pendente</b-dropdown-item>
                     <b-dropdown-item :disabled="orders[0].order_status == 'approved'" @click="changeStatus('approved')">Aprovado</b-dropdown-item>
                     <b-dropdown-item :disabled="orders[0].order_status == 'reproved'" @click="changeStatus('reproved')">Reprovado</b-dropdown-item>
                 </b-dropdown>
-              </b-button-group>
+              </b-button-group> -->
             </div>
 
           </div>
@@ -30,11 +30,17 @@
                 </b-colxx>
               </b-row>
               <hr>
+                {{order.order_attributes.lens}}
               <b-row v-for="(item, itemIndex) in order.order_attributes.lens" :key="itemIndex">
                 <b-colxx md="4" lg="3" v-for="(itemLen, lenIndex) in item" :key="lenIndex" >
                   <b-form-group :label="{code: 'Código', name: 'Nome', price: 'Preço', type: 'Tipo'}[lenIndex]" class="has-float-label mb-4">
-                      <b-form-input v-if="lenIndex != 'price'" type="text" :disabled="lenIndex != 'price'" placeholder="Nome" v-model="orders[index].order_attributes.lens[itemIndex][lenIndex]" />
-                      <Money v-else class="form-control" :disabled="true" v-model="orders[index].order_attributes.lens[itemIndex][lenIndex]" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
+                      <b-form-input v-if="lenIndex != 'price'" type="text" placeholder="Nome" v-model="orders[index].order_attributes.lens[itemIndex][lenIndex]" />
+                      <v-select v-else-if="lenIndex == 'name'" v-model="orders[index].order_attributes.lens[itemIndex][lenIndex]" :options="[
+                        {code: 'EPI ID 101 A', label: 'EPI ID 101 A'},
+                        {code: 'EPI ID 101 B', label: 'EPI ID 101 B'},
+                        {code: 'EPI ID 101 R', label: 'EPI ID 101 R'}
+                      ]" dir="ltr" />
+                      <Money v-else class="form-control" :disabled="1" v-model="orders[index].order_attributes.lens[itemIndex][lenIndex]" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
                   </b-form-group>
                 </b-colxx>
               </b-row>
@@ -58,7 +64,7 @@
             </b-card>
         </b-colxx>
     </b-row>
-    <b-row class="my-3">
+    <!-- <b-row class="my-3 ">
       <b-colxx xxs="3" v-for="tag in like" :key="tag.order_id" class="mb-3">
         <b-card class="position-relative">
           <span class="status position-absolute">
@@ -89,7 +95,7 @@
       <b-colxx xxs="12">
         <button class="btn btn-success btn-lg btn-block" @click="vincular">Vincular pedidos</button>
       </b-colxx>
-    </b-row>
+    </b-row> -->
   <b-modal v-if="changeImage" id="modalbasic" ref="modalbasic" title="Alterar imagem">
       <take-photo-default :target="changeImage.type" @photoInfo="photoInfo" />
       <template slot="modal-footer">

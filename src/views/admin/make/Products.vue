@@ -28,10 +28,15 @@
 											{{color.name}}
 										</option>
 									</select>
-									<select v-for="(attr, iAttr) in pro.attributes" v-model="pro.attributes[iAttr].select" :key="attr.name" class="form-control mb-2">
+									<!-- <select v-for="(attr, iAttr) in pro.attributes" v-model="pro.attributes[iAttr].select" :key="attr.name" class="form-control mb-2">
 										<option value="">Selecione...</option>
 										<option v-for="(val, iVal) in attr.value" :value="val.name" :key="iVal">{{val.name}}</option>
-									</select>
+									</select> -->
+                  <select v-if="pro.attributes" v-model="pro.attributes.select" class="form-control mb-2">
+                  <!-- <select v-for="(attr, iAttr) in pro.attributes" :key="iAttr" v-model="pro.attributes[iattr]" class="form-control mb-2"> -->
+                    <option>Com mascara</option>
+                    <option>Sem mascara</option>
+                  </select>
 								<div class="separator my-2"></div>
 								<button class="btn btn-outline-success float-right w-100">Adicionar</button>
 							</form>
@@ -64,20 +69,27 @@ export default {
 	methods: {
 		setProduct: function (index) {
       let resp = false;
-      if(this.products.data[index].attributes){
-        resp = this.products.data[index].attributes.filter(r => {
-          if(r.select.length) {
-            return r
-          }
-        });
-      }
+      // if(this.products.data[index].attributes){
+      //   resp = this.products.data[index].attributes.filter(r => {
+      //     if(r.select.length) {
+      //       return r
+      //     }
+      //   });
+      // }
 
       if(!resp || resp.length == 0){
-        if( (!this.products.data[index].colorSelected || !this.products.data[index].sizeSelected) ){
+        if(this.products.data[index].attributes) {
+          if(!this.products.data[index].attributes.select) {
+            this.$notify("error", 'Opsss.!!!', "Você precisa selecionar o item", {
+              duration: 3000,
+              permanent: false
+            }); return false
+          }
+        }else if( (!this.products.data[index].colorSelected || !this.products.data[index].sizeSelected) ){
           this.$notify("error", 'Opsss.!!!', "Você precisa selecionar o tamanho e a cor do seu óculos", {
             duration: 3000,
             permanent: false
-          });
+          }); return false
         }
       }
 			let order = window.localStorage.getItem('order');
@@ -92,7 +104,7 @@ export default {
 				color: this.products.data[index].colorSelected,
 				size: this.products.data[index].sizeSelected,
         image: this.products.data[index].color ? this.products.data[index].color.filter(color => color.name == this.products.data[index].colorSelected)[0].image : '',
-        attributes: resp
+        attributes: this.products.data[index].attributes.select
 			};
 			window.localStorage.setItem('order',JSON.stringify(order));
 			this.$router.push("/admin/make/lens");

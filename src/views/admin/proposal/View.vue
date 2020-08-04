@@ -42,10 +42,9 @@
               </b-form-group>
           </b-colxx>
           <b-colxx lg="3">
-            <b-form-group>
-            </b-form-group>
-              <!-- <b-form-group label="Até:" class="has-float-label mb-4">
-              </b-form-group> -->
+              <b-form-group label="Consultor" class="has-float-label mb-4">
+                <v-select v-model="filter.consult" :options="suggestions" dir="ltr"></v-select>
+              </b-form-group>
           </b-colxx>
           <b-colxx lg="12">
               <button class="btn btn-outline-success float-right" @click="() => {filter.page = 1; getOrder()}">Buscar</button>
@@ -101,10 +100,9 @@
                   }) | numeroPreco}}</td>
                 <td>{{item.multiple == 'pending' ? 'Proposta agendada' : item.status}}</td>
                 <td>
-                  <!-- <button @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-success">
+                  <button @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-success">
                     <div class="simple-icon-doc"/>
-                  </button> -->
-                  <router-link class="btn btn-outline-success" :to="`/admin/proposal/edit/${item.id}`"><div class="simple-icon-doc"/></router-link>
+                  </button>
                   <button class="btn btn-outline-danger" @click="deleteOrder(item.id)"><div class="simple-icon-trash"/></button>
                 </td>
               </tr>
@@ -160,18 +158,23 @@
           <b-button v-if="false && order.status == 'Pendente'" variant="success" @click="changeStatus('approved', order.id)">Aprovar</b-button>
           <b-button v-if="false && order.status == 'Pendente'" variant="danger" @click="changeStatus('reproved', order.id)">Reprovar</b-button><br>
           <b-button v-if="false && order.status == 'Pendente'" variant="primary" @click="reenviar(order.id)">Reenviar</b-button>
-          <b-button variant="info" @click="hideModal('modalright')">Fechar</b-button>
+          <button class="btn btn-outline-danger" @click="hideModal('modalright')">Fechar</button>
+          <router-link class="btn btn-info" :to="`/admin/proposal/edit/${order.id}`">Editar</router-link>
+
       </template>
   </b-modal>
 
 </div>
 </template>
 <script>
+import vSelect from 'vue-select';
+import 'vue-select/dist/vue-select.css';
 import { api, baseURL } from '@/constants/config'
 import Stars from '@/components/Common/Stars';
 export default {
   components: {
-    'stars': Stars
+    'stars': Stars,
+    'v-select': vSelect,
   },
   data () {
     return {
@@ -182,7 +185,8 @@ export default {
       check: null,
       selectAll: false,
       filter: {},
-      total: 0
+      total: 0,
+      suggestions: []
     }
   },
   methods: {
@@ -191,8 +195,17 @@ export default {
       return existe.length
     },
     async getOrder() {
+      console.log('Oi')
+      this.items = null;
       const items = await api.get('/admin/proposal', {
         params: this.filter
+      });
+
+      this.suggestions = items.data.data.consult.map(r => {
+        return {
+          code: r.id,
+          label: r.name
+        }
       });
 
       this.items = items.data.data.orders.map(r => {
@@ -363,13 +376,13 @@ export default {
         })
     },
     sum_array(arr) {
-        let total = 0;
-        arr.forEach(e => {
-          total += Number(e)
-        });
+      let total = 0;
+      arr.forEach(e => {
+        total += Number(e)
+      });
 
-        return total;
-      },
+      return total;
+    },
   },
   created(){
     this.getOrder();

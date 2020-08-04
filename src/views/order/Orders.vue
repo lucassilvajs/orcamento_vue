@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="items">
     <b-row>
       <b-colxx>
         <b-card class="mb-4">
@@ -131,15 +131,10 @@
                     <td>{{it.date}}</td>
                     <td>{{it.multiple == 'pending' ? 'Proposta agendada' : it.status}}</td>
                     <td>
-                      <button v-if="!consultor" @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-info">
+                      <button @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-info">
                         <div class="simple-icon-eye"/>
                       </button>
-                      <b-dropdown v-else id="ddown1" text="Ações" variant="outline-secondary">
-                          <b-dropdown-item @click="link(`/app/order/edit/${it.id}`)">
-                              Editar
-                          </b-dropdown-item>
-                          <b-dropdown-item @click="resend(it.id)">Reenviar proposta</b-dropdown-item>
-                      </b-dropdown>
+
                       <button v-if="it.status != 'Aprovado' && it.status != 'Aguardando'" @click="swalsendOrder(it.id)" v-b-modal.modalright class="d-none btn btn-outline-success">
                         <div class="simple-icon-doc"/>
                       </button>
@@ -197,11 +192,11 @@
       </div>
       <hr>
       <div v-for="item in order.attr.lens" :key="item.code">
-        <b>{{item.type}}</b> {{item.name}}
+        <b>{{item.type}}</b> {{item.name}} <span v-if="item.attributes"> - {{item.attributes}} </span>
       </div>
-      <div v-for="attr in order.attr.product.attributes" :key="attr.label">
+      <!-- <div v-for="attr in order.attr.product.attributes" :key="attr.label">
         <b>{{attr.label}}: </b>{{attr.select}}
-      </div>
+      </div> -->
       <div v-if="order.attr.measure">
         <b>DP:</b> {{order.attr.measure.pupillary_distance}}<br />
         <b>ALT:</b> {{order.attr.measure.pupillary_height}}<br />
@@ -214,7 +209,8 @@
       <img class="w-100" :src="baseURL + order.attr.recipe" v-if="isImage(order.attr.recipe)" alt="">
       <iframe height="350" v-else class="w-100" :src="baseURL + order.attr.recipe" frameborder="0"></iframe>
       <template slot="modal-footer">
-          <b-button variant="info" @click="hideModal('modalright')">Fechar</b-button>
+          <button class="btn btn-outline-warning" @click="hideModal('modalright')">Fechar</button>
+          <router-link v-if="consultor" :to="`/app/order/edit/${order.id}`" class="btn btn-info">Editar</router-link>
       </template>
     </b-modal>
 
@@ -288,6 +284,9 @@
       </template>
     </b-modal>
   </div>
+  <div v-else style="height:90vh; display:flex; justify-content:center; align-items:center">
+    <h1>Buscando informações...</h1>
+  </div>
 </template>
 <script>
 import Stars from '@/components/Common/Stars';
@@ -334,6 +333,7 @@ export default {
       return existe.length
     },
     async getOrder() {
+      this.items = null;
       const orderType = this.$route.path.split('/')[3];
       const items = await api.get('/order', {
         params: {

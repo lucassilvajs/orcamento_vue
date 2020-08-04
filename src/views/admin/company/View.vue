@@ -66,6 +66,7 @@
                 <span class="badge mb-1" :class="[{'badge-primary': com.has_contract == 0}, {'badge-success': 1 == com.has_contract}]">{{ com.has_contract == 1 ? 'Tem Contrato' : 'Sem Contrato' }}</span>
                 <span class="badge mb-1" :class="[{'badge-primary': com.pedido_compra == 0}, {'badge-success': 1 == com.pedido_compra}]">{{ com.pedido_compra == 1 ? 'PC Obrigatório' : 'PC não obrigatório' }}</span>
                 <span class="badge mb-1" :class="[{'badge-primary': com.multiple_order == 0}, {'badge-success': 1 == com.multiple_order}]">{{ com.multiple_order == 1 ? 'Carrinho' : 'Compra direta' }}</span>
+                <span class="badge mb-1" :class="[{'badge-primary': com.attachment == 0}, {'badge-success': 1 == com.attachment}]">{{ com.attachment == 1 ? 'Anexo' : 'Sem anexo' }}</span>
               </td>
               <td>{{com.date | date}}</td>
               <td>
