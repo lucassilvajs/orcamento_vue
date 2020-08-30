@@ -102,7 +102,7 @@
                 <div class="alert alert-info">Para manter o preço original você pode deixar o campo do valor zerado</div>
                 <b-row>
                     <b-colxx md="3" lg="3" v-for="(pro, index) in allProduct" :key="index">
-                        <div v-if="pro.name.indexOf('EPI STEALTH') >= 0">
+                        <div v-if="false && pro.name.indexOf('EPI STEALTH') >= 0">
                           <div v-for="(attr, attrIndex) in pro.variation.attributes[0].values" :key="attrIndex">
                             {{pro.name}} {{attr}}
                             <b-input-group class="mb-3" >
@@ -117,7 +117,7 @@
                           <b-input-group class="mb-3">
                               <Money class="form-control" v-model="pro.value" :disabled="true" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
 
-                              <Money class="form-control" v-model="pro.valueDA" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
+                              <Money class="form-control" v-model="pro.valueD" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
                           </b-input-group>
                         </div>
                     </b-colxx>

@@ -7,9 +7,9 @@
         </b-colxx>
     </b-row>
     <b-alert variant="info" show  dismissible>Você pode parametrizar o preço e as variações disponíveis na tela de cadastro/edição da empresa que você quiser!</b-alert>
-    <b-row>
+    <b-row v-if="productInfo.type">
         <b-colxx xxs="12">
-            <b-card class="mb-4" title="Novo produto">
+            <b-card class="mb-4" title="Informações gerais">
                 <b-row>
                     <b-colxx md="4" lg="3">
                         <b-form-group label="Nome do Produto" class="has-float-label mb-4">
@@ -26,56 +26,157 @@
                             </fieldset>
                         </b-form-group>
                     </b-colxx>
-                </b-row>
-            </b-card>
-
-            <b-card class="mb-4" title="Cor">
-                <b-row>
                     <b-colxx md="4" lg="3">
-                        <b-form-group label="SKU (mesmo do bling)" class="has-float-label mb-1">
-                            <b-form-input v-model="color.sku" type="text" placeholder="SKU" />
-                        </b-form-group>
-                        <b-alert variant="info" show  dismissible>O mesmo do bling!</b-alert>
-                        <b-form-group label="Cor" class="has-float-label my-4">
-                            <b-form-input v-model="color.name" type="text" placeholder="Cor" />
-                        </b-form-group>
-                        <vue-dropzone
-                            @vdropzone-complete="completeUpload"
-                            ref="myVueDropzone" id="dropzone" :options="dropzoneOptions"></vue-dropzone>
-                        <button class="btn btn-success w-100 mt-3" @click="addImage">Adicionar Cor</button>
+                      <b-form-group label="Status" class="has-float-label mb-4">
+                        <b-form-select v-model="product.status" :options="[{value: 'Active', text: 'Ativo'}, {value: 'Inactive', text: 'Inativo'}]" />
+                      </b-form-group>
                     </b-colxx>
-                     <b-colxx md="8" lg="9">
-                        <b-row>
-                            <b-colxx v-for="(product,productIndex) in product.colors" xxs="6" lg="3" xl="3" class="mb-4" :key="`product_${productIndex}`">
-                                <b-card no-body>
-                                    <div class="position-relative">
-                                        <b-card-img top :alt="product.name" :src="baseURL+product.image" />
-                                        <h4 class="product_title">{{product.name}}</h4>
-                                    </div>
-                                </b-card>
-                            </b-colxx>
-                        </b-row>
+                    <b-colxx md="4" lg="3">
+                      <b-form-group label="Tipo do produto" class="has-float-label mb-4">
+                        <b-form-select v-model="product.type" :options="productInfo.type.map(r => {
+                          return {value: r.id,
+                          text: r.name}
+                          })" />
+                      </b-form-group>
                     </b-colxx>
                 </b-row>
             </b-card>
 
-            <b-card class="mb-4" title="Tamanho">
+            <b-card class="mb-4" title="Informações gerais" v-if="['1', '6'].indexOf(product.type) >= 0">
                 <b-row>
-                    <b-colxx lg="3">
-                        <div class="alert alert-info"><i class="glyph-icon simple-icon-info"></i> Insira uma medida e tecle Enter</div>
-                        <b-form-group label="Comercial" class="has-float-label mb-4">
-                            <input-tag v-model="product.sizes.commercial"></input-tag>
-                        </b-form-group>
-                        <b-form-group label="Interno" class="has-float-label mb-4">
-                            <input-tag v-model="product.sizes.internal"></input-tag>
-                        </b-form-group>
-                    </b-colxx>
+                  <b-colxx md="6" lg="6">
+                    <b-row class="mb-3">
+                      <b-form-group label="SKU (mesmo do bling)" class="col-lg-6 has-float-label mb-1">
+                          <b-form-input v-model="saveProduct.sku" type="text" placeholder="SKU" />
+                      </b-form-group>
+
+                      <b-form-group label="Cor" class="col-lg-6 has-float-label mb-1">
+                          <b-form-input v-model="saveProduct.name" type="text" placeholder="Cor" />
+                      </b-form-group>
+                    </b-row>
+                    <table class="table">
+                      <thead>
+                        <tr>
+                          <th>Interno</th>
+                          <th>Comercial</th>
+                          <th>Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(size, indexSize) in saveProduct.commercial" :key="indexSize">
+                          <td>
+                            <b-input v-model="saveProduct.internal[indexSize]" />
+                          </td>
+                          <td>
+                            <b-input v-model="saveProduct.commercial[indexSize]" />
+                          </td>
+                          <td>
+                            <button @click="() => {
+                                saveProduct.commercial.splice(indexSize,1)
+                                saveProduct.internal.splice(indexSize,1)
+                              }" class="btn btn-xs btn-outline-danger">
+                              <div class="glyph-icon simple-icon-trash"></div>
+                            </button>
+                          </td>
+                        </tr>
+                        <tr v-if="saveProduct.commercial.length == 0">
+                          <td colspan="3">Nenhum tamanho foi encontrado</td>
+                        </tr>
+                        <tr>
+                          <td colspan="3">
+                            <button @click="() => {
+                                saveProduct.internal.push('');
+                                saveProduct.commercial.push('');
+                            }" class="btn btn-outline-success btn-block">Adicionar <div class="d-inline glyph-icon simple-icon-plus"></div></button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <vue-dropzone
+                        @vdropzone-complete="completeUpload"
+                        ref="myVueDropzone" id="dropzone" :options="dropzoneOptions"></vue-dropzone>
+                    <button class="btn btn-success w-100 mt-3" @click="addInformation">Adicionar informação</button>
+                  </b-colxx>
+                    <b-colxx md="6" lg="6">
+                      <b-row>
+                          <b-colxx v-for="(prod, productIndex) in product.info" xxs="6" lg="6" xl="6" class="mb-4" :key="`product_${productIndex}`">
+                              <b-card no-body>
+                                  <div class="position-relative">
+                                      <button style="position:absolute; right:5px; top:5px;" @click="() => {
+                                          product.info.splice(productIndex,1)
+                                        }" class="btn btn-xs btn-outline-danger">
+                                        <div class="glyph-icon simple-icon-trash"></div>
+                                      </button>
+                                      <b-card-img v-if="prod.image" top :alt="prod.name" :src="baseURL+prod.image" />
+                                      <h4 class="product_title">{{product.name}}</h4>
+                                  </div>
+                              </b-card>
+                          </b-colxx>
+                      </b-row>
+                  </b-colxx>
                 </b-row>
             </b-card>
-        </b-colxx>
-        <b-colxx>
+
+            <b-card class="mb-4" title="Atributos">
+              <b-row v-for="(attr, attrIndex) in product.attributes" :key="attrIndex">
+                <b-colxx md="6" lg="6">
+                  <b-row class="mb-3">
+                    <b-colxx>
+                      <b-form-group label="Nome" class="has-float-label mb-1">
+                        <b-form-input v-model="attr.name" type="text" placeholder="Nome do atributo" />
+                      </b-form-group>
+                    </b-colxx>
+                  </b-row>
+
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th>Valor</th>
+                        <th>SKU</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(at, atIndex) in attrInfo" :key="atIndex">
+                        <td>
+                          <b-input v-model="at.value" />
+                        </td>
+                        <td>
+                          <b-input v-model="at.sku" />
+                        </td>
+                        <td>
+                          <button @click="() => {
+                              at.sku.splice(atIndex,1)
+                              at.sku.splice(atIndex,1)
+                            }" class="btn btn-xs btn-outline-danger">
+                            <div class="glyph-icon simple-icon-trash"></div>
+                          </button>
+                        </td>
+                      </tr>
+                      <tr v-if="saveProduct.commercial.length == 0">
+                        <td colspan="3">Nenhum tamanho foi encontrado</td>
+                      </tr>
+                      <tr>
+                        <td colspan="3">
+                          <button @click="() => {
+                              saveProduct.internal.push('');
+                              saveProduct.commercial.push('');
+                          }" class="btn btn-outline-success btn-block">Adicionar <div class="d-inline glyph-icon simple-icon-plus"></div></button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <vue-dropzone
+                    @vdropzone-complete="completeUpload"
+                    ref="myVueDropzone" id="dropzone" :options="dropzoneOptions"></vue-dropzone>
+                  <button class="btn btn-success w-100 mt-3" @click="addInformation">Adicionar informação</button>
+                </b-colxx>
+              </b-row>
+            </b-card>
+          </b-colxx>
+          <b-colxx>
             <button class="btn btn-success float-right" @click="addProduct">Adicionar Produto</button>
-        </b-colxx>
+          </b-colxx>
     </b-row>
 </div>
 </template>
@@ -98,16 +199,31 @@ export default {
     },
     data() {
         return {
+            productInfo: {},
+            saveProduct: {
+              internal: [],
+              commercial: [],
+              name: '',
+              sku: '',
+              image: ''
+            }, //Armazena informações auxiliares antes de adicionar ao objeto do produto
             product:{
-                type: '',
+                type: '1',
+                status: 'Active',
                 name: '',
                 sku: '',
                 price: '',
-                colors: [],
-                sizes: {
-                    commercial: [],
-                    internal: []
-                }
+                image: '',
+                info: [],
+                attributes: [{
+                  name: '',
+                  info: [
+                    {
+                      value: 'Com máscara',
+                      sku: ''
+                    }
+                  ]
+                }]
             },
             baseURL,
             color: {
@@ -154,17 +270,26 @@ export default {
                 </div>
         `
         },
-        addImage() {
-            if(this.color.name && this.color.image && this.color.sku ){
-                this.product.colors.push({
-                    name: this.color.name,
-                    image: this.color.image,
-                    sku: this.color.sku,
-                });
+        addInformation() {
+            if(this.saveProduct.name && this.saveProduct.image && this.saveProduct.sku){
+              let product = this.saveProduct;
+              this.product.info.push(product);
+              this.saveProduct = {
+                internal: product.internal,
+                commercial: product.commercial,
+                name: '',
+                sku: '',
+                image: ''
+              }
+                // this.product.colors.push({
+                //     name: this.color.name,
+                //     image: this.color.image,
+                //     sku: this.color.sku,
+                // });
 
-                this.color.name = '';
-                this.color.image = '';
-                this.color.sku = '';
+                // this.color.name = '';
+                // this.color.image = '';
+                // this.color.sku = '';
                 this.$refs.myVueDropzone.removeFile(this.file);
             }else{
                 this.$notify("error", "Opsss...!", "Você precisa inserir uma imagem e o nome da cor", {
@@ -175,7 +300,7 @@ export default {
         },
         completeUpload(file) {
             this.file = file;
-            this.color.image = JSON.parse(file.xhr.response).data;
+            this.saveProduct.image = JSON.parse(file.xhr.response).data;
         },
         async addProduct() {
             const response = await api.post('admin/product', this.product);
@@ -191,7 +316,21 @@ export default {
                     permanent: false
                 });
             }
+        },
+        async getInfoProduct(){
+          const response = await api.get('admin/product/info');
+          if(response.data.status == 'success') {
+            if(response.data.data.type) {
+              console.log(response.data.data.type);
+              this.productInfo = response.data.data
+
+              console.log(this.productInfo.type)
+            }
+          }
         }
+    },
+    created(){
+      this.getInfoProduct();
     }
 }
 </script>

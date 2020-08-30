@@ -62,7 +62,8 @@
         </b-colxx>
     </b-row>
     <b-row>
-        <b-colxx class="d-flex justify-content-end">
+        <b-colxx class="d-flex justify-content-end align-items-center">
+          <button v-if="userStorage.pedido_compra == '1'" v-b-modal.modalPv class="btn btn-link">Adicionar pedido de compra?</button>
           <button v-if="!hasMultiple" class="show-success btn btn-info mb-3 btn-multiple-state btn-shadow ml-3" @click="() => {
               if(order) {
                 order.new = true;
@@ -99,6 +100,27 @@
             </b-button>
         </b-colxx>
     </b-row>
+    <b-modal id="modalPv" ref="modalPv" title="Pedido de compra"
+            :hide-backdrop="selectedBackdrop=='false'"
+            :no-close-on-backdrop="selectedBackdrop=='false' || selectedBackdrop=='static'">
+
+            <b-row>
+              <b-colxx>
+                <b-form-group label="Número do pedido" class="has-float-label mb-4">
+                  <b-form-input type="text" v-model="pc.number" />
+                </b-form-group>
+                <b-input-group class="mb-3">
+                  <b-form-file v-model="pc.file"  placeholder="Anexar"></b-form-file>
+                </b-input-group>
+              </b-colxx>
+            </b-row>
+
+        <template slot="modal-footer">
+            <b-button variant="primary" @click="sendPedidoCompra" class="mr-1">Adicionar</b-button>
+            <b-button variant="secondary" @click="hideModal('modalPv')">Cancelar</b-button>
+        </template>
+    </b-modal>
+
 </div>
 </template>
 
@@ -120,7 +142,13 @@ export default {
             baseURL,
             processing: false,
             uploadError: false,
-            orderAwaiting: 0
+            orderAwaiting: 0,
+            pc: {
+              file: null,
+              number: null,
+              validation: true,
+              fileName: null
+            },
         }
     },
 
@@ -177,6 +205,9 @@ export default {
         },
         hasMultiple: function(){
           return JSON.parse(window.localStorage.getItem('user')).user.multiple_order;
+        },
+        userStorage: function(){
+          return JSON.parse(window.localStorage.getItem('user')).user;
         }
     },
     methods: {
@@ -186,6 +217,14 @@ export default {
         return existe.length
       },
       sendInfo: async function(){
+        if(this.userStorage.pedido_compra == '1' && this.userStorage.has_contract == '1' && !this.pc.number && this.pc.validation){
+          this.$notify("error", "Pedido de compra obrigatório", 'Por favor, anexe ou insira o pedido de compra.', {
+            duration: 3000,
+            permanent: false
+          });
+
+          return false
+        }
         if(false) {
         }else{
           if(!this.valido.status) {
@@ -198,6 +237,13 @@ export default {
             let order = JSON.parse(window.localStorage.getItem('order'));
             if(this.order.new) { // Verifica se o usuário necessita cadastrar multiplos pedidos antes de efetuar a proposta
               order.new = true;
+            }
+
+            if(this.pc.number || this.pc.fileName) {
+              order.pc = {
+                number: this.pc.number,
+                file: this.pc.fileName
+              }
             }
             const response = await api.post('/order', order);
             let data = response.data;
@@ -224,6 +270,44 @@ export default {
       },
       infoOrder: function() {
           this.order = JSON.parse(window.localStorage.getItem('order'));
+      },
+      async sendPedidoCompra(typeRequest = false)
+      { //typeRequest é true quandoa função é chamada pelo proprio sistema e não pelo evento (click)
+        if(!this.pc.number) {
+          this.$notify("error", 'Ops...!', 'Por favor insira o número pedido de compra.', {
+            duration: 3000,
+            permanent: false
+          });
+        }else{
+          let fileName = '';
+          if(this.pc.file) {
+            let fd = new FormData();
+            fd.append('file', this.pc.file);
+            const file = await api.post('saveFile/pc', fd);
+            fileName = file.data.data;
+          }else{
+            fileName = '';
+          }
+
+          this.pc.fileName = fileName
+
+          this.$notify("success", 'Sucesso', 'Seu pedido de compra foi inserido com sucesso.', {
+              duration: 3000,
+              permanent: false
+          });
+
+          this.hideModal('modalPv')
+        }
+
+      },
+
+      hideModal (refname) {
+        this.$refs[refname].hide()
+        console.log('hide modal:: ' + refname)
+
+        if (refname === 'modalnestedinline') {
+          this.$refs['modalnested'].show()
+        }
       },
     },
     created() {
