@@ -9,174 +9,110 @@
     <b-alert variant="info" show  dismissible>Você pode parametrizar o preço e as variações disponíveis na tela de cadastro/edição da empresa que você quiser!</b-alert>
     <b-row v-if="productInfo.type">
         <b-colxx xxs="12">
-            <b-card class="mb-4" title="Informações gerais">
-                <b-row>
-                    <b-colxx md="4" lg="3">
-                        <b-form-group label="Nome do Produto" class="has-float-label mb-4">
-                            <b-form-input v-model="product.name" type="text" placeholder="Nome do Produto" />
-                        </b-form-group>
-                    </b-colxx>
-                    <b-colxx md="4" lg="3">
-                        <b-form-group label="Preço" class="has-float-label mb-4">
-                            <fieldset class="form-group has-float-label mb-4">
-                                <legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0">Preço</legend>
-                                <div tabindex="-1" role="group" class="bv-no-focus-ring">
-                                    <Money class="form-control" v-model="product.price" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
-                                </div>
-                            </fieldset>
-                        </b-form-group>
-                    </b-colxx>
-                    <b-colxx md="4" lg="3">
-                      <b-form-group label="Status" class="has-float-label mb-4">
-                        <b-form-select v-model="product.status" :options="[{value: 'Active', text: 'Ativo'}, {value: 'Inactive', text: 'Inativo'}]" />
-                      </b-form-group>
-                    </b-colxx>
-                    <b-colxx md="4" lg="3">
-                      <b-form-group label="Tipo do produto" class="has-float-label mb-4">
-                        <b-form-select v-model="product.type" :options="productInfo.type.map(r => {
-                          return {value: r.id,
-                          text: r.name}
-                          })" />
-                      </b-form-group>
-                    </b-colxx>
-                </b-row>
-            </b-card>
-
-            <b-card class="mb-4" title="Informações gerais" v-if="['1', '6'].indexOf(product.type) >= 0">
-                <b-row>
-                  <b-colxx md="6" lg="6">
-                    <b-row class="mb-3">
-                      <b-form-group label="SKU (mesmo do bling)" class="col-lg-6 has-float-label mb-1">
-                          <b-form-input v-model="saveProduct.sku" type="text" placeholder="SKU" />
-                      </b-form-group>
-
-                      <b-form-group label="Cor" class="col-lg-6 has-float-label mb-1">
-                          <b-form-input v-model="saveProduct.name" type="text" placeholder="Cor" />
-                      </b-form-group>
-                    </b-row>
-                    <table class="table">
-                      <thead>
-                        <tr>
-                          <th>Interno</th>
-                          <th>Comercial</th>
-                          <th>Ações</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="(size, indexSize) in saveProduct.commercial" :key="indexSize">
-                          <td>
-                            <b-input v-model="saveProduct.internal[indexSize]" />
-                          </td>
-                          <td>
-                            <b-input v-model="saveProduct.commercial[indexSize]" />
-                          </td>
-                          <td>
-                            <button @click="() => {
-                                saveProduct.commercial.splice(indexSize,1)
-                                saveProduct.internal.splice(indexSize,1)
-                              }" class="btn btn-xs btn-outline-danger">
-                              <div class="glyph-icon simple-icon-trash"></div>
-                            </button>
-                          </td>
-                        </tr>
-                        <tr v-if="saveProduct.commercial.length == 0">
-                          <td colspan="3">Nenhum tamanho foi encontrado</td>
-                        </tr>
-                        <tr>
-                          <td colspan="3">
-                            <button @click="() => {
-                                saveProduct.internal.push('');
-                                saveProduct.commercial.push('');
-                            }" class="btn btn-outline-success btn-block">Adicionar <div class="d-inline glyph-icon simple-icon-plus"></div></button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <vue-dropzone
-                        @vdropzone-complete="completeUpload"
-                        ref="myVueDropzone" id="dropzone" :options="dropzoneOptions"></vue-dropzone>
-                    <button class="btn btn-success w-100 mt-3" @click="addInformation">Adicionar informação</button>
-                  </b-colxx>
-                    <b-colxx md="6" lg="6">
-                      <b-row>
-                          <b-colxx v-for="(prod, productIndex) in product.info" xxs="6" lg="6" xl="6" class="mb-4" :key="`product_${productIndex}`">
-                              <b-card no-body>
-                                  <div class="position-relative">
-                                      <button style="position:absolute; right:5px; top:5px;" @click="() => {
-                                          product.info.splice(productIndex,1)
-                                        }" class="btn btn-xs btn-outline-danger">
-                                        <div class="glyph-icon simple-icon-trash"></div>
-                                      </button>
-                                      <b-card-img v-if="prod.image" top :alt="prod.name" :src="baseURL+prod.image" />
-                                      <h4 class="product_title">{{product.name}}</h4>
-                                  </div>
-                              </b-card>
-                          </b-colxx>
-                      </b-row>
-                  </b-colxx>
-                </b-row>
-            </b-card>
-
-            <b-card class="mb-4" title="Atributos">
-              <b-row v-for="(attr, attrIndex) in product.attributes" :key="attrIndex">
-                <b-colxx md="6" lg="6">
-                  <b-row class="mb-3">
-                    <b-colxx>
-                      <b-form-group label="Nome" class="has-float-label mb-1">
-                        <b-form-input v-model="attr.name" type="text" placeholder="Nome do atributo" />
-                      </b-form-group>
-                    </b-colxx>
-                  </b-row>
-
-                  <table class="table">
-                    <thead>
-                      <tr>
-                        <th>Valor</th>
-                        <th>SKU</th>
-                        <th>Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(at, atIndex) in attrInfo" :key="atIndex">
-                        <td>
-                          <b-input v-model="at.value" />
-                        </td>
-                        <td>
-                          <b-input v-model="at.sku" />
-                        </td>
-                        <td>
-                          <button @click="() => {
-                              at.sku.splice(atIndex,1)
-                              at.sku.splice(atIndex,1)
-                            }" class="btn btn-xs btn-outline-danger">
-                            <div class="glyph-icon simple-icon-trash"></div>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr v-if="saveProduct.commercial.length == 0">
-                        <td colspan="3">Nenhum tamanho foi encontrado</td>
-                      </tr>
-                      <tr>
-                        <td colspan="3">
-                          <button @click="() => {
-                              saveProduct.internal.push('');
-                              saveProduct.commercial.push('');
-                          }" class="btn btn-outline-success btn-block">Adicionar <div class="d-inline glyph-icon simple-icon-plus"></div></button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <vue-dropzone
-                    @vdropzone-complete="completeUpload"
-                    ref="myVueDropzone" id="dropzone" :options="dropzoneOptions"></vue-dropzone>
-                  <button class="btn btn-success w-100 mt-3" @click="addInformation">Adicionar informação</button>
+          <b-card class="mb-4" title="Informações gerais">
+            <b-row>
+                <b-colxx md="4" lg="3">
+                    <b-form-group label="Nome do Produto" class="has-float-label mb-4">
+                        <b-form-input v-model="product.name" type="text" placeholder="Nome do Produto" />
+                    </b-form-group>
                 </b-colxx>
-              </b-row>
-            </b-card>
-          </b-colxx>
-          <b-colxx>
-            <button class="btn btn-success float-right" @click="addProduct">Adicionar Produto</button>
-          </b-colxx>
+                <b-colxx md="4" lg="3">
+                    <b-form-group label="Preço" class="has-float-label mb-4">
+                        <fieldset class="form-group has-float-label mb-4">
+                            <legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0">Preço</legend>
+                            <div tabindex="-1" role="group" class="bv-no-focus-ring">
+                                <Money class="form-control" v-model="product.price" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
+                            </div>
+                        </fieldset>
+                    </b-form-group>
+                </b-colxx>
+                <b-colxx md="4" lg="3">
+                  <b-form-group label="Status" class="has-float-label mb-4">
+                    <b-form-select v-model="product.status" :options="[{value: 'Active', text: 'Ativo'}, {value: 'Inactive', text: 'Inativo'}, {value: 'Internal', text: 'Interno'}]" />
+                  </b-form-group>
+                </b-colxx>
+                <b-colxx md="4" lg="3">
+                  <b-form-group label="Tipo do produto" class="has-float-label mb-4">
+                    <b-form-select v-model="product.type" :options="productInfo.type.map(r => {
+                      return {value: r.id,
+                      text: r.name}
+                      })" />
+                  </b-form-group>
+                </b-colxx>
+            </b-row>
+          </b-card>
+        </b-colxx>
+
+        <b-colxx xxs="12">
+          <b-card class="mb-4" title="Imagens">
+            <b-alert dismissible show variant="info">Adicione aqui <strong>Todas</strong> as imagens referentes a esse produto</b-alert>
+            <vue-dropzone @vdropzone-complete="completeUpload" ref="myVueDropzone" id="dropzone" :options="dropzoneOptions" />
+            <draggable v-if="listImages.length > 0" class="row min-height" :list="listImages" :group="{ name: 'people', pull: 'clone' }" @change="refreshElements">
+              <b-colxx md="4" lg="3" v-for="(element, index) in listImages" :key="index">
+                <img :src="baseURL + element.label" class="w-100" alt="">
+              </b-colxx>
+            </draggable>
+          </b-card>
+        </b-colxx>
+
+        <b-colxx lg="8" xxs="12">
+
+          <b-card class="mb-4" title="Criar seu produto">
+            <div class="area-drop">
+              {{createdProduct}}
+              <draggable class="row min-height" :list="createdProduct" :group="{ name: 'people'}" @change="refreshElements">
+                <b-colxx class="my-2" md="4" v-for="(element, index) in createdProduct" :key="index">
+                  <b-form-group v-if="element.type == 'text'" :label="element.label" class="has-float-label mb-4">
+                    <b-form-input v-model="element.value" type="text" :placeholder="element.label" />
+                  </b-form-group>
+                  <div v-if="element.type == 'img'" class="image-hover position-relative" @click="() => {
+                      createdProduct = createdProduct.filter((r, i) => i != index)
+                    }">
+                    <img class="w-100" :src="baseURL +  element.label" alt="">
+                    <div class="image-drag w-100 h-100 position-absolute align-items-center justify-content-center">
+                      <button style="opacity:1;" class="btn btn-danger">
+                        <div class="glyph-icon simple-icon-trash"></div>
+                      </button>
+                    </div>
+                  </div>
+                  <b-form-group v-if="element.type == 'select'" :label="element.label" class="has-float-label mb-4">
+                    <input-tag v-model="element.value"></input-tag>
+                  </b-form-group>
+                </b-colxx>
+              </draggable>
+            </div>
+            <button class="btn btn-outline-success float-right" @click="() => {product.attributes.push(createdProduct)}">Adicionar variação</button>
+            <button class="btn btn-outline-info float-right mx-3" @click="() => {createdProduct = []}">Limpar</button>
+          </b-card>
+
+
+        </b-colxx>
+
+        <b-colxx lg="4" xxs="12" v-if="productInfo.attributes">
+          <b-card class="mb-4" title="Atributos">
+            <draggable class="list-group min-height" :list="productInfo.attributes" :group="{ name: 'people', pull: 'clone'}" @change="refreshElements">
+              <div class="list-group-item" v-for="(element, index) in productInfo.attributes" :key="index">
+                {{element.label}}
+              </div>
+            </draggable>
+          </b-card>
+        </b-colxx>
+
+
+        <b-colxx xxs="12" v-if="product.attributes.length > 0">
+          <b-card title="Variações criadas">
+            <b-row>
+              <b-colxx md="3" v-for="(attr, attrIndex) in product.attributes" :key="attrIndex">
+                <div v-for="(item, itemIndex) in attr" :key="itemIndex"><b>{{item.label}}</b>: {{item.value}}</div>
+              </b-colxx>
+            </b-row>
+          </b-card>
+        </b-colxx>
+
+
+        <b-colxx>
+          <button class="btn btn-success float-right" @click="addProduct">Salvar Produto</button>
+        </b-colxx>
     </b-row>
 </div>
 </template>
@@ -187,7 +123,8 @@ import {
     mapGetters,
     mapActions
 } from "vuex";
-import {Money} from '@/vmoney.js'
+import draggable from "vuedraggable";
+import {Money} from '@/vmoney.js';
 import {api, baseURL} from '@/constants/config';
 import VueDropzone from 'vue2-dropzone';
 import InputTag from '@/components/Form/InputTag'
@@ -195,14 +132,20 @@ export default {
     components:{
         'vue-dropzone': VueDropzone,
         'input-tag': InputTag,
-        Money
+        Money,
+        draggable
     },
     data() {
         return {
+            listAttributes: [],
+            listImages: [],
+            createdProduct: [],
             productInfo: {},
+            auxAttr: {},
             saveProduct: {
               internal: [],
               commercial: [],
+              attributes: [],
               name: '',
               sku: '',
               image: ''
@@ -211,19 +154,8 @@ export default {
                 type: '1',
                 status: 'Active',
                 name: '',
-                sku: '',
                 price: '',
-                image: '',
-                info: [],
-                attributes: [{
-                  name: '',
-                  info: [
-                    {
-                      value: 'Com máscara',
-                      sku: ''
-                    }
-                  ]
-                }]
+                attributes: []
             },
             baseURL,
             color: {
@@ -240,11 +172,9 @@ export default {
             return {
                 url: `${baseURL}saveFile/product`,
                 thumbnailWidth: 150,
-                maxFilesize: 1,
                 headers: { "X-Auth-Token": token },
-                dictDefaultMessage: "Adicionar Imagem do produto",
+                dictDefaultMessage: "Adicionar imagens do produto",
                 previewTemplate: this.dropzoneTemplate(),
-                maxFiles: 1
             }
         }
     },
@@ -281,15 +211,6 @@ export default {
                 sku: '',
                 image: ''
               }
-                // this.product.colors.push({
-                //     name: this.color.name,
-                //     image: this.color.image,
-                //     sku: this.color.sku,
-                // });
-
-                // this.color.name = '';
-                // this.color.image = '';
-                // this.color.sku = '';
                 this.$refs.myVueDropzone.removeFile(this.file);
             }else{
                 this.$notify("error", "Opsss...!", "Você precisa inserir uma imagem e o nome da cor", {
@@ -301,6 +222,14 @@ export default {
         completeUpload(file) {
             this.file = file;
             this.saveProduct.image = JSON.parse(file.xhr.response).data;
+            this.listImages.push(
+              {
+                id: 6,
+                label: 'Imagem',
+                value: this.saveProduct.image,
+                type: 'img'
+              }
+            )
         },
         async addProduct() {
             const response = await api.post('admin/product', this.product);
@@ -323,11 +252,41 @@ export default {
             if(response.data.data.type) {
               console.log(response.data.data.type);
               this.productInfo = response.data.data
-
-              console.log(this.productInfo.type)
             }
           }
-        }
+        },
+        refreshElements(){
+          let createdProduct = [];
+          for(let i in this.createdProduct){
+            console.log(createdProduct)
+            if(createdProduct.filter(r => r.label == this.createdProduct[i].label).length == 0) {
+              createdProduct.push(this.createdProduct[i]);
+            }
+          }
+          this.createdProduct = createdProduct;
+
+          let listAttributes = [];
+          for(let i in this.productInfo.attributes){
+            console.log(listAttributes)
+            if(listAttributes.filter(r => r.label == this.productInfo.attributes[i].label).length == 0) {
+              listAttributes.push(this.productInfo.attributes[i]);
+            }
+          }
+
+          this.productInfo.attributes = listAttributes;
+
+          let listImages = [];
+          for(let i in this.listImages){
+            console.log(listImages)
+            if(listImages.filter(r => r.label == this.listImages[i].label).length == 0) {
+              listImages.push(this.listImages[i]);
+            }
+          }
+
+          this.listImages = listImages;
+
+
+    }
     },
     created(){
       this.getInfoProduct();
@@ -337,10 +296,33 @@ export default {
 
 <style>
 .product_title{
-    position: absolute;
-    bottom: 0;
-    background: #fff;
-    width: 100%;
-    text-shadow: 1px 1px 2px rgba(0,0,0,.2);
+  position: absolute;
+  bottom: 0;
+  background: #fff;
+  width: 100%;
+  text-shadow: 1px 1px 2px rgba(0,0,0,.2);
+}
+
+.area-drop{
+  width: 100%;
+  min-height: 300px;
+}
+
+.list-group{
+  height: 100%;
+  width: 100%;
+}
+
+.min-height {
+  min-height: 200px;
+}
+
+.image-drag{display: none; transition:.5s;}
+.image-hover:hover .image-drag {
+  cursor: pointer;
+  display: flex;
+  top:0;
+  left:0;
+  background: rgba(100,100,100,.5);
 }
 </style>

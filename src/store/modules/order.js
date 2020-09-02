@@ -18,7 +18,10 @@ export default {
           status: 'awaiting',
         }
       });
-      commit('setAwaitingOrders', response.data.data.orders.map(r => {r.item = false; return r;}));
+
+      if(response.data.data.orders){
+        commit('setAwaitingOrders', response.data.data.orders.map(r => {r.item = false; return r;}));
+      }
     },
 
     async sendAwaitingOrders({commit}, payload) {

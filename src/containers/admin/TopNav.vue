@@ -57,14 +57,14 @@
             </template>
         </b-modal>
 
-                <div v-if="true" class="header-icons d-inline-block align-middle">
+          <div v-if="true" class="header-icons d-inline-block align-middle">
             <div class="position-relative d-inline-block">
                 <b-dropdown variant="empty" size="sm" right toggle-class="header-icon notificationButton" menu-class="position-absolute mt-3 notificationDropdown" no-caret>
-                    <template slot="button-content">
+                    <template v-if="awaitingOrders" slot="button-content">
                         <i class="simple-icon-bell" />
                         <span v-if="awaitingOrders.length > 0" class="count">{{awaitingOrders.length > 0 ? 1 : 0}}</span>
                     </template>
-                    <vue-perfect-scrollbar :settings="{ suppressScrollX: true, wheelPropagation: false }">
+                    <vue-perfect-scrollbar v-if="awaitingOrders" :settings="{ suppressScrollX: true, wheelPropagation: false }">
                         <div v-if="awaitingOrders.length > 0">
                           <div v-b-modal.modalbackdrop class="d-flex flex-row mb-3 pb-3 border-bottom align-items-center cursor-pointer">
                               <div>
