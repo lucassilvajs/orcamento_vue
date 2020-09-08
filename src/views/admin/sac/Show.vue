@@ -52,12 +52,15 @@
                     <button @click="getInfoSAC(index)" v-b-modal.r class="btn btn-outline-success">
                         <div class="glyph-icon simple-icon-eye"/>
                     </button>
+                    <button @click="deleteSac(sac.id)" class="btn btn-danger">
+                      <div class="glyph-icon simple-icon-trash"></div>
+                    </button>
                 </td>
-                <td>
+                <!-- <td>
                     <router-link v-if="false" :to="`/admin/sac/view/${sac.id}`" class="btn btn-outline-info">
                         <div class="glyph-icon iconsminds-speach-bubble"/>
                     </router-link>
-                </td>
+                </td> -->
               </tr>
             </tbody>
           </table>
@@ -70,45 +73,48 @@
   </b-row>
 
   <b-modal id="r" ref="r" :title="`SAC #${modal.id}`" modal-class="modal-right">
-    <div v-if="true">
+    <div>
       <b>Nota: </b>{{modal.nota}}<br />
       <b>Colaborador: </b>{{modal.colaborador}}<br />
       <b>empresa: </b>{{modal.name.split('-')[0]}}<br />
       <b>Solicitação: </b>{{modal.date | date}}<br />
       <b>O que aconteceu:</b> {{modal.about}} <br />
-      <b>Nota:</b> <br />
+      <b>Imagens:</b> <br />
       <div v-for="(img, i) in modal.image" :key="i">
         <img target="_blank" v-if="['jpg', 'jpeg', 'png', 'gif', 'svg'].indexOf(img.split('.')[img.split('.').length - 1]) >= 0" :src="baseURL+img" class="w-100 mt-3" alt="">
         <iframe v-else class="w-100 mt-3" :src="baseURL + img" frameborder="0"></iframe>
       </div>
       <hr class="my-3">
-      <div v-if="modal.order_id">
-        <h3>Informações do pedido</h3>
-        <b>Data do pedido:</b> 29/03/2020 22:43<br />
-        <b>Informações:</b> 29/03/2020 22:43<br />
-        <div class="ml-3" v-if="modal.order_id">
-          <b>Pedido:</b> {{modal.order_id}}<br />
-          <b>Informações:</b> <br />
-          <div class="ml-3">
-            <span v-for="(items, index) in JSON.parse(modal.attr).lens" :key="index">- {{items.name}}<br /></span>
-          </div>
-        </div>
 
-      </div>
-      <div v-else>
-        <div class="alert alert-info">Não foi possível encontrar o pedido</div>
-      </div>
+      <div v-for="(ord, indexOrd) in modal.orders" :key="indexOrd" style="border-bottom:1px solid rgba(100,100,100,.5); padding:10px 0;">
+        <b class="mb-3" v-if="indexOrd == 0">Pedidos encontrados: </b>
+        <div>
+          <b>Pedido: </b> {{ord.order_id}} <br>
+          <div v-for="(attr, indexAttr) in JSON.parse(ord.order_attributes).info" :key="indexAttr">
+            <b>{{indexAttr == 'name' ? 'Nome' : indexAttr}}: </b> {{attr}} <br>
+          </div>
+
+          <div v-for="(attr, indexAttr) in JSON.parse(ord.order_attributes).product" :key="'a'+indexAttr">
+            <div v-if="['model', 'color', 'image', 'size', 'attributes'].indexOf(indexAttr) == -1">
+              <b>{{indexAttr == 'name' ? 'Produto' : indexAttr}}: </b> {{attr}} <br>
+            </div>
+          </div>
+
+        </div>
+     </div>
+      <br>
+        <p>Número do pedido</p>
+        <b-form-group v-if="!modal.order_id" label="Número do pedido" class="has-float-label mb-2">
+          <b-form-input type="text" v-model="modal.idOrder" />
+        </b-form-group>
 
       <div class="feedback mt-5"  v-if="modal.status == 'Aberto'">
         <p>Você gostaria de enviar enviar algo ao cliente?</p>
 
-        <b-form-group v-if="!modal.order_id" label="Número do pedido" class="has-float-label mb-2">
-          <b-form-input type="text" v-model="modal.idOrder" />
-        </b-form-group>
         <b-form-group label="Informação" class="has-float-label mb-2">
           <textarea v-model="modal.info" rows="3" class="form-control"></textarea>
         </b-form-group>
-        <!-- <input type="checkbox" id="modal_email" checked v-model="modal.info.email"> <label for="modal_email">Enviar para o e-mail</label> -->
+
       </div>
     </div>
 
@@ -143,7 +149,8 @@ export default {
         nota: '',
         colaborador: '',
         name: '',
-        date:''
+        date:'',
+        idOrder: '',
       }
     }
   },
@@ -198,6 +205,14 @@ export default {
       }).then(async (result) => {
         if(result.value) {
           if(status != '') {
+            if(status == 'approved' && !this.modal.idOrder) {
+              this.$notify('error', 'Ops...!', 'Por favor, preencha o número do pedido', {
+                duration: 3000,
+                permanent: false
+              });
+
+              return false;
+            }
             const response = await api.put(`admin/sac/${this.modal.id}`, {status, info: this.modal});
             let res = response.data;
             this.$notify(res.status, res.status == 'success' ? 'Sucesso' : 'Opsss!', res.message, {
@@ -215,9 +230,34 @@ export default {
         }
 
       });
+    },
+    async deleteSac(sac) {
+      await this.$swal.fire({
+        title: `O que você acha?`,
+        text: `Você realmente deletar esse SAC?`,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sim',
+        cancelButtonText: 'Não',
+        showLoaderOnConfirm: true,
+      }).then(async (result) => {
+        if(result.value) {
+          const response = await api.delete(`admin/sac/${sac}`);
+          let res = response.data;
+          this.$notify(res.status, res.status == 'success' ? 'Sucesso' : 'Opsss!', res.message, {
+            duration: 3000,
+            permanent: false
+          });
+          await this.getSac();
+        }
 
-
-
+      });
+    },
+    addOrder(order){
+      console.log(order)
+      this.modal.lucas = "Lindo"
     }
   },
   created () {

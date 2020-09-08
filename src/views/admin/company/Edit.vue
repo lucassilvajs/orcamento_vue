@@ -14,7 +14,7 @@
                       <b-input-group class="mb-4 cnpj">
                         <the-mask class="form-control " v-model="company.cnpj" :mask="['###.###.###-##', '##.###.###/####-##']" />
                         <b-input-group-append>
-                          <b-button variant="outline-info" @click="buscaBling()"
+                          <b-button variant="outline-info" v-if="false" @click="buscaBling()"
                             :disabled="processing" :class="{'btn-multiple-state btn-shadow': true,
                             'show-spinner': processing,
                             'show-success': !processing && requestError===false,
@@ -147,52 +147,21 @@
                           <div v-if="pro.variation && restrictions.product.indexOf(pro.id) == -1">
                             <hr>
                             <h4>Variações: </h4>
-                            <div class="sizes" v-if="pro.variation.sizes">
-                              <p class="mb-0">Tamanhos</p>
-                              <div class="d-flex justify-content-between align-items-center my-2 area py-1" v-for="(sizes, i) in pro.variation.sizes.commercial" :key="i">
-                                <span> {{sizes}}</span>
-                                <div v-if="restrictions.sizes.indexOf(`${pro.id}_${sizes}`) >= 0" class="text-success cursor-pointer" @click="removeVariationRestrict(pro.id, sizes, 'sizes')" :id="`res_size_${pro.id}_${sizes}`">
-                                  <i class="glyph-icon simple-icon-check p-0"></i>
-                                </div>
-
-                                <div v-else class="text-danger cursor-pointer" @click="addVariationRestrict(pro.id, sizes, 'sizes')" :id="`res_size_${pro.id}_${sizes}`">
-                                  <i class="glyph-icon simple-icon-trash p-0"></i>
-                                </div>
-                                  <b-tooltip :target="`res_size_${pro.id}_${sizes}`" :placement="`res_size_${pro.id}_${sizes}`"
-                                  :title="(restrictions.sizes.indexOf(`${pro.id}_${sizes}`) >= 0 ? 'Permitir' : 'Restringir')+` variação`" ></b-tooltip>
-                              </div>
-                            </div>
-                            <hr>
-                            <div class="sizes" v-if="pro.variation.colors">
-                              <p class="mb-0">Cores</p>
-                              <div class="d-flex justify-content-between align-items-center my-2 area py-1" v-for="(colors, index) in pro.variation.colors" :key="index">
-                                <span> {{colors.name}}</span>
-                                 <div v-if="restrictions.colors.indexOf(`${pro.id}_${colors.name}`) >= 0" class="text-success cursor-pointer" @click="removeVariationRestrict(pro.id, colors.name, 'colors')" :id="`res_size_${pro.id}_${colors.name}`">
-                                  <i class="glyph-icon simple-icon-check p-0"></i>
-                                </div>
-
-                                <div v-else class="text-danger cursor-pointer" @click="addVariationRestrict(pro.id, colors.name, 'colors')" :id="`res_size_${pro.id}_${colors.name}`">
-                                  <i class="glyph-icon simple-icon-trash p-0"></i>
-                                </div>
-                                  <b-tooltip :target="`res_size_${pro.id}_${colors.name}`" :placement="`res_size_${pro.id}_${colors.name}`"
-                                  :title="(restrictions.colors.indexOf(`${pro.id}_${colors.name}`) >= 0 ? 'Permitir' : 'Restringir')+` variação`" ></b-tooltip>
-                              </div>
-                            </div>
-
-
-                            <div class="sizes" v-for="(attr, iAttr) in pro.variation.attributes" :key="iAttr">
-                              <p class="mb-0">{{attr.title}}</p>
-                              <div class="d-flex justify-content-between align-items-center my-2 area py-1" v-for="(val, iVal) in attr.value" :key="iVal">
-                                <span> {{val.name}}</span>
-
-                                 <div v-if="true" class="text-success cursor-pointer">
-                                  <i class="glyph-icon simple-icon-check p-0"></i>
-                                </div>
-
-                                <div v-else class="text-danger cursor-pointer">
-                                  <i class="glyph-icon simple-icon-trash p-0"></i>
+                            <div v-for="(attr, attrIndex) in pro.attrs" :key="attrIndex">
+                              <div v-if="[6,5,2].indexOf(attr.id) == -1">
+                                <h5 class="mb-2 mt-3">{{attr.label}}</h5>
+                                <div v-for="(atr, atrIndex) in attr.values" :key="atrIndex" class="d-flex align-items-center justify-content-between my-2">
+                                  <span>{{atr}}</span>
+                                  <button v-if="true" @click="() => {restriction[attr.id].push(atr)}" class="btn btn-xs btn-success">
+                                    Permitir
+                                  </button>
+                                  <button v-else @click="() => {restriction[attr.id].push(atr)}" class="btn btn-xs btn-danger">
+                                    Não permitir
+                                  </button>
+                                  {{restriction}}
                                 </div>
                               </div>
+
                             </div>
                           </div>
                       </b-card-body>
@@ -303,11 +272,7 @@ export default {
               price: ''
             }
           ],
-          restrictions: {
-            product:[],
-            sizes: [],
-            colors: []
-          },
+          restrictions:[],
             company: {
                 name: '',
                 cnpj: '',

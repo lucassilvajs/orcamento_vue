@@ -40,6 +40,11 @@ const data = [
         label: "Ver produtos",
         to: "/admin/product/view"
       },
+      {
+        icon: "iconsminds-add",
+        label: "Adicionar produto",
+        to: "/admin/product/new"
+      },
     ]
   },
   {

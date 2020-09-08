@@ -15,7 +15,7 @@
 				<div class="checkPicture" v-if="img">
 					<button type="button" class="btn btn-danger mr-2" @click="() => {img = false; loadCamera()}">
 						<div class="d-inline glyph-icon simple-icon-dislike"></div>
-						Tirar Outra
+						Tirar Outrass
 					</button>
 
 					<b-button variant="success" :disabled="processing" :class="{'btn-multiple-state btn-shadow': true,
@@ -132,6 +132,10 @@ export default {
       };
       this.fileObject = e.target.files[0];
       file.readAsDataURL(e.target.files[0]);
+
+      setTimeout(async () => {
+        await this.sendImage();
+      }, 100);
 		},
 		async sendImage() {
       this.processing = false;
@@ -242,7 +246,7 @@ export default {
       var blob = new Blob(byteArrays, {type: contentType});
       return blob;
     },
-    takeSnapShot(){
+    async takeSnapShot(){
     //Captura elemento de vídeo
 
       document.querySelector('.count').classList.add('flash');
@@ -279,6 +283,11 @@ export default {
         document.querySelector('.counter').classList.add('d-none');
         document.querySelector('.counter').classList.remove('d-flex');
       }, this.timeAwait * 1000);
+
+      console.log('Foi!')
+      setTimeout(async () => {
+        await this.sendImage();
+      }, 100);
 
       // sendSnapShot(dataURI); //Gerar Imagem e Salvar Caminho no Banco
     },
