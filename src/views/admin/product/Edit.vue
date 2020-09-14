@@ -86,21 +86,13 @@
                   <label class="custom-control-label" for="keepForm">Manter preenchido</label>
                 </div>
               </div>
-              <button class="btn btn-outline-success" @click="addVariation">Adicionar variação</button>
+              <button class="btn btn-outline-success" @click="addVariation">{{isEdition ? 'Editar' : 'Adicionar'}} variação</button>
               <button class="btn btn-outline-info mx-3" @click="() => {createdProduct = []}">Limpar</button>
             </b-row>
           </b-card>
         </b-colxx>
 
-        <b-colxx lg="4" xxs="12" v-if="productInfo.attributes">
-          <b-card class="mb-4" title="Atributos">
-            <draggable class="list-group min-height" :list="productInfo.attributes" :group="{ name: 'people', pull: 'clone'}" @change="refreshElements">
-              <div class="list-group-item" v-for="(element, index) in productInfo.attributes" :key="index">
-                {{element.label}}
-              </div>
-            </draggable>
-          </b-card>
-        </b-colxx>
+        <product-attributes :productInfo="productInfo" />
 
         <b-colxx xxs="12" v-if="product.attributes.length > 0">
           <b-card title="Variações criadas">
@@ -142,10 +134,12 @@ import {Money} from '@/vmoney.js';
 import {api, baseURL} from '@/constants/config';
 import VueDropzone from 'vue2-dropzone';
 import InputTag from '@/components/Form/InputTag'
+import productAttributes from '@/components/productAttributes'
 export default {
     components:{
         'vue-dropzone': VueDropzone,
         'input-tag': InputTag,
+        'product-attributes': productAttributes,
         Money,
         draggable
     },

@@ -60,8 +60,6 @@ if(window.location.href.indexOf('localhost') >= 0) {
   base = "https://api.idsafety.com.br/";
 }
 
-base = "https://apitest.idsafety.com.br/"
-
 export const baseURL = base;
 const url = baseURL;
 

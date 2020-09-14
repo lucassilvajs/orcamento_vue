@@ -7,41 +7,36 @@
 			<b-row v-if="products">
         {{products.data['mask']}}
 				<b-colxx md="4" lg="3" v-for="(pro, i) in products.data" :key="i">
-					<b-card class="mb-4" style="border:1px solid rgba(100,100,100,.5); border-radius:6px" no-body>
-						<div class="position-relative">
-							<img v-if="pro.colorSelected" :src="`${pro.color.filter(color => color.name == pro.colorSelected)[0].image ? baseURL+pro.color.filter(color => color.name == pro.colorSelected)[0].image : 'https://via.placeholder.com/870x470'}`" class="card-img-top" />
-							<img v-else :src="`${pro.image ? baseURL+pro.image : 'https://via.placeholder.com/870x470' }`" class="card-img-top" />
-						</div>
-						<b-card-body>
-							<form @submit.prevent="setProduct(i)">
-								<p class="mb-2 card-subtitle">{{pro.name}}</p>
-								<div class="separator mb-2"></div>
-									<select v-if="pro.size" v-model="pro.sizeSelected" name="" id="" class="form-control mb-2">
-										<option value="">Selecione o tamanho</option>
-										<option v-for="(s, ci) in pro.size" :key="ci">
-											{{s}} MM
-										</option>
-									</select>
-									<select v-if="pro.color" v-model="pro.colorSelected" name="" id="" class="form-control mb-2">
-										<option value="">Selecione a cor</option>
-										<option v-for="(color, ci) in pro.color" :key="ci">
-											{{color.name}}
-										</option>
-									</select>
-									<!-- <select v-for="(attr, iAttr) in pro.attributes" v-model="pro.attributes[iAttr].select" :key="attr.name" class="form-control mb-2">
-										<option value="">Selecione...</option>
-										<option v-for="(val, iVal) in attr.value" :value="val.name" :key="iVal">{{val.name}}</option>
-									</select> -->
-                  <select v-if="pro.attributes" v-model="pro.attributes.select" class="form-control mb-2">
-                  <!-- <select v-for="(attr, iAttr) in pro.attributes" :key="iAttr" v-model="pro.attributes[iattr]" class="form-control mb-2"> -->
-                    <option>Com mascara</option>
-                    <option>Sem mascara</option>
-                  </select>
-								<div class="separator my-2"></div>
-								<button class="btn btn-outline-success float-right w-100">Adicionar</button>
-							</form>
-						</b-card-body>
-					</b-card>
+          {{pro}}
+          <b-card class="mb-4" style="border:1px solid rgba(100,100,100,.5); border-radius:6px" no-body>
+              <div class="position-relative">
+                  <img src="getImage(pro)" class="card-img-top" />
+              </div>
+              <b-card-body>
+                  <form @submit.prevent="setProduct(i)">
+                      <p class="mb-2 card-subtitle">{{pro.information.pro_name}}</p>
+                      <div class="separator mb-2"></div>
+                          <select v-if="pro.size" v-model="pro.sizeSelected" name="" id="" class="form-control mb-2">
+                              <option value="">Selecione o tamanho</option>
+                              <option v-for="(s, ci) in pro.size" :key="ci">
+                                  {{s}} MM
+                              </option>
+                          </select>
+                          <select v-if="pro.color" v-model="pro.colorSelected" name="" id="" class="form-control mb-2">
+                              <option value="">Selecione a cor</option>
+                              <option v-for="(color, ci) in pro.color" :key="ci">
+                                  {{color.name}}
+                              </option>
+                          </select>
+                          <select v-if="pro.attributes" v-model="pro.attributes.select" class="form-control mb-2">
+                              <option>Com mascara</option>
+                              <option>Sem mascara</option>
+                          </select>
+                      <div class="separator my-2"></div>
+                      <button class="btn btn-outline-success float-right w-100">Adicionar</button>
+                  </form>
+              </b-card-body>
+          </b-card>
 				</b-colxx>
 			</b-row>
 			<b-row v-else class="align-items-center justify-content-center text-center">

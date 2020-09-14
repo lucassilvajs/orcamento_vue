@@ -124,24 +124,25 @@
                 </b-row>
             </b-card>
             <b-card class="mb-4" title="Restrições" v-if="allProduct">
+                {{restrictions}}
                 <b-row>
                   <b-colxx class="mb-4" md="3" lg="3" v-for="(pro, index) in allProduct" :key="index" >
                     <b-card no-body>
                       <b-card-body>
                           <div class="d-flex justify-content-between align-items-center">
-                              <div class="d-inline-block">
-                                  <h5 class="d-inline">{{ pro.name }}</h5>
-                              </div>
+                            <div class="d-inline-block">
+                                <h5 class="d-inline">{{ pro.name }}</h5>
+                            </div>
 
-                              <div :id="`res_pro_${pro.id}`" v-if="restrictions && restrictions.product.indexOf(pro.id) == -1" class="text-danger cursor-pointer" @click="restrictions.product.push(pro.id)">
-                                <i class="glyph-icon simple-icon-trash p-0"></i>
-                              </div>
+                            <div :id="`res_pro_${pro.id}`" v-if="restrictions && restrictions.product.indexOf(pro.id) == -1" class="text-danger cursor-pointer" @click="restrictions.product.push(pro.id)">
+                              <i class="glyph-icon simple-icon-trash p-0"></i>
+                            </div>
 
-                              <div :id="`res_pro_${pro.id}`" v-else class="cursor-pointer text-success" @click="restrictions.product = restrictions.product.filter(r => r != pro.id)">
-                                <i class="glyph-icon simple-icon-check p-0"></i>
-                              </div>
+                            <div :id="`res_pro_${pro.id}`" v-else class="cursor-pointer text-success" @click="restrictions.product = restrictions.product.filter(r => r != pro.id)">
+                              <i class="glyph-icon simple-icon-check p-0"></i>
+                            </div>
 
-                              <b-tooltip :target="`res_pro_${pro.id}`" :placement="`res_pro_${pro.id}`"
+                            <b-tooltip :target="`res_pro_${pro.id}`" :placement="`res_pro_${pro.id}`"
                                   :title="(restrictions && restrictions.product.indexOf(pro.id) >= 0 ? 'Permitir' : 'Restringir') + ` produto`" ></b-tooltip>
                           </div>
                           <div v-if="pro.variation && restrictions.product.indexOf(pro.id) == -1">
@@ -152,18 +153,42 @@
                                 <h5 class="mb-2 mt-3">{{attr.label}}</h5>
                                 <div v-for="(atr, atrIndex) in attr.values" :key="atrIndex" class="d-flex align-items-center justify-content-between my-2">
                                   <span>{{atr}}</span>
-                                  <button v-if="true" @click="() => {restriction[attr.id].push(atr)}" class="btn btn-xs btn-success">
-                                    Permitir
+                                  <span class="d-none">
+                                    {{gambiarra}}
+                                  </span>
+                                  <button v-if="restrictions.attributes.filter( r => {
+                                    if(r.pro == pro.id && r.attr == attr.id && r.value == atr) {
+                                      return r
+                                    }
+                                  }).length > 0" @click="() => {
+                                    gambiarra = 'lucas'
+                                    for(let i in restrictions.attributes){
+                                      const item = restrictions.attributes[i];
+
+                                      if(item.pro == pro.id && item.attr == attr.id && item.value == atr) {
+                                        restrictions.attributes.splice(i, 1);
+                                      }
+                                    }
+
+                                    gambiarra = false
+
+                                  }" class="btn btn-xs btn-danger p-1">
+                                    <i class="glyph-icon iconsminds-close p-0"></i>
                                   </button>
-                                  <button v-else @click="() => {restriction[attr.id].push(atr)}" class="btn btn-xs btn-danger">
-                                    Não permitir
+                                  <button v-else @click="function(){
+                                    gambiarra = 'Lucas';
+                                    restrictions.attributes.push({pro: pro.id, attr: attr.id, value: atr});
+                                    gambiarra = false;
+                                  }" class="btn btn-xs btn-outline-danger p-1">
+                                  <i class="glyph-icon iconsminds-close p-0"></i>
                                   </button>
-                                  {{restriction}}
                                 </div>
                               </div>
 
                             </div>
                           </div>
+                          <!--
+                          -->
                       </b-card-body>
                     </b-card>
                   </b-colxx>
@@ -265,6 +290,7 @@ export default {
     },
     data() {
         return {
+          gambiarra: false,
           newProduct:[
             {
               name: '',
@@ -375,7 +401,9 @@ export default {
               price: '',
               type: ''
             });
+
             this.restrictions = this.company.restrictions;
+            this.restrictions.attributes = [];
         },
         async getAllProducts() {
           let company = this.$route.params.id;
