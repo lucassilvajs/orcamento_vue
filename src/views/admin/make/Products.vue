@@ -7,16 +7,25 @@
 			<b-row v-if="products">
         {{products.data['mask']}}
 				<b-colxx md="4" lg="3" v-for="(pro, i) in products.data" :key="i">
-          {{pro}}
           <b-card class="mb-4" style="border:1px solid rgba(100,100,100,.5); border-radius:6px" no-body>
               <div class="position-relative">
-                  <img src="getImage(pro)" class="card-img-top" />
+                  <img :src="getImage(pro)" class="card-img-top" />
               </div>
               <b-card-body>
                   <form @submit.prevent="setProduct(i)">
                       <p class="mb-2 card-subtitle">{{pro.information.pro_name}}</p>
                       <div class="separator mb-2"></div>
-                          <select v-if="pro.size" v-model="pro.sizeSelected" name="" id="" class="form-control mb-2">
+                        <b-form-group v-for="(attrs, indexAttr) in pro.attrs" :key="indexAttr" :label="attrs.name" class="has-float-label mb-4">
+                          <select class="form-control">
+                            <option v-for="(attr, indexAttr) in attrs.values" :value="attr" :key="indexAttr">
+                              {{attr}}
+                            </option>
+                          </select>
+                        </b-form-group>
+                        <!-- <select v-for="(attrs, indexAttr) in pro.attrs" :key="indexAttr" v-model="pro[indexAttr]" class="form-control">
+                          <option value="">{{attrs.name}}</option>
+                        </select> -->
+                          <!-- <select v-if="pro.size" v-model="pro.sizeSelected" name="" id="" class="form-control mb-2">
                               <option value="">Selecione o tamanho</option>
                               <option v-for="(s, ci) in pro.size" :key="ci">
                                   {{s}} MM
@@ -31,7 +40,7 @@
                           <select v-if="pro.attributes" v-model="pro.attributes.select" class="form-control mb-2">
                               <option>Com mascara</option>
                               <option>Sem mascara</option>
-                          </select>
+                          </select> -->
                       <div class="separator my-2"></div>
                       <button class="btn btn-outline-success float-right w-100">Adicionar</button>
                   </form>
@@ -55,7 +64,8 @@ export default {
 	data() {
 		return {
 			products: null,
-			baseURL
+      baseURL,
+      itemSelected: []
 		}
 	},
     components: {
@@ -64,14 +74,6 @@ export default {
 	methods: {
 		setProduct: function (index) {
       let resp = false;
-      // if(this.products.data[index].attributes){
-      //   resp = this.products.data[index].attributes.filter(r => {
-      //     if(r.select.length) {
-      //       return r
-      //     }
-      //   });
-      // }
-
       if(!resp || resp.length == 0){
         if(this.products.data[index].attributes) {
           if(!this.products.data[index].attributes.select) {
@@ -105,8 +107,7 @@ export default {
 			this.$router.push("/admin/make/lens");
 		},
 
-		getProducts: async function()
-		{
+		getProducts: async function(){
       let order = JSON.parse(window.localStorage.getItem('order'));
       let user = JSON.parse(window.localStorage.getItem('user'));
       let company = '';
@@ -123,10 +124,27 @@ export default {
           company = order.company;
         }
       }
-			const products = await api.get(`/products/${company}`);
+      const products = await api.get(`/products/${company}`);
+
+      for(let i=0; i<=100; i++) {
+        this.itemSelected.push(i)
+      }
+
 			this.products = products.data
-		}
-	},
+    },
+    getImage(pro) {
+      for(let i in pro.variation) {
+        for(let j in pro.variation[i]) {
+          if(pro.variation[i][j].id == '6') {
+            console.log('-=-=-=');
+            return this.baseURL + pro.variation[i][j].value;
+            console.log(this.baseURL + pro.variation[i][j].value)
+          }
+        }
+      }
+    }
+
+  },
 	created() {
 		this.getProducts();
 	}

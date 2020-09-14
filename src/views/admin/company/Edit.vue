@@ -124,7 +124,6 @@
                 </b-row>
             </b-card>
             <b-card class="mb-4" title="Restrições" v-if="allProduct">
-                {{restrictions}}
                 <b-row>
                   <b-colxx class="mb-4" md="3" lg="3" v-for="(pro, index) in allProduct" :key="index" >
                     <b-card no-body>
