@@ -17,13 +17,7 @@
                     <b-colxx md="3" lg="3" class="">
                         <h5 class="mb-2 mt-4 card-title">Produto Selecionado</h5>
                         <div v-if="order && order.product">
-                            <p v-if="order.product.name"><b>Nome: </b>{{order.product.name}}</p>
-                            <p v-if="order.product.size"><b>Tamanho: </b>{{order.product.size}}</p>
-                            <p v-if="order.product.color"><b>Cor: </b>{{order.product.color}}</p>
-                            <div v-if="order.product.attributes">
-                              {{order.product.attributes}}
-                              <!-- <p v-for="(attr, iAttr) in order.product.attributes" :key="iAttr">- <b>{{attr.select}}</b></p> -->
-                            </div>
+                            <p v-for="(pro, indexProduct) in order.product.filter(r => {if(r.attr != 'model') return r})" :key="indexProduct"><b>{{pro.attr}}: </b>{{pro.value}}</p>
                             <hr />
                             <div v-if="order.lens">
                                 <div v-for="(lens, index) in order.lens" :key="index">

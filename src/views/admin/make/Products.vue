@@ -5,47 +5,25 @@
       <b-colxx xxs="12">
         <b-card class="mb-4" title="Selecione o item">
 			<b-row v-if="products">
-        {{products.data['mask']}}
 				<b-colxx md="4" lg="3" v-for="(pro, i) in products.data" :key="i">
-          <b-card class="mb-4" style="border:1px solid rgba(100,100,100,.5); border-radius:6px" no-body>
-              <div class="position-relative">
-                  <img :src="getImage(pro)" class="card-img-top" />
-              </div>
-              <b-card-body>
-                  <form @submit.prevent="setProduct(i)">
-                      <p class="mb-2 card-subtitle">{{pro.information.pro_name}}</p>
-                      <div class="separator mb-2"></div>
-                        <b-form-group v-for="(attrs, indexAttr) in pro.attrs" :key="indexAttr" :label="attrs.name" class="has-float-label mb-4">
-                          <select class="form-control">
-                            <option v-for="(attr, indexAttr) in attrs.values" :value="attr" :key="indexAttr">
-                              {{attr}}
-                            </option>
-                          </select>
-                        </b-form-group>
-                        <!-- <select v-for="(attrs, indexAttr) in pro.attrs" :key="indexAttr" v-model="pro[indexAttr]" class="form-control">
-                          <option value="">{{attrs.name}}</option>
-                        </select> -->
-                          <!-- <select v-if="pro.size" v-model="pro.sizeSelected" name="" id="" class="form-control mb-2">
-                              <option value="">Selecione o tamanho</option>
-                              <option v-for="(s, ci) in pro.size" :key="ci">
-                                  {{s}} MM
-                              </option>
-                          </select>
-                          <select v-if="pro.color" v-model="pro.colorSelected" name="" id="" class="form-control mb-2">
-                              <option value="">Selecione a cor</option>
-                              <option v-for="(color, ci) in pro.color" :key="ci">
-                                  {{color.name}}
-                              </option>
-                          </select>
-                          <select v-if="pro.attributes" v-model="pro.attributes.select" class="form-control mb-2">
-                              <option>Com mascara</option>
-                              <option>Sem mascara</option>
-                          </select> -->
-                      <div class="separator my-2"></div>
-                      <button class="btn btn-outline-success float-right w-100">Adicionar</button>
-                  </form>
-              </b-card-body>
-          </b-card>
+					<b-card class="mb-4" style="border:1px solid rgba(100,100,100,.5); border-radius:6px" no-body>
+						<div class="position-relative">
+							<!-- <img v-if="pro.colorSelected" :src="`${pro.color.filter(color => color.name == pro.colorSelected)[0].image ? baseURL+pro.color.filter(color => color.name == pro.colorSelected)[0].image : 'https://via.placeholder.com/870x470'}`" class="card-img-top" />
+							<img v-else :src="`${pro.image ? baseURL+pro.image : 'https://via.placeholder.com/870x470' }`" class="card-img-top" /> -->
+              <img :src="baseURL + getProductImage(pro)" alt="" class="card-img-top">
+						</div>
+						<b-card-body>
+							<form @submit.prevent="setProduct(pro)">
+								<p class="mb-2 card-subtitle">{{pro.name}}</p>
+								<div class="separator mb-2"></div>
+                  <b-form-group v-for="(attr, indexAttr) in pro.attrs" :key="`${indexAttr}_${i}`" :label="indexAttr" class="has-float-label mb-4">
+                    <b-form-select :options="option(attr)" plain v-model="pro['items_'+indexAttr]" />
+                  </b-form-group>
+								<div class="separator my-2"></div>
+								<button class="btn btn-outline-success float-right w-100">Adicionar</button>
+							</form>
+						</b-card-body>
+					</b-card>
 				</b-colxx>
 			</b-row>
 			<b-row v-else class="align-items-center justify-content-center text-center">
@@ -64,50 +42,39 @@ export default {
 	data() {
 		return {
 			products: null,
-      baseURL,
-      itemSelected: []
+      baseURL
 		}
 	},
     components: {
         'my-breadcrumb': myBreadCrumb
 	},
 	methods: {
-		setProduct: function (index) {
-      let resp = false;
-      if(!resp || resp.length == 0){
-        if(this.products.data[index].attributes) {
-          if(!this.products.data[index].attributes.select) {
-            this.$notify("error", 'Opsss.!!!', "Você precisa selecionar o item", {
-              duration: 3000,
-              permanent: false
-            }); return false
-          }
-        }else if( (!this.products.data[index].colorSelected || !this.products.data[index].sizeSelected) ){
-          this.$notify("error", 'Opsss.!!!', "Você precisa selecionar o tamanho e a cor do seu óculos", {
-            duration: 3000,
-            permanent: false
-          }); return false
+		setProduct: function (item) {
+      let attr = [];
+      for(let i in item) {
+        if(i.indexOf('items_') >= 0) {
+          attr.push({attr: i.replace('items_', ''), value: item[i]})
         }
       }
-			let order = window.localStorage.getItem('order');
+
+      attr.push({attr: 'model', value: item.information.pro_id});
+
+      let order = window.localStorage.getItem('order');
 			if(order){
 				order = JSON.parse(order);
 			}else{
 				order = {};
-			}
-			order.product = {
-				model: this.products.data[index].id,
-				name: this.products.data[index].name,
-				color: this.products.data[index].colorSelected,
-				size: this.products.data[index].sizeSelected,
-        image: this.products.data[index].color ? this.products.data[index].color.filter(color => color.name == this.products.data[index].colorSelected)[0].image : '',
-        attributes: this.products.data[index].attributes.select
-			};
-			window.localStorage.setItem('order',JSON.stringify(order));
+      }
+
+      order.product = attr
+      window.localStorage.setItem('order', JSON.stringify(order));
 			this.$router.push("/admin/make/lens");
+
+
 		},
 
-		getProducts: async function(){
+		getProducts: async function()
+		{
       let order = JSON.parse(window.localStorage.getItem('order'));
       let user = JSON.parse(window.localStorage.getItem('user'));
       let company = '';
@@ -124,27 +91,74 @@ export default {
           company = order.company;
         }
       }
-      const products = await api.get(`/products/${company}`);
-
-      for(let i=0; i<=100; i++) {
-        this.itemSelected.push(i)
-      }
-
+			const products = await api.get(`/products/${company}`);
 			this.products = products.data
     },
-    getImage(pro) {
-      for(let i in pro.variation) {
-        for(let j in pro.variation[i]) {
-          if(pro.variation[i][j].id == '6') {
-            console.log('-=-=-=');
-            return this.baseURL + pro.variation[i][j].value;
-            console.log(this.baseURL + pro.variation[i][j].value)
-          }
+    option(attr){
+      let retorno = [];
+      for(let i in attr) {
+        retorno.push({
+          value: attr[i],
+          text: attr[i]
+        });
+      }
+
+      return retorno
+    },
+    getProductImage(item){
+      let image = item.variation[0].filter(r => {
+        if(r.label == 'Imagem'){return r}
+      })[0].value;
+
+      let attr = [];
+
+      for(let i in item) {
+        if(i.indexOf('items_') >= 0) {
+          attr.push({attr: i.replace('items_', ''), value: item[i]})
         }
       }
-    }
 
-  },
+      let color = attr.filter(r => {
+        if(r.attr == 'Cor') {
+          return r.value
+        }
+      });
+
+      let allAttr = []
+      if(color.length > 0) {
+        color = color[0].value;
+        for(let i in item.variation) {
+          let imagem = '';
+          let cor = '';
+          for(let j in item.variation[i]){
+            if(item.variation[i][j].label == 'Imagem') {
+              imagem = item.variation[i][j].value
+            }
+
+            if(item.variation[i][j].label == 'Cor') {
+              cor = item.variation[i][j].value
+            }
+          }
+          if(cor == color) {
+            allAttr.push({imagem, cor});
+          }
+        }
+
+        let myImage = allAttr.filter(r => {
+          if(r.cor == color) {
+            return r.imagem
+          }
+        });
+
+        if(allAttr.length > 0) {
+          image = allAttr[0].imagem
+        }
+
+      }
+
+      return image
+    },
+	},
 	created() {
 		this.getProducts();
 	}

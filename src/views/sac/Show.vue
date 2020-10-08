@@ -17,15 +17,15 @@
               </thead>
               <tbody>
                   <tr v-for="(item, index) in items" :key="index">
-                      <td>{{index + 1}}</td>
+                      <td>{{item.id}}</td>
                       <td>{{item.colaborador}}</td>
                       <td>{{item.date | date}}</td>
-                      <td><span class="badge" :style="[{background: item.color}]">{{item.status}}</span></td>
+                      <td><span class="badge text-white" :style="[{background: item.color}]">{{item.status}}</span></td>
                       <td>
                         <button  @click="getInfoSAC(index)" v-b-modal.modalright class="btn btn-outline-success btn-sm">
                           <div class="glyph-icon simple-icon-eye"/>
                         </button>
-                        <router-link v-if="false" :to="`/app/sac/view/${item.id}`" class="btn btn-outline-info btn-sm">
+                        <router-link v-if="item.hasChat" :to="`/app/sac/view/${item.id}`" class="btn btn-outline-info btn-sm">
                           <i class="glyph-icon iconsminds-speach-bubble"></i>
                         </router-link>
                       </td>
@@ -43,7 +43,13 @@
         <b>Nota: </b>{{modal.number}}<br />
         <b>Colaborador: </b>{{modal.colaborador}}<br />
         <b>Solicitação: </b>{{modal.date | date}}<br />
+        <b>Sobre: </b>{{modal.about}}<br />
         <b>Imagem:</b> <br />
+        <hr>
+        <div v-if="modal.feedback">
+          <b>Feedback:</b> {{modal.feedback}} <br />
+
+        </div>
         <div v-for="(img, i) in modal.image" :key="i">
           <img target="_blank" v-if="['jpg', 'jpeg', 'png', 'gif', 'svg'].indexOf(img.split('.')[img.split('.').length - 1]) >= 0" :src="baseURL+img" class="w-100 mt-3" alt="">
           <iframe v-else class="w-100 mt-3" :src="baseURL + img" frameborder="0"></iframe>

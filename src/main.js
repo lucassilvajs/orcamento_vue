@@ -89,6 +89,10 @@ Vue.filter("capitalize", valor => {
   return valor.substring(0,1).toUpperCase().concat(valor.toLowerCase().substring(1));
 });
 
+Vue.filter("limit", (valor, limit = 50) => {
+  return valor.slice(0, limit)+(valor.length > limit ? '...' : '')
+});
+
 Vue.filter("date", valor => {
   let d = new Date(valor)
   return d.toLocaleDateString('pt-BR');

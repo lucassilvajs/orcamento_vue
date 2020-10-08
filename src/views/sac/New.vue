@@ -32,7 +32,7 @@
                 </b-row>
                 <b-row v-if="imgList">
                   <b-colxx xxs="4" v-for="(img, ind) in imgList" :key="ind">
-                    <b-card class="p-0 img">
+                    <b-card class="p-0 img flex-column-child">
                       <a :href="baseURL + img.data">
                         <img target="_blank" v-if="['jpg', 'jpeg', 'png', 'gif', 'svg'].indexOf(img.data.split('.')[img.data.split('.').length - 1]) >= 0" :src="baseURL+img.data" class="w-100" alt="">
                         <div v-else class="pdf-file">
@@ -40,6 +40,7 @@
                           <span style="font-size:.8rem;">Documento</span>
                         </div>
                       </a>
+                      <button type="button" @click="() => { imgList.splice(ind, 1) }" class="btn btn-link text-danger">Remover</button>
                     </b-card>
                   </b-colxx>
                 </b-row>
@@ -93,6 +94,7 @@ export default {
   },
   methods: {
     async getInfoPhoto(img){
+      console.log(img)
       this.imgList.push(img)
     },
     async addSac(e) {
@@ -169,5 +171,9 @@ export default {
   justify-content: center;
   font-size: 2rem;
   color: #a00;
+}
+
+.flex-column-child .card-body {
+  flex-direction: column;
 }
 </style>

@@ -6,27 +6,108 @@
       <div class="separator mb-5"></div>
     </b-colxx>
   </b-row>
-  <b-row v-if="false">
-    <b-colxx md="4" lg="3">
-        <b-form-group label="Status" class="has-float-label mb-4">
-            <select v-model="filter.status" id="status" class="form-control">
-              <option value="">Todos</option>
-              <option v-for="(status, index) in data.status" :key="status" :value="index">{{status}}</option>
-            </select>
+  <b-card class="mb-2" title="Filtro">
+    <b-row>
+      <b-colxx xs="12" lg="3">
+        <b-form-group label="Empresa, Colaborador e NF  " class="has-float-label mb-2">
+          <b-form-input type="text" v-model="filter.name" />
         </b-form-group>
-    </b-colxx>
-    <b-colxx md="8" lg="9">
-        <button class="btn btn-outline-success float-right" @click="getSac()">Buscar</button>
-    </b-colxx>
-  </b-row>
+      </b-colxx>
+      <b-colxx xs="12" lg="3">
+          <b-form-group label="Status" class="has-float-label mb-4">
+              <b-form-select v-model="filter.status" :options="{0:'Todos',...data.status}" plain />
+          </b-form-group>
+      </b-colxx>
+      <b-colxx xxs="12" v-if="false" md="3">
+        <b-form-group label="Resultados por página" class="has-float-label mb-4">
+          <b-form-select v-model="order.limit" :options="[
+            { value: '20', text: '20' },
+            { value: '50', text: '50' },
+            { value: '100', text: '100' },
+          ]" plain />
+        </b-form-group>
+      </b-colxx>
+      <b-colxx xxs="12" v-if="false" md="3">
+        <b-form-group label="Ordenação" class="has-float-label mb-4">
+          <b-form-select v-model="order.orderBy" :options="[
+            { value: 'DESC', text: 'Decrescente' },
+            { value: 'ASC', text: 'Crescente' },
+          ]" plain />
+        </b-form-group>
+      </b-colxx>
+      <b-colxx xxs="12" v-if="false" md="3">
+        <b-form-group label="Ordenar por" class="has-float-label mb-4">
+          <b-form-select v-model="order.orderByValue" :options="[
+            { value: 'sac_date_added', text: 'Criação' },
+            { value: 'name', text: 'Empresa' },
+            { value: 'sac_colaborador', text: 'Colaborador' },
+          ]" plain />
+        </b-form-group>
+      </b-colxx>
+      <b-colxx lg="3"></b-colxx>
+      <b-colxx xs="12" lg="3" class="text-right">
+          <b-button variant="success" :disabled="processing" :class="{'btn-multiple-state text-sucess': true,
+              'show-spinner': processing,
+              'show-success': !processing}" @click="getSac(1)">
+              <span class="spinner d-inline-block">
+                  <span class="bounce1"></span>
+                  <span class="bounce2"></span>
+                  <span class="bounce3"></span>
+              </span>
+              <span class="icon success">
+                  Buscar
+              </span>
+              <span class="icon fail">
+                  <i class="simple-icon-exclamation"></i>
+              </span>
+              <span class="label">Buscar</span>
+          </b-button>
+          <!-- <button class="show-success btn btn-info mb-3 btn-multiple-state btn-shadow ml-3" @click="getSac(1)">
+            <span class="label">Buscar</span>
+            <span class="spinner d-inline-block">
+              <span class="bounce1"></span>
+              <span class="bounce2"></span>
+              <span class="bounce3"></span>
+            </span>
+            <span class="icon success">
+              Buscar
+            </span>
+          </button> -->
+      </b-colxx>
+    </b-row>
+  </b-card>
+
+
+
+
   <b-row class="mb-5">
     <b-colxx xxs="12">
       <b-card class="mb-4" title="SAC">
+        <b-row class="mb-3">
+
+          <b-colxx xxs="12" md="11">
+          </b-colxx>
+
+          <b-colxx xxs="12" md="1" class="text-right">
+            <b-button-group>
+              <b-dropdown split right class="check-button" variant="primary btn-xs">
+                <label class="pt-2 custom-control custom-checkbox pl-4 mb-0 d-flex justify-content-center align-items-center" slot="button-content">
+                  <input v-model="selectAll" @change="() => {data.sac = data.sac.map(r => {r.selected = selectAll; return r;})}" class="custom-control-input" type="checkbox" />
+                  <span class="custom-control-label">&nbsp;</span>
+                </label>
+                <b-dropdown-item v-for="(status, index) in data.status" :key="index" @click="changeStatusSelected(index)">{{status}}</b-dropdown-item>
+                </b-dropdown>
+            </b-button-group>
+          </b-colxx>
+        </b-row>
+        <b-row>
+        </b-row>
         <div class="table-responsive" v-if="data.sac.length > 0">
           <table class="table">
             <thead>
               <tr>
                 <th>#</th>
+                <th>ID</th>
                 <th>Nota</th>
                 <th>Colaborador</th>
                 <th>Solicitante</th>
@@ -39,7 +120,13 @@
             </thead>
             <tbody>
               <tr v-for="(sac, index) in data.sac" :key="index">
-                <td>{{sac.id}}</td>
+                <td>
+                  <label class="pt-2 custom-control custom-checkbox pl-4 mb-0 d-flex justify-content-center align-items-center" slot="button-content">
+                    <input class="custom-control-input" v-model="sac.selected" type="checkbox" />
+                    <span class="custom-control-label indeterminate">&nbsp;</span>
+                  </label>
+                </td>
+                <td> {{sac.id}}</td>
                 <td>{{sac.nota}}</td>
                 <td>{{sac.colaborador}}</td>
                 <td>{{sac.solicitante}}</td>
@@ -47,26 +134,52 @@
                 <td>{{sac.cnpj}}</td>
                 <td>{{sac.date | date}}</td>
                 <td>
-                  <span :style="{background:sac.color}" style="color:#fff; padding:5px 7px; border-radius:3px;">{{sac.status}}</span> </td>
+                  <span :style="{background:sac.color}" style="color:#fff; padding:5px 7px; border-radius:3px;">{{sac.status}}</span>
+                </td>
                 <td>
-                    <button @click="getInfoSAC(index)" v-b-modal.r class="btn btn-outline-success">
+                  <b-dropdown v-if="'Deletado' != sac.status" id="ddown1" text="Ações" variant="outline-primary">
+                    <b-dropdown-item @click="getInfoSAC(index)" v-b-modal.r>Acessar solicitação</b-dropdown-item>
+                    <b-dropdown-item @click="() => {$router.push(`/admin/sac/view/${sac.id}`) }">Chat</b-dropdown-item>
+                    <b-dropdown-item @click="deleteSac(sac.id)">Excluir</b-dropdown-item>
+                  </b-dropdown>
+                  <b-dropdown v-else text="Restaurar" variant="outline-dark btn-xs">
+                    <b-dropdown-item @click="changeStatus(sac.id, 1)">Aberto</b-dropdown-item>
+                    <b-dropdown-item @click="changeStatus(sac.id, 5)">Aprovado</b-dropdown-item>
+                    <b-dropdown-item @click="changeStatus(sac.id, 6)">Recusado</b-dropdown-item>
+                  </b-dropdown>
+
+
+                    <!-- <button @click="getInfoSAC(index)" v-b-modal.r class="btn btn-outline-success">
                         <div class="glyph-icon simple-icon-eye"/>
                     </button>
                     <button @click="deleteSac(sac.id)" class="btn btn-danger">
                       <div class="glyph-icon simple-icon-trash"></div>
                     </button>
+                    <router-link :to="`/admin/sac/view/${sac.id}`" class="btn btn-outline-info">
+                        <div class="glyph-icon simple-icon-eye"/>
+                    </router-link> -->
                 </td>
                 <!-- <td>
-                    <router-link v-if="false" :to="`/admin/sac/view/${sac.id}`" class="btn btn-outline-info">
-                        <div class="glyph-icon iconsminds-speach-bubble"/>
-                    </router-link>
                 </td> -->
               </tr>
             </tbody>
           </table>
+          <b-pagination v-if="false && total > limit"
+            size="sm"
+            align="center"
+            :total-rows="total"
+            :per-page="limit"
+            @change="(numbe) => {
+              order.page = numbe;
+              getSac(1);
+            }"
+          />
         </div>
-        <div v-else>
+        <div v-else-if="data.sac.length == 0 && processing == false">
           <div class="alert alert-info">Nenhuma solicitação foi encontrada!</div>
+        </div>
+        <div v-else >
+          <h3 class="text-center">Buscando informações</h3>
         </div>
       </b-card>
     </b-colxx>
@@ -79,6 +192,8 @@
       <b>empresa: </b>{{modal.name.split('-')[0]}}<br />
       <b>Solicitação: </b>{{modal.date | date}}<br />
       <b>O que aconteceu:</b> {{modal.about}} <br />
+      <div v-if="modal.feedback"><hr><b>Considerações:</b> {{modal.feedback}} <hr> <br /></div>
+
       <b>Imagens:</b> <br />
       <div v-for="(img, i) in modal.image" :key="i">
         <img target="_blank" v-if="['jpg', 'jpeg', 'png', 'gif', 'svg'].indexOf(img.split('.')[img.split('.').length - 1]) >= 0" :src="baseURL+img" class="w-100 mt-3" alt="">
@@ -102,12 +217,6 @@
 
         </div>
      </div>
-      <br>
-        <p>Número do pedido</p>
-        <b-form-group v-if="!modal.order_id" label="Número do pedido" class="has-float-label mb-2">
-          <b-form-input type="text" v-model="modal.idOrder" />
-        </b-form-group>
-
       <div class="feedback mt-5"  v-if="modal.status == 'Aberto'">
         <p>Você gostaria de enviar enviar algo ao cliente?</p>
 
@@ -120,8 +229,8 @@
 
       <template slot="modal-footer">
           <div v-if="modal.status == 'Aberto'">
-            <b-button variant="success" @click="changeStatus('approved')" class="mr-1">Aprovar</b-button>
-            <b-button variant="secondary" @click="changeStatus('reproved')" class="mr-1">Reprovar</b-button>
+            <b-button variant="success" @click="changeStatus(modal.id, 5, modal.info)" class="mr-1">Aprovar</b-button>
+            <b-button variant="secondary" @click="changeStatus(modal.id, 6, modal.info)" class="mr-1">Reprovar</b-button>
 
           </div>
           <b-button variant="info" @click="hideModal('r')">Fechar</b-button>
@@ -138,12 +247,17 @@ export default {
   },
   data () {
     return {
-      index: null,
-      filter: {
-        status: ''
-      },
       baseURL,
-      data: null,
+      selectAll: false,
+      index: null,
+      processing: false,
+      filter: {},
+      order: {
+        limit: 100,
+        orderBy: 'DESC',
+        orderByValue: 'sac_date_added'
+      },
+      data: {},
       modal: {
         title: '',
         nota: '',
@@ -155,9 +269,10 @@ export default {
     }
   },
   methods: {
-    async getSac(){
-      const filter = (this.filter.status ? this.filter.status : '');
-      const response = await api.get(`admin/sac/${filter}`);
+    async getSac(hasFilter = false){
+      this.data.sac = [];
+      this.processing = true;
+      const response = await api.get(`admin/sac/`, {params: {...this.order, ...this.filter}});
       this.data = response.data.data;
       this.data.sac = this.data.sac.map(r => {
         let image = [];
@@ -170,7 +285,9 @@ export default {
 
         r.image = image
         return r;
-      })
+      });
+
+      this.processing = false;
     },
     getInfoSAC(index) {
       this.index = index;
@@ -191,10 +308,35 @@ export default {
         this.$refs['modalnested'].show()
       }
     },
-    async changeStatus(status) {
+
+    async changeStatusSelected(status, feedback = '') {
+      await this.$swal.fire({
+        title: `O que você acha?`,
+        text: `Você realmente deseja alterar o status dos SACs selecionados?`,
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sim',
+        cancelButtonText: 'Não',
+        showLoaderOnConfirm: true,
+      }).then(async (result) => {
+        if(result.value) {
+          this.data.sac.filter(r => r.selected).map(async r => {
+              const response = await api.put(`admin/sac/${r.id}`, {update: {status, feedback}} );
+          });
+        }
+      });
+
+      this.modal.info = ''
+      await this.getSac();
+
+    },
+
+    async changeStatus(sac, status, feedback = '') {
        await this.$swal.fire({
         title: `O que você acha?`,
-        text: `Você realmente deseja ${status == 'approved' ? 'aprovar' :  'reprovar'} essa solicitação?`,
+        text: `Você realmente deseja alterar o status do SAC selecionado?`,
         icon: 'info',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
@@ -205,27 +347,15 @@ export default {
       }).then(async (result) => {
         if(result.value) {
           if(status != '') {
-            if(status == 'approved' && !this.modal.idOrder) {
-              this.$notify('error', 'Ops...!', 'Por favor, preencha o número do pedido', {
-                duration: 3000,
-                permanent: false
-              });
-
-              return false;
-            }
-            const response = await api.put(`admin/sac/${this.modal.id}`, {status, info: this.modal});
+            const response = await api.put(`admin/sac/${sac}`, {update: {status, feedback}});
             let res = response.data;
             this.$notify(res.status, res.status == 'success' ? 'Sucesso' : 'Opsss!', res.message, {
               duration: 3000,
               permanent: false
             });
+
+            this.modal.info = ''
             await this.getSac();
-
-            this.modal = this.data.sac[this.index];
-
-            if(res.status == 'success') {
-              this.somethingModal('modalright')
-            }
           }
         }
 

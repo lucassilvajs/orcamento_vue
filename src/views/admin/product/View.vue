@@ -9,7 +9,7 @@
   <b-row class="mb-5" v-if="product">
     <b-colxx xxs="12">
       <b-card class="mb-4" title="Produtos">
-        <b-row v-hide="true">
+        <b-row v-if="false">
           <b-colxx md="4" lg="3">
               <b-form-group label="Nome do produto" class="has-float-label mb-4">
                   <b-form-input v-model="filter.name" type="text" placeholder="Nome do produto" />

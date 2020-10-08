@@ -15,7 +15,7 @@
 				<div class="checkPicture" v-if="img">
 					<button type="button" class="btn btn-danger mr-2" @click="() => {img = false; loadCamera()}">
 						<div class="d-inline glyph-icon simple-icon-dislike"></div>
-						Tirar Outrass
+						Tirar Outra
 					</button>
 
 					<b-button variant="success" :disabled="processing" :class="{'btn-multiple-state btn-shadow': true,
@@ -28,12 +28,12 @@
 							<span class="bounce3"></span>
 						</span>
 						<span class="icon success">
-							<div class="d-inline glyph-icon simple-icon-like"></div> Gostei
+							<div class="d-inline glyph-icon simple-icon-like"></div> Adicionar foto
 						</span>
 						<span class="icon fail">
 							<i class="simple-icon-exclamation"></i>
 						</span>
-						<span class="label">Gostei</span>
+						<span class="label">Adicionar foto</span>
 					</b-button>
 				</div>
 				<button type="button" v-if="img" class="btn btn-outline-light mr-2" @click="img = false">
@@ -133,9 +133,9 @@ export default {
       this.fileObject = e.target.files[0];
       file.readAsDataURL(e.target.files[0]);
 
-      setTimeout(async () => {
-        await this.sendImage();
-      }, 100);
+      // setTimeout(async () => {
+      //   await this.sendImage();
+      // }, 100);
 		},
 		async sendImage() {
       this.processing = false;
@@ -284,10 +284,10 @@ export default {
         document.querySelector('.counter').classList.remove('d-flex');
       }, this.timeAwait * 1000);
 
-      console.log('Foi!')
-      setTimeout(async () => {
-        await this.sendImage();
-      }, 100);
+      // console.log('Foi!')
+      // setTimeout(async () => {
+      //   await this.sendImage();
+      // }, 100);
 
       // sendSnapShot(dataURI); //Gerar Imagem e Salvar Caminho no Banco
     },

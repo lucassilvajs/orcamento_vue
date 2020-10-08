@@ -244,6 +244,11 @@ const routes = [
           import("./views/admin/make/Information")
       },
       {
+        path: "/admin/make/Distribuicao",
+        component: () =>
+          import("./views/admin/make/Distribuicao")
+      },
+      {
         path: "/admin/make/products",
         component: () =>
           import("./views/admin/make/Products")
