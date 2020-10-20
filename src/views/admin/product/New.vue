@@ -28,12 +28,18 @@
                 </b-colxx>
                 <b-colxx md="4" lg="3">
                   <b-form-group label="Status" class="has-float-label mb-4">
-                    <b-form-select v-model="product.status" :options="[{value: 'Active', text: 'Ativo'}, {value: 'Inactive', text: 'Inativo'}, {value: 'Internal', text: 'Interno'}]" />
+                    <b-form-select v-model="product.status" :options="[{value: 'Active', text: 'Ativo'}, {value: 'Inactive', text: 'Inativo'}]" />
                   </b-form-group>
                 </b-colxx>
                 <b-colxx md="4" lg="3">
                   <b-form-group label="Tipo do produto" class="has-float-label mb-4">
                     <b-form-select v-model="product.type" :options="productInfo.type.map(r => {
+                      return {value: r.id,
+                      text: r.name}
+                      })" />
+                  </b-form-group>
+                  <b-form-group v-if="productInfo.type.filter(r => {if(r.id == product.type) return r;})[0].parent" label="Sub categoria" class="has-float-label mb-4">
+                    <b-form-select v-model="product.subtype" :options="productInfo.type.filter(r => {if(r.id == product.type) return r;})[0].parent.map(r => {
                       return {value: r.id,
                       text: r.name}
                       })" />
@@ -44,7 +50,7 @@
         </b-colxx>
 
         <b-colxx xxs="12">
-          <b-card class="mb-4" title="Imagens">
+          <b-card class="mb-4" title="Imagens" v-if="product.type == 1">
             <b-alert dismissible show variant="info">Adicione aqui <strong>Todas</strong> as imagens referentes a esse produto</b-alert>
             <vue-dropzone @vdropzone-complete="completeUpload" ref="myVueDropzone" id="dropzone" :options="dropzoneOptions" />
             <draggable v-if="listImages.length > 0" class="row min-height" :list="listImages" :group="{name: 'people', pull: 'clone'}" >
@@ -124,6 +130,40 @@
           </b-card>
         </b-colxx>
 
+        <b-colxx xxs="12" v-if="product.type == 6 && ['7','8'].indexOf(product.subtype) >= 0">
+          <b-card title="Preços atacado">
+            <table class="w-100 table">
+              <thead>
+                <tr>
+                  <th v-for="(qtd, indexQtd) in product.prices.map(r => r.qtd)" :key="indexQtd">{{qtd}} Itens <a class="p-1 text-danger" @click="() => {
+                    if(product.prices.length == 1) {
+                      $notify('error', 'Opsss...!', 'Você tem que deixar pelo menos um preço ativo', {
+                        duration: 3000,
+                        permanent: false
+                      });
+                    }else{
+                      product.prices.splice(indexQtd, 1);
+                    }
+                  }"><i class="glyph-icon simple-icon-minus" /></a> </th>
+                  <th>
+                    <input type="text" class="form-my" v-model="addPrices">
+                    <button class="btn btn-xs btn-outline-success"  @click="addItemProduct">
+                      <i class="glyph-icon simple-icon-plus" />
+                    </button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td v-for="(value, indexValue) in product.prices.map(r => r.value)" :key="indexValue">
+                    <Money class="form-my" v-model="product.prices[indexValue].value" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </b-card>
+        </b-colxx>
+
 
         <b-colxx>
           <button class="btn btn-success float-right mt-3" @click="addProduct">Salvar Produto</button>
@@ -152,6 +192,7 @@ export default {
     },
     data() {
         return {
+            addPrices: 0,
             isEdition: false,
             keepForm: true,
             listAttributes: [],
@@ -172,6 +213,12 @@ export default {
                 status: 'Active',
                 name: '',
                 price: '',
+                prices: [
+                  {qtd: 1, value: 69},
+                  {qtd: 10, value: 56},
+                  {qtd: 50, value: 43},
+                  {qtd: 100, value: 39},
+                ],
                 attributes: []
             },
             baseURL,
@@ -319,6 +366,19 @@ export default {
         this.isEdition = variation;
 
       },
+
+      addItemProduct(){
+        if(this.product.prices.filter(r => r.qtd == this.addPrices).length > 0){
+          this.$notify("error", "Opsss...!", "Você já tem essa quantia parametrizada", {
+            duration: 3000,
+            permanent: false
+          });
+        }else{
+          this.product.prices.push({qtd: this.addPrices, value: 0});
+          this.product.prices = this.product.prices.sort((a, b)=> a.qtd - b.qtd)
+        }
+
+      }
     },
     created(){
       this.getInfoProduct();
@@ -356,5 +416,9 @@ export default {
   top:0;
   left:0;
   background: rgba(100,100,100,.5);
+}
+
+.form-my {
+  border:2px solid #ccc; height:26px; width:100px; border-radius: 3px;
 }
 </style>

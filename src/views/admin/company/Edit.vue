@@ -101,31 +101,69 @@
             <b-card class="mb-4" title="Tabela de preços dinamica" v-if="allProduct">
                 <div class="alert alert-info">Para manter o preço original você pode deixar o campo do valor zerado</div>
                 <b-row>
-                    <b-colxx md="3" lg="3" v-for="(pro, index) in allProduct" :key="index">
-                        <div v-if="false && pro.name.indexOf('EPI STEALTH') >= 0">
-                          <div v-for="(attr, attrIndex) in pro.variation.attributes[0].values" :key="attrIndex">
-                            {{pro.name}} {{attr}}
-                            <b-input-group class="mb-3" >
-                                <Money class="form-control" v-model="pro.variation.attributes[0].price[attrIndex]" :disabled="true" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
-
-                                <Money class="form-control" v-model="pro.variation.valueDA[attrIndex]" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
-                            </b-input-group>
-                          </div>
-                        </div>
-                        <div v-else>
+                    <b-colxx md="3" lg="3" v-for="(pro, index) in allProduct.filter(r => r.parent == 0)" :key="index">
+                        <div>
                           {{pro.name}}
                           <b-input-group class="mb-3">
                               <Money class="form-control" v-model="pro.value" :disabled="true" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
-
                               <Money class="form-control" v-model="pro.valueD" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
                           </b-input-group>
                         </div>
                     </b-colxx>
                 </b-row>
             </b-card>
+            <b-card class="mb-4" title="Tabela de preços dinamica 2" v-if="allProduct">
+                <div class="alert alert-info">Para manter o preço original você pode deixar o campo do valor zerado</div>
+                <b-row>
+                    <b-colxx md="12" lg="12">
+                      <table class="w-100 table-striped">
+                        <thead>
+                          <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>SKU</th>
+                            <th>Precificação</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="filter-table-area" style="background: rgb(78 173 188)!important">
+                            <td><input v-on:keyup.enter="getProducts" type="text" v-model="filter.id" style="height:25px; max-width:30%;"></td>
+                            <td><input v-on:keyup.enter="getProducts" type="text" v-model="filter.name" style="height:25px; min-width:60%;"></td>
+                            <td><input v-on:keyup.enter="getProducts" type="text" v-model="filter.sku" style="height:25px; max-width:50%;"></td>
+                            <td></td>
+                            <td></td>
+                          </tr>
+                          <tr v-for="(pro, proIndex) in products.products" :key="proIndex">
+                            <td>{{pro.id}}</td>
+                            <td>{{pro.name}}</td>
+                            <td>{{pro.sku ? pro.sku : '-'}}</td>
+                            <td>
+                              <button @click="getPrecificavel(pro.id)" class="btn btn-sm btn-outline-info">Precificar</button>
+                            </td>
+                          </tr>
+                          <tr v-if="productsProcessing" class="text-center">
+                            <td colspan="5">
+                              <h4 class="title">Buscando produtos</h4>
+                            </td>
+                          </tr>
+                          <tr v-if="!productsProcessing && products.products.length == 0" class="text-center">
+                            <td colspan="5">
+                              <h4 class="title">Nenhum produto foi encontrado</h4>
+                            </td>
+                          </tr>
+                          <tr v-if="products.products.length > 0" class="py-2">
+                            <td colspan="5">
+                              <button class="btn btn-sm btn-outline-info float-right" @click="addSelected">Adicionar selecionados</button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </b-colxx>
+                </b-row>
+            </b-card>
             <b-card class="mb-4" title="Restrições" v-if="allProduct">
                 <b-row>
-                  <b-colxx class="mb-4" md="3" lg="3" v-for="(pro, index) in allProduct" :key="index" >
+                  <b-colxx class="mb-4" md="3" lg="3" v-for="(pro, index) in allProduct.filter(r => r.parent == 0)" :key="index" >
                     <b-card no-body>
                       <b-card-body>
                           <div class="d-flex justify-content-between align-items-center">
@@ -327,6 +365,7 @@ export default {
                 },
             },
             product:null,
+            products: [],
             baseURL,
             color: {
                 name: '',
@@ -337,7 +376,9 @@ export default {
             checked,
             allProduct: null,
             processing: false,
-            requestError: false
+            requestError: false,
+            productsProcessing:false,
+            filter: [],
         }
     },
     computed: {
@@ -474,11 +515,26 @@ export default {
           }
 
           this.processing = false;
+        },
+        getProducts: async function()
+        {
+          this.productsProcessing = true;
+          this.products.products = [];
+          let company = this.$route.params.id;
+          const products = await api.get(`admin/distribution/${company}`, {params: this.filter});
+          this.products = products.data.data;
+          this.productsProcessing = false;
+        },
+
+        async getPrecificavel(idProduct){
+          let company = this.$route.params.id;
+          const products = await api.get(`admin/distribution/item/${company}/${idProduct}`, {params: this.filter});
         }
     },
     async created(){
         await this.getCompany();
         await this.getAllProducts();
+        await this.getProducts();
     }
 }
 </script>

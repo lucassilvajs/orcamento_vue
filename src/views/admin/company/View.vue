@@ -2,7 +2,7 @@
 <div>
   <b-row>
     <b-colxx xxs="12">
-      <h1>Empresas</h1>
+      <h1>Empresas <button @click="refreshCompany" class="btn btn-xs btn-outline-info"> <i class="rotate glyph-icon simple-icon-refresh"></i> </button></h1>
       <div class="separator mb-5"></div>
     </b-colxx>
   </b-row>
@@ -158,6 +158,18 @@ export default {
       this.company = response.data.data.company;
       this.total = response.data.data.total;
     },
+
+    async refreshCompany(){
+      const response = await api.get('bling/getContatos', {params : {erp: '1'}});
+      if(response.data.status) {
+        this.$notify('success', "Sucesso", "Empresas atualizadas com sucesso", {
+          duration: 3000,
+          permanent: false
+        });
+
+        this.getCompanies();
+      }
+    }
   },
   created() {
     this.getCompanies();
@@ -172,6 +184,12 @@ export default {
     animation-iteration-count: infinite;
   }
 
+  .rotate {
+    animation-name: rotate;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+  }
+
   @keyframes flash {
     0% {
       opacity: 1;
@@ -181,6 +199,18 @@ export default {
     }
     100% {
       opacity: 1;
+    }
+  }
+
+  @keyframes rotate {
+    0% {
+      transform: rotate(0);
+    }
+    50% {
+      transform: rotate(180);
+    }
+    100% {
+      transform: rotate(0);
     }
   }
 </style>

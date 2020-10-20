@@ -2,18 +2,18 @@
   <div>
      <b-row v-if="1">
       <b-colxx xxs="12">
-        <b-card class="mb-4" title="Novo pedido para Coca-cola do Brasil">
+        <b-card class="mb-4" :title="`Novo pedido para: ${products.company}`">
           <b-row class="flex-column mb-3">
             <b-colxx>
               <h5 class="sub-title" style="color: #444;border-bottom: 1px solid;">Adicionar Itens</h5>
             </b-colxx>
             <b-colxx class="mb-3 d-flex justify-content-between align-items-end">
               <div>
-                <span>Pagina: <input type="text" v-model="filter.page" style="height:25px; max-width:40px;"> de 5 páginas</span>
+                <span>Pagina: <input type="text" v-model="filter.page" style="height:25px; max-width:40px;"> de {{Math.ceil(Number(products.total) / 10)}} páginas</span>
               </div>
               <div>
-                <button class="btn btn-sm btn-outline-info">Limpar busca</button>
-                <button class="btn btn-sm btn-info">Buscar</button>
+                <button class="btn btn-sm btn-outline-info" @click="() => {filter = {}; getProducts()}">Limpar busca</button>
+                <button class="btn btn-sm btn-info" @click="getProducts">Buscar</button>
 
               </div>
             </b-colxx>
@@ -30,28 +30,38 @@
                 </thead>
                 <tbody>
                   <tr class="filter-table-area" style="background: rgb(78 173 188)!important">
-                    <td><input type="text" v-model="filter.id" style="height:25px; max-width:30%;"></td>
-                    <td><input type="text" v-model="filter.name" style="height:25px; min-width:60%;"></td>
-                    <td><input type="text" v-model="filter.sku" style="height:25px; max-width:50%;"></td>
+                    <td><input v-on:keyup.enter="getProducts" type="text" v-model="filter.id" style="height:25px; max-width:30%;"></td>
+                    <td><input v-on:keyup.enter="getProducts" type="text" v-model="filter.name" style="height:25px; min-width:60%;"></td>
+                    <td><input v-on:keyup.enter="getProducts" type="text" v-model="filter.sku" style="height:25px; max-width:50%;"></td>
                     <td></td>
                     <td></td>
                   </tr>
-                  <tr v-for="l in 5" :key="l">
-                    <td>15</td>
-                    <td>EPI ID 101 A</td>
-                    <td>100152</td>
+                  <tr v-for="(pro, proIndex) in products.products" :key="proIndex">
+                    <td>{{pro.id}}</td>
+                    <td>{{pro.name}}</td>
+                    <td>{{pro.sku ? pro.sku : '-'}}</td>
                     <td>
                       <b-form-checkbox-group>
-                        <b-form-checkbox value="first"></b-form-checkbox>
+                        <b-form-checkbox v-model="pro.checked"></b-form-checkbox>
                       </b-form-checkbox-group>
                     </td>
                     <td>
-                      <input type="text" style="height:25px; width:60px;">
+                      <input type="text" v-model="pro.qtd" style="height:25px; width:60px;">
                     </td>
                   </tr>
-                  <tr class="py-2">
+                  <tr v-if="productsProcessing" class="text-center">
                     <td colspan="5">
-                      <button class="btn btn-sm btn-outline-info float-right">Adicionar selecionados</button>
+                      <h4 class="title">Buscando produtos</h4>
+                    </td>
+                  </tr>
+                  <tr v-if="!productsProcessing && products.products.length == 0" class="text-center">
+                    <td colspan="5">
+                      <h4 class="title">Nenhum produto foi encontrado</h4>
+                    </td>
+                  </tr>
+                  <tr v-if="products.products.length > 0" class="py-2">
+                    <td colspan="5">
+                      <button class="btn btn-sm btn-outline-info float-right" @click="addSelected">Adicionar selecionados</button>
                     </td>
                   </tr>
                 </tbody>
@@ -74,21 +84,32 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="l in 5" :key="l">
-                    <td><b>Haste 101 A - Azul</b><br><b>SKU: </b>600005</td>
-                    <td>R$ 5,00</td>
-                    <td><input type="text" style="height:25px; max-width:60px;"></td>
-                    <td>R$50,00</td>
+                  <tr v-for="(pro, indexPro) in productSelected" :key="indexPro">
+                    <td><b>{{pro.name}}</b><br><b>SKU: </b>{{pro.sku}}</td>
+                    <td>{{proPrice(pro.id) | numeroPreco}}</td>
+                    <td><input type="text" v-model="pro.qtd" style="height:25px; max-width:60px;"></td>
+                    <td>{{ proPrice(pro.id) * pro.qtd | numeroPreco }}</td>
                     <td>
-                      <button class="btn btn-xs btn-danger">
+                      <button @click="() => {
+                        productSelected.splice(indexPro, 1);
+                      }" class="btn btn-xs btn-danger">
                         <i class="simple-icon-trash" />
                       </button>
                     </td>
                   </tr>
+                  <tr v-if="productSelected.length == 0" class="text-center">
+                    <td colspan="5">
+                      <h4 class="title">Nenhum item adicionado</h4>
+                    </td>
+                  </tr>
                   <tr>
                     <td colspan="5">
-                      <span><b>Total: </b> 5 produto(s)</span><br>
-                      <span><b>Subtotal: </b> R$ 250,00</span>
+                      <span><b>Total: </b> {{productSelected.length}} produto(s)</span><br>
+                      <span v-if="productSelected.length > 0"><b>Subtotal: </b> {{ productSelected.map(r => {
+                        return Number(proPrice(r.id)) * Number(r.qtd)
+                      }).reduce( (total, current) => {
+                        return total + current
+                      }) | numeroPreco}} </span>
                     </td>
                   </tr>
                 </tbody>
@@ -97,7 +118,7 @@
           </b-row>
           <b-row>
             <b-colxx>
-              <button class="btn btn-success float-right">Finalizar pedido</button>
+              <button @click="addOrder" class="btn btn-success float-right">Finalizar pedido</button>
             </b-colxx>
           </b-row>
         </b-card>
@@ -115,9 +136,12 @@ import {api, baseURL} from '@/constants/config';
 export default {
 	data() {
 		return {
-			products: null,
+			products: [],
       baseURL,
+      company: null,
       filter: {},
+      productsProcessing: false,
+      productSelected: []
 		}
 	},
     components: {
@@ -126,14 +150,6 @@ export default {
 	methods: {
 		setProduct: function (index) {
       let resp = false;
-      // if(this.products.data[index].attributes){
-      //   resp = this.products.data[index].attributes.filter(r => {
-      //     if(r.select.length) {
-      //       return r
-      //     }
-      //   });
-      // }
-
       if(!resp || resp.length == 0){
         if(this.products.data[index].attributes) {
           if(!this.products.data[index].attributes.select) {
@@ -155,39 +171,53 @@ export default {
 			}else{
 				order = {};
 			}
-			order.product = {
-				model: this.products.data[index].id,
-				name: this.products.data[index].name,
-				color: this.products.data[index].colorSelected,
-				size: this.products.data[index].sizeSelected,
-        image: this.products.data[index].color ? this.products.data[index].color.filter(color => color.name == this.products.data[index].colorSelected)[0].image : '',
-        attributes: this.products.data[index].attributes.select
-			};
 			window.localStorage.setItem('order',JSON.stringify(order));
 			this.$router.push("/admin/make/lens");
 		},
 
 		getProducts: async function()
 		{
-      let order = JSON.parse(window.localStorage.getItem('order'));
-      let user = JSON.parse(window.localStorage.getItem('user'));
-      let company = '';
-      console.log(order)
-      console.log(user)
-      if(true) {
-        if(!order || !order.company) {
-          this.$notify("error", 'Opsss.!!!', "Por favor, selecione uma empresa para buscarmos a relação de produto disponível", {
-            duration: 5000,
-            permanent: false
-          });
-          return false;
-        }else{
-          company = order.company;
+      this.productsProcessing = true;
+      this.products.products = [];
+      let company = JSON.parse(window.localStorage.getItem('order')).company;
+			const products = await api.get(`admin/distribution/${company}`, {params: this.filter});
+			this.products = products.data.data;
+      this.productsProcessing = false;
+    },
+
+    addSelected() {
+      this.products.products.forEach(element => {
+        if(element.checked) {
+          element.qtd = element.qtd > 1 ? element.qtd : 1;
+
+          this.productSelected.push(element)
         }
-      }
-			const products = await api.get(`/products/${company}`);
-			this.products = products.data
-		}
+      });
+
+      let selected = [];
+      this.productSelected.forEach(element => {
+        if(selected.filter(r => r.id == element.id).length == 0){
+          selected.push(element);
+        }
+      })
+
+      this.productSelected = selected;
+
+    },
+    proPrice(idProduct){
+      let produto = this.productSelected.filter(r => r.id == idProduct)[0];
+      let preco = 0;
+      produto.price.forEach(r => {
+        if(produto.qtd >= Number(r.qty)) {
+          preco = r.value
+        }
+      });
+      return preco;
+    },
+    async addOrder(){
+      let company = JSON.parse(window.localStorage.getItem('order')).company;
+      const response = await api.post(`admin/distribution`, {product: this.productSelected, company});
+    }
 	},
 	created() {
 		this.getProducts();

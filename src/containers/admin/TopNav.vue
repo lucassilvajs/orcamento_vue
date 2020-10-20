@@ -291,7 +291,7 @@ export default {
         this.getErpNotifications();
         setInterval(() => {
           this.getErpNotifications();
-        }, 1000 * 60);
+        }, 1000 * 600);
     },
     watch: {
         '$i18n.locale'(to, from) {

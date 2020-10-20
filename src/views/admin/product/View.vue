@@ -41,12 +41,12 @@
           <tbody>
             <tr v-for="(pro, index) in product" :key="index">
               <td>{{index+1}}</td>
-              <td>{{pro.name}}</td>
+              <td>{{pro.name}} {{pro.subname}}</td>
               <td>{{pro.date | date}}</td>
               <td>{{pro.value | numeroPreco}}</td>
               <td>{{pro.status == 'Active' ? 'Ativo' : 'Inativo'}}</td>
               <td>
-                <router-link class="btn btn-outline-info mr-1" :to="`/admin/product/edit/${pro.id}`"><div class="glyph-icon simple-icon-pencil"></div></router-link>
+                <router-link class="btn btn-outline-info mr-1" :to="`/admin/product/edit/${pro.parent == 0 ? pro.id : pro.parent}`"><div class="glyph-icon simple-icon-pencil"></div></router-link>
                 <button class="btn btn-outline-danger" @click="hideButton(index)" v-if="!pro.inDelete">
                   <div class="glyph-icon simple-icon-trash"></div>
                 </button>

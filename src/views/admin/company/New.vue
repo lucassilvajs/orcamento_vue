@@ -14,24 +14,6 @@
                       <b-input-group class="mb-4 cnpj">
                         <the-mask class="form-control " v-model="company.cnpj" :mask="['###.###.###-##', '##.###.###/####-##']" />
                         <b-input-group-append>
-                          <b-button variant="outline-info" @click="buscaBling()"
-                            :disabled="processing" :class="{'btn-multiple-state btn-shadow': true,
-                            'show-spinner': processing,
-                            'show-success': !processing && requestError===false,
-                            'show-fail': !processing && requestError }">
-                              <span class="spinner d-inline-block">
-                                  <span class="bounce1"></span>
-                                  <span class="bounce2"></span>
-                                  <span class="bounce3"></span>
-                              </span>
-                              <span class="icon success">
-                                  <i class="simple-icon-check"></i>
-                              </span>
-                              <span class="icon fail">
-                                  <i class="simple-icon-exclamation"></i>
-                              </span>
-                              <span class="label">Buscar</span>
-                          </b-button>
                         </b-input-group-append>
                       </b-input-group>
                         <vue-dropzone

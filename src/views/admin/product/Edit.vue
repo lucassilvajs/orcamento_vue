@@ -289,6 +289,7 @@ export default {
         if(this.isEdition === false) {
           this.product.attributes.push(productCurrent);
         }else{
+          productCurrent.edition = true;
           this.product.attributes[this.isEdition] = productCurrent;
 
           for(let i in this.createdProduct) {

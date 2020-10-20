@@ -8,13 +8,11 @@
 				<b-colxx md="4" lg="3" v-for="(pro, i) in products.data" :key="i">
 					<b-card class="mb-4" style="border:1px solid rgba(100,100,100,.5); border-radius:6px" no-body>
 						<div class="position-relative">
-							<!-- <img v-if="pro.colorSelected" :src="`${pro.color.filter(color => color.name == pro.colorSelected)[0].image ? baseURL+pro.color.filter(color => color.name == pro.colorSelected)[0].image : 'https://via.placeholder.com/870x470'}`" class="card-img-top" />
-							<img v-else :src="`${pro.image ? baseURL+pro.image : 'https://via.placeholder.com/870x470' }`" class="card-img-top" /> -->
               <img :src="baseURL + getProductImage(pro)" alt="" class="card-img-top">
 						</div>
 						<b-card-body>
 							<form @submit.prevent="setProduct(pro)">
-								<p class="mb-2 card-subtitle">{{pro.name}}</p>
+								<p class="mb-2 card-subtitle">{{pro.information.pro_name}} <sub>CA: {{pro.information.pro_ca}}</sub> </p>
 								<div class="separator mb-2"></div>
                   <b-form-group v-for="(attr, indexAttr) in pro.attrs" :key="`${indexAttr}_${i}`" :label="indexAttr" class="has-float-label mb-4">
                     <b-form-select :options="option(attr)" plain v-model="pro['items_'+indexAttr]" />
