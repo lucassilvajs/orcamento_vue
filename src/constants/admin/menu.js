@@ -6,6 +6,12 @@ const data = [
     to: "/admin/dashboard"
   },
   {
+    id: "crm",
+    icon: "simple-icon-graph",
+    label: "CRM",
+    to: "/admin/crm"
+  },
+  {
     id: "make",
     icon: "simple-icon-note",
     label: "Fazer proposta",

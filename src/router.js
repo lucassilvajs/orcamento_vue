@@ -144,6 +144,11 @@ const routes = [
           import(/* webpackChunkName: "dashboards" */ "./views/admin/bi/Bi")
       },
       {
+        path: "/admin/crm",
+        component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/crm/Dashboard")
+      },
+      {
         path: "/admin/sac",
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/sac/Show")
