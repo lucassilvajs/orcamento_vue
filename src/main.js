@@ -103,6 +103,11 @@ Vue.filter("datetime", valor => {
   return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR');
 });
 
+Vue.filter("datestring", valor => {
+  let d = new Date(valor)
+  return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR');
+});
+
 export default new Vue({
   i18n,
   router,
