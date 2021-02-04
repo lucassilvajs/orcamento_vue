@@ -1,5 +1,9 @@
 ## Eye Measure
 
+### Requisitos
+- Node.js na versão 10 ou superior
+- NPM versão 6 ou superior
+
 ### Sobre
 - Eye Measure sistema de medição da Id Safety
 
@@ -39,3 +43,24 @@ https://github.com/lucassilvajs/orcamento_api
 
 #### Config
 ``` application/config/config.php ```
+
+### Rotas
+Você pode configurar suas rotas dentro do arquivo
+``` application/config/routes.php ```
+
+### Rest
+Para rotas que não necessitam autenticação, você deve coloca-las na lista de rotas em
+``` application/config/rest.php ```
+
+## Banco de dados
+- MySql
+
+## Linguagem de programação
+- PHP
+
+## Servidor
+### Aplicativo 
+Path para configurar no servidor no endereço ``` /www/dp/ ```
+
+### API 
+Path para configurar no servidor no endereço ``` /www/api/ ```
