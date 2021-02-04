@@ -31,4 +31,11 @@ npm run test
 ## Api
 
 ### Link repositório
-[!(https://github.com/lucassilvajs/orcamento_api)] https://github.com/lucassilvajs/orcamento_api
+https://github.com/lucassilvajs/orcamento_api
+
+### Configurações
+#### Banco de dados
+``` application/config/database.php ```
+
+#### Config
+``` application/config/config.php ```
