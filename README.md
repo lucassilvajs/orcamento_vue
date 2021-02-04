@@ -1,19 +1,33 @@
-# piaf-vue
+## Eye Measure
 
-## Project setup
+### Sobre
+- Eye Measure sistema de medição da Id Safety
+
+## Setup do projeto
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Compilar e acesso como desenvolvedor
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+### Compilar e produção
 ```
 npm run build
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Executar testes
+```
+npm run test
+```
+
+### Configurações
+- API - Para configurar o endereço da API 
+``` src/constants/config.js ```
+
+
+## Api
+
+### Link repositório
