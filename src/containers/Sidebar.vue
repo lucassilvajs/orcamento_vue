@@ -258,7 +258,7 @@ export default {
             this.menuItems = this.menuItems.filter( r => {
               if(!colaborador) {
                 // N COlaborador
-                return ['orders', 'proposal', 'bi'].indexOf(r.id) == -1
+                return ['orders', 'proposal', 'bi', 'crm', 'empresas'].indexOf(r.id) == -1
               }
               else{
                 return ['history'].indexOf(r.id) == -1

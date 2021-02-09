@@ -8,7 +8,7 @@
             <mobile-menu-icon />
         </a>
 
-          <b-modal id="modalbackdrop" ref="modalbackdrop" size="lg" title="Seus pedidos pendentes">
+                  <b-modal id="modalbackdrop" ref="modalbackdrop" size="lg" title="Seus pedidos pendentes">
             <table class="table">
               <thead>
                 <tr>
@@ -57,14 +57,14 @@
             </template>
         </b-modal>
 
-          <div v-if="true" class="header-icons d-inline-block align-middle">
+                <div v-if="true" class="header-icons d-inline-block align-middle">
             <div class="position-relative d-inline-block">
                 <b-dropdown variant="empty" size="sm" right toggle-class="header-icon notificationButton" menu-class="position-absolute mt-3 notificationDropdown" no-caret>
-                    <template v-if="awaitingOrders" slot="button-content">
+                    <template slot="button-content">
                         <i class="simple-icon-bell" />
-                        <span v-if="awaitingOrders.length || erpNotifications.length" class="count">{{(awaitingOrders.length > 0 ? 1 : 0) + erpNotifications.length}}</span>
+                        <span v-if="awaitingOrders.length > 0" class="count">{{awaitingOrders.length > 0 ? 1 : 0}}</span>
                     </template>
-                    <vue-perfect-scrollbar v-if="awaitingOrders || erpNotifications" :settings="{ suppressScrollX: true, wheelPropagation: false }">
+                    <vue-perfect-scrollbar :settings="{ suppressScrollX: true, wheelPropagation: false }">
                         <div v-if="awaitingOrders.length > 0">
                           <div v-b-modal.modalbackdrop class="d-flex flex-row mb-3 pb-3 border-bottom align-items-center cursor-pointer">
                               <div>
@@ -78,20 +78,7 @@
                               <!-- <div class="delete-btn" @click="deleteAwaitingOrder">x</div> -->
                           </div>
                         </div>
-                        <div v-if="erpNotifications">
-                          <router-link v-for="(sacNot, indexNot) in erpNotifications" :key="indexNot" :to="`/admin/sac/view/${sacNot.sac}`" class="d-flex flex-row mb-3 pb-3 border-bottom align-items-center cursor-pointer">
-                              <i style="font-size: 3rem;" class="iconsminds-headset" />
-                              <div class="pl-3 pr-2">
-                                  <div>
-                                      <h5>SAC #{{sacNot.sac}}</h5>
-                                      <p class="mb-1"><b>{{sacNot.noRead == 1 ? 'Uma mensagem' : `${sacNot.noRead} mensagens`}}</b><br />- {{sacNot.last | limit(30)}}</p>
-                                  </div>
-                              </div>
-                              <!-- <div class="delete-btn" @click="deleteAwaitingOrder">x</div> -->
-                          </router-link>
-                        </div>
-
-                        <div v-if="!erpNotifications.length && !awaitingOrders.length" class="h-100 text-center d-flex align-items-center justify-content-center">
+                        <div v-else class="h-100 text-center d-flex align-items-center justify-content-center">
                           <h3>Você não possui nenhum pedido aguardando</h3>
                         </div>
                     </vue-perfect-scrollbar>
@@ -163,7 +150,7 @@ export default {
     },
     methods: {
         ...mapMutations(['changeSideMenuStatus', 'changeSideMenuForMobile']),
-        ...mapActions(['setLang', 'signOut', 'getAwaitingOrders', 'sendOrdersAwaiting', 'sendAwaitingOrders', 'getErpNotifications']),
+        ...mapActions(['setLang', 'signOut', 'getAwaitingOrders', 'sendOrdersAwaiting', 'sendAwaitingOrders']),
         search() {
             this.$router.push(`${this.searchPath}?search=${this.searchKeyword}`)
             this.searchKeyword = ''
@@ -277,8 +264,7 @@ export default {
             menuType: 'getMenuType',
             menuClickCount: 'getMenuClickCount',
             selectedMenuHasSubItems: 'getSelectedMenuHasSubItems',
-            awaitingOrders: 'awaitingOrders',
-            erpNotifications: 'erpNotifications'
+            awaitingOrders: 'awaitingOrders'
         })
     },
     beforeDestroy() {
@@ -288,10 +274,6 @@ export default {
         const color = this.getThemeColor()
         this.isDarkActive = color.indexOf('dark') > -1
         this.getAwaitingOrders();
-        this.getErpNotifications();
-        setInterval(() => {
-          this.getErpNotifications();
-        }, 1000 * 600);
     },
     watch: {
         '$i18n.locale'(to, from) {

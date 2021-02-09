@@ -221,7 +221,6 @@ export default {
         const orders = await api.get(`order/${this.$route.params.id}`)
         this.orders = orders.data.data.order.map(r => {
           r.order_attributes = JSON.parse(r.order_attributes)
-          r.order_info = JSON.parse(r.order_info)
           return r
         });
         this.like = orders.data.data.like;

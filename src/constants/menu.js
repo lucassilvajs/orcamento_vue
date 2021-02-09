@@ -7,6 +7,13 @@ const data = [
   subs: false
 },
 {
+  id: "crm",
+  icon: "simple-icon-graph",
+  label: "CRM",
+  to: "/app/crm",
+  subs: false
+},
+{
   id: "history",
   icon: "simple-icon-clock",
   label: "Histórico",
@@ -29,6 +36,12 @@ const data = [
   icon: "iconsminds-headset",
   label: "SAC",
   to: "/app/sac"
+},
+{
+  id: "empresas",
+  icon: "iconsminds-empire-state-building",
+  label: "Empresas",
+  to: "/app/company/view"
 },
 {
   id: "bi",

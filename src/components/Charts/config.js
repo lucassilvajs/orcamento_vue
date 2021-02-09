@@ -2,7 +2,8 @@ import { chartTooltip } from '../../utils'
 
 export const lineChartOptions = {
   legend: {
-    display: false
+    display: false,
+    position: 'bottom',
   },
   responsive: true,
   maintainAspectRatio: false,
@@ -133,6 +134,11 @@ export const scatterChartOptions = {
   tooltips: chartTooltip
 }
 
+const formatter = new Intl.NumberFormat("pt-BR", {
+  style: "currency",
+  currency: "BRL"
+}); // Change locale according to your currency and country
+
 export const barChartOptions = {
   legend: {
     position: 'bottom',
@@ -154,11 +160,11 @@ export const barChartOptions = {
           drawBorder: false
         },
         ticks: {
-          beginAtZero: true,
-          stepSize: 100,
-          min: 300,
-          max: 800,
-          padding: 20
+          padding: 10,
+          stepSize: 150000,
+          callback: (label, index, labels) => {
+            return formatter.format(label);
+          }
         }
       }
     ],
@@ -194,7 +200,7 @@ export const radarChartOptions = {
 
 export const pieChartOptions = {
   legend: {
-    position: 'bottom',
+    position: 'right',
     labels: {
       padding: 30,
       usePointStyle: true,
@@ -242,14 +248,15 @@ export const smallLineChartOptions = {
     padding: {
       left: 5,
       right: 5,
-      top: 10,
-      bottom: 10
+      top: 5,
+      bottom: 5
     }
   },
   responsive: true,
   maintainAspectRatio: false,
   legend: {
-    display: false
+    display: false,
+    position: 'right',
   },
   scales: {
     yAxes: [

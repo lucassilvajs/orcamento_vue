@@ -30,7 +30,7 @@
         <table class="table table-hover" v-if="product.length">
           <thead>
             <tr>
-              <th>ID</th>
+              <th>Código</th>
               <th>Nome</th>
               <th>Criação</th>
               <th>Preço</th>
@@ -40,19 +40,21 @@
           </thead>
           <tbody>
             <tr v-for="(pro, index) in product" :key="index">
-              <td>{{index+1}}</td>
+              <td>{{pro.sku}}</td>
               <td>{{pro.name}} {{pro.subname}}</td>
               <td>{{pro.date | date}}</td>
               <td>{{pro.value | numeroPreco}}</td>
               <td>{{pro.status == 'Active' ? 'Ativo' : 'Inativo'}}</td>
               <td>
-                <router-link class="btn btn-outline-info mr-1" :to="`/admin/product/edit/${pro.parent == 0 ? pro.id : pro.parent}`"><div class="glyph-icon simple-icon-pencil"></div></router-link>
+                <router-link class="btn btn-outline-info mr-1" :to="`/admin/product/edit/${!pro.parent ? pro.id : pro.parent}`"><div class="glyph-icon simple-icon-pencil"></div></router-link>
                 <button class="btn btn-outline-danger" @click="hideButton(index)" v-if="!pro.inDelete">
                   <div class="glyph-icon simple-icon-trash"></div>
                 </button>
-                <button class="btn btn-danger" @click="deleteItem(index)" v-else>
+                <button class="btn btn-danger mr-1" @click="deleteItem(index)" v-else>
                   <div class="glyph-icon simple-icon-exclamation flash"></div>
                 </button>
+                <router-link class="btn btn-outline-warning mr-1" :to="`/admin/product/test/${pro.id}`"><div class="glyph-icon simple-icon-organization"></div></router-link>
+
               </td>
             </tr>
           </tbody>
@@ -90,7 +92,8 @@ export default {
       this.$notify('success', "Sucesso", "Produto deletado com sucesso", {
         duration: 3000,
         permanent: false
-      })
+      });
+
     },
     hideButton(index) {
       this.product[index].inDelete = true;

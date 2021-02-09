@@ -1,10 +1,10 @@
 <template>
 <div>
-    <my-breadcrumb />
+    <my-breadcrumb v-if="order" :distribuidor="order.type_user == 'distribuidor'" />
     <b-row>
         <b-colxx xxs="12">
             <b-card class="mb-4" title="Confirmação da solicitação">
-                <b-row>
+                <b-row v-if="order.type_user != 'distribuidor'">
                     <b-colxx md="3" lg="3" class="">
                         <h5 class="mb-2 mt-4 card-title">Dados do colaborador</h5>
                         <div v-if="order && order.info">
@@ -17,13 +17,7 @@
                     <b-colxx md="3" lg="3" class="">
                         <h5 class="mb-2 mt-4 card-title">Produto Selecionado</h5>
                         <div v-if="order && order.product">
-                            <p v-if="order.product.name"><b>Nome: </b>{{order.product.name}}</p>
-                            <p v-if="order.product.size"><b>Tamanho: </b>{{order.product.size}}</p>
-                            <p v-if="order.product.color"><b>Cor: </b>{{order.product.color}}</p>
-                            <div v-if="order.product.attributes">
-                              {{order.product.attributes}}
-                              <!-- <p v-for="(attr, iAttr) in order.product.attributes" :key="iAttr">- <b>{{attr.select}}</b></p> -->
-                            </div>
+                            <p v-for="(pro, indexProduct) in order.product.filter(r => {if(r.attr != 'model') return r})" :key="indexProduct"><b>{{pro.attr}}: </b>{{pro.value}}</p>
                             <hr />
                             <div v-if="order.lens">
                                 <div v-for="(lens, index) in order.lens" :key="index">
@@ -58,17 +52,52 @@
                         </div>
                     </b-colxx>
                 </b-row>
+                <b-row v-else>
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Nome</th>
+                        <th>Quantidade</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(item, index) in order.distribuidorCard" :key="index">
+                        <td>
+                          {{item.filter((r, i) => {
+                            if(r.attr == 'nome') return r
+                          })[0].value}}
+
+                          {{item.filter((r, i) => {
+                            if(r.attr == 'Cor') return r
+                          })[0].value}}
+
+                          {{item.filter((r, i) => {
+                            if(r.attr == 'Tamanho Comercial') return r
+                          })[0].value}}
+                        </td>
+                        <td>{{item.filter((r, i) => {
+                            if(r.attr == 'qtd') return r
+                          })[0].value}}</td>
+                        <td>
+                          <button class="btn btn-outline-danger btn-xs" @click="order.distribuidorCard.splice(index,1)">
+                            <i class="simple-icon-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </b-row>
             </b-card>
         </b-colxx>
     </b-row>
-    <b-row>
-        <b-colxx class="d-flex justify-content-end align-items-center">
-          <button v-if="userStorage.pedido_compra == '1'" v-b-modal.modalPv class="btn btn-link">Adicionar pedido de compra?</button>
-          <button v-if="!hasMultiple" class="show-success btn btn-info mb-3 btn-multiple-state btn-shadow ml-3" @click="() => {
+    <b-row v-if="order.type_user != 'distribuidor'">
+        <b-colxx class="d-flex justify-content-end">
+          <button class="show-success btn btn-info mb-3 btn-multiple-state btn-shadow ml-3" @click="() => {
               if(order) {
-                order.new = true;
+               order.new  = true;
               }
-              sendInfo()
+              sendInfo();
             }">
             <span class="label">Finalizar e iniciar nova solicitação</span>
             <span class="spinner d-inline-block">
@@ -80,6 +109,7 @@
               Finalizar e iniciar nova solicitação
             </span>
           </button>
+
 
             <b-button v-if="awaitingOrders.length == 0" variant="success" :disabled="processing" :class="{'mb-3 btn-multiple-state btn-shadow ml-3': true,
                 'show-spinner': processing,
@@ -100,27 +130,27 @@
             </b-button>
         </b-colxx>
     </b-row>
-    <b-modal id="modalPv" ref="modalPv" title="Pedido de compra"
-            :hide-backdrop="selectedBackdrop=='false'"
-            :no-close-on-backdrop="selectedBackdrop=='false' || selectedBackdrop=='static'">
-
-            <b-row>
-              <b-colxx>
-                <b-form-group label="Número do pedido" class="has-float-label mb-4">
-                  <b-form-input type="text" v-model="pc.number" />
-                </b-form-group>
-                <b-input-group class="mb-3">
-                  <b-form-file v-model="pc.file"  placeholder="Anexar"></b-form-file>
-                </b-input-group>
-              </b-colxx>
-            </b-row>
-
-        <template slot="modal-footer">
-            <b-button variant="primary" @click="sendPedidoCompra" class="mr-1">Adicionar</b-button>
-            <b-button variant="secondary" @click="hideModal('modalPv')">Cancelar</b-button>
-        </template>
-    </b-modal>
-
+    <b-row v-else>
+        <b-colxx class="d-flex justify-content-end">
+            <b-button v-if="awaitingOrders.length == 0" variant="success" :disabled="processing" :class="{'mb-3 btn-multiple-state btn-shadow ml-3': true,
+                'show-spinner': processing,
+                'show-success': !processing && uploadError===false,
+                'show-fail': !processing && uploadError }" @click="sendInfoDistribuidor">
+                <span class="spinner d-inline-block">
+                    <span class="bounce1"></span>
+                    <span class="bounce2"></span>
+                    <span class="bounce3"></span>
+                </span>
+                <span class="icon success">
+                    Enviar Solicitação
+                </span>
+                <span class="icon fail">
+                    <i class="simple-icon-exclamation"></i>
+                </span>
+                <span class="label">Enviar Solicitação</span>
+            </b-button>
+        </b-colxx>
+    </b-row>
 </div>
 </template>
 
@@ -142,18 +172,12 @@ export default {
             baseURL,
             processing: false,
             uploadError: false,
-            orderAwaiting: 0,
-            pc: {
-              file: null,
-              number: null,
-              validation: true,
-              fileName: null
-            },
+            orderAwaiting: 0
         }
     },
 
     computed: {
-        ...mapGetters(["loginError", "awaitingOrders"]),
+        ...mapGetters(["processing", "loginError", "awaitingOrders"]),
         valido: function(){
             let message = '';
             let status = true;
@@ -203,12 +227,6 @@ export default {
                 message
             }
         },
-        hasMultiple: function(){
-          return JSON.parse(window.localStorage.getItem('user')).user.multiple_order;
-        },
-        userStorage: function(){
-          return JSON.parse(window.localStorage.getItem('user')).user;
-        }
     },
     methods: {
       ...mapActions(['getAwaitingOrders']),
@@ -217,16 +235,6 @@ export default {
         return existe.length
       },
       sendInfo: async function(){
-        if(this.userStorage.pedido_compra == '1' && this.userStorage.has_contract == '1' && !this.pc.number && this.pc.validation){
-          this.$notify("error", "Pedido de compra obrigatório", 'Por favor, anexe ou insira o pedido de compra.', {
-            duration: 3000,
-            permanent: false
-          });
-
-          return false
-        }
-        if(false) {
-        }else{
           if(!this.valido.status) {
               this.$notify("error", "Faltam algumas coisas", this.valido.message, {
                   duration: 3000,
@@ -237,13 +245,6 @@ export default {
             let order = JSON.parse(window.localStorage.getItem('order'));
             if(this.order.new) { // Verifica se o usuário necessita cadastrar multiplos pedidos antes de efetuar a proposta
               order.new = true;
-            }
-
-            if(this.pc.number || this.pc.fileName) {
-              order.pc = {
-                number: this.pc.number,
-                file: this.pc.fileName
-              }
             }
             const response = await api.post('/order', order);
             let data = response.data;
@@ -266,48 +267,45 @@ export default {
 
             this.getAwaitingOrders();
           }
-        }
+      },
+      sendInfoDistribuidor: async function(){
+          if(false) {
+              this.$notify("error", "Faltam algumas coisas", this.valido.message, {
+                  duration: 3000,
+                  permanent: false
+              });
+          }else{
+            this.processing = true;
+            let order = JSON.parse(window.localStorage.getItem('order'));
+            if(this.order.new) { // Verifica se o usuário necessita cadastrar multiplos pedidos antes de efetuar a proposta
+              order.new = true;
+            }
+
+            order.distribuidor = this.type_user == 'distribuidor';
+            const response = await api.post('/order', order);
+            let data = response.data;
+            if(data.status == 'success') {
+                this.$notify("success", `Pedido #${data.data.order.id}`, data.message, {
+                    duration: 3000,
+                    permanent: false
+                });
+
+                window.localStorage.removeItem('order');
+                this.$router.push(data.data.order.target);
+            }else{
+                this.uploadError = false;
+                this.$notify("error", 'Opsss...!', data.message, {
+                    duration: 3000,
+                    permanent: false
+                });
+                this.processing = false
+            }
+
+            this.getAwaitingOrders();
+          }
       },
       infoOrder: function() {
           this.order = JSON.parse(window.localStorage.getItem('order'));
-      },
-      async sendPedidoCompra(typeRequest = false)
-      { //typeRequest é true quandoa função é chamada pelo proprio sistema e não pelo evento (click)
-        if(!this.pc.number) {
-          this.$notify("error", 'Ops...!', 'Por favor insira o número pedido de compra.', {
-            duration: 3000,
-            permanent: false
-          });
-        }else{
-          let fileName = '';
-          if(this.pc.file) {
-            let fd = new FormData();
-            fd.append('file', this.pc.file);
-            const file = await api.post('saveFile/pc', fd);
-            fileName = file.data.data;
-          }else{
-            fileName = '';
-          }
-
-          this.pc.fileName = fileName
-
-          this.$notify("success", 'Sucesso', 'Seu pedido de compra foi inserido com sucesso.', {
-              duration: 3000,
-              permanent: false
-          });
-
-          this.hideModal('modalPv')
-        }
-
-      },
-
-      hideModal (refname) {
-        this.$refs[refname].hide()
-        console.log('hide modal:: ' + refname)
-
-        if (refname === 'modalnestedinline') {
-          this.$refs['modalnested'].show()
-        }
       },
     },
     created() {

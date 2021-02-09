@@ -30,6 +30,7 @@
                 <th>Nome</th>
                 <th>E-mail</th>
                 <th>Numero de empresas</th>
+                <th>Metas</th>
                 <th>Ações</th>
               </tr>
             </thead>
@@ -39,6 +40,21 @@
                 <td>{{consult.vendedor ? consult.vendedor : 'Não atribuido'}}</td>
                 <td>{{consult.email}}</td>
                 <td>{{consult.totalComp}}</td>
+                <td class="d-flex flex-column">
+                  <div class="d-flex align-items-center mb-2">
+                    <span>{{consult.meta | numeroPreco}}</span>
+                    <button class="ml-2 btn btn-xs btn-outline-success" @click="consult.edit = true">Atribuir meta</button>
+                  </div>
+                  <div v-if="consult.edit == true" class="d-flex" style="max-width:250px;">
+                    <b-form-group label="Período" class="has-float-label">
+                        <the-mask class="form-control " v-model="consult.date" :masked="true" :mask="['##/##', '##/####']" />
+                    </b-form-group>
+                    <b-form-group label="Valor" class="has-float-label">
+                      <Money class="form-control" v-model="consult.value" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
+                    </b-form-group>
+                  </div>
+                  <button v-if="consult.edit == true" @click="savePeriodo(consult)" class="btn btn-outline-success btn-xs">SALVAR</button>
+                </td>
                 <td v-if="false">
                     <button @click="getInfoConsult(index)" v-b-modal.modalright class="btn btn-outline-success">
                         <div class="glyph-icon simple-icon-eye"/>
@@ -78,9 +94,12 @@
 </template>
 <script>
 import { api, baseURL } from '@/constants/config'
-
+import {Money} from '@/vmoney.js';
+import {TheMask} from 'vue-the-mask';
 export default {
   components: {
+    Money,
+    TheMask
   },
   data () {
     return {
@@ -158,6 +177,9 @@ export default {
         }
       });
     },
+    async savePeriodo(consultor) {
+      const data = await api.post('admin/metas', {consultor: consultor.id, date: consultor.date, value: consultor.value});
+    }
   },
   created () {
       this.getSac();

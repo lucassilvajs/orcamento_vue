@@ -199,6 +199,10 @@ import PieChart from '../../../../components/Charts/Pie'
 import DoughnutShadowChart from '../../../../components/Charts/DoughnutShadow'
 import DoughnutChart from '../../../../components/Charts/Doughnut'
 
+
+import RadialProgressCard from '../../../components/Cards/RadialProgressCard';
+
+
 export default {
     components: {
         'line-chart': LineChart,
@@ -216,7 +220,8 @@ export default {
         'pie-shadow-chart': PieShadowChart,
         'pie-chart': PieChart,
         'doughnut-shadow-chart': DoughnutShadowChart,
-        'doughnut-chart': DoughnutChart
+        'doughnut-chart': DoughnutChart,
+        'radial-progress-card': RadialProgressCard,
     },
     data() {
         return {

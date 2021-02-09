@@ -28,12 +28,12 @@
 							<span class="bounce3"></span>
 						</span>
 						<span class="icon success">
-							<div class="d-inline glyph-icon simple-icon-like"></div> Adicionar foto
+							<div class="d-inline glyph-icon simple-icon-like"></div> Gostei
 						</span>
 						<span class="icon fail">
 							<i class="simple-icon-exclamation"></i>
 						</span>
-						<span class="label">Adicionar foto</span>
+						<span class="label">Gostei</span>
 					</b-button>
 				</div>
 				<button type="button" v-if="img" class="btn btn-outline-light mr-2" @click="img = false">
@@ -132,10 +132,6 @@ export default {
       };
       this.fileObject = e.target.files[0];
       file.readAsDataURL(e.target.files[0]);
-
-      // setTimeout(async () => {
-      //   await this.sendImage();
-      // }, 100);
 		},
 		async sendImage() {
       this.processing = false;
@@ -246,7 +242,7 @@ export default {
       var blob = new Blob(byteArrays, {type: contentType});
       return blob;
     },
-    async takeSnapShot(){
+    takeSnapShot(){
     //Captura elemento de vídeo
 
       document.querySelector('.count').classList.add('flash');
@@ -283,11 +279,6 @@ export default {
         document.querySelector('.counter').classList.add('d-none');
         document.querySelector('.counter').classList.remove('d-flex');
       }, this.timeAwait * 1000);
-
-      // console.log('Foi!')
-      // setTimeout(async () => {
-      //   await this.sendImage();
-      // }, 100);
 
       // sendSnapShot(dataURI); //Gerar Imagem e Salvar Caminho no Banco
     },

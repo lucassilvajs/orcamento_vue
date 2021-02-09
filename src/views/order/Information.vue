@@ -126,6 +126,14 @@ export default {
             }
           }
         },
+        checkDistribuidor(){
+        let user = JSON.parse(window.localStorage.getItem('user'));
+        console.log(user)
+        if(user.user.distribuidor == '1') {
+          window.localStorage.setItem('order', JSON.stringify([]));
+          this.$router.push("/app/order/products");
+        }
+      }
     },
 
     watch: {
@@ -161,11 +169,12 @@ export default {
 
           if(this.company) order.company = this.company;
           window.localStorage.setItem('order', JSON.stringify(order));
-      }
+      },
     },
 
     created() {
         this.getItemsAdd();
+        this.checkDistribuidor();
     }
 }
 </script>

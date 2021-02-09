@@ -142,7 +142,8 @@ export default {
             this.image = JSON.parse(file.xhr.response).data;
         },
         async editUserAdmin() {
-          const response = await api.put('admin/user', {...this.user.user, image: this.image});
+          let id = this.$route.params.id;
+          const response = await api.put('admin/user', {...this.user.user, image: this.image, id});
           if(response.data.status == 'success') {
             this.$notify("success", "Sucesso", response.data.message, {
                 duration: 3000,

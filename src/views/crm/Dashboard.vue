@@ -112,14 +112,14 @@
           </li>
           <li class="nav-item step-done">
             <a v-b-toggle.collapseComments href="#" class="nav-link">
-              <span class="d-block">Comentário</span>
+              <span class="d-block">Comentários</span>
             </a>
           </li>
-          <li class="nav-item step-done" v-if="[4,5,6,7,8].indexOf(parseInt(modal.stage)) >= 0 && modal.isCreator">
-            <router-link v-if="modal.idCompany" :to="`/admin/company/edit/${modal.idCompany}`" class="nav-link">
+          <li class="nav-item step-done" v-if="[4,5,6,7,8].indexOf(parseInt(modal.stage)) >= 0">
+            <router-link v-if="modal.idCompany" :to="`/app/company/edit/${modal.idCompany}`" class="nav-link">
               <span class="d-block">Cadastrar</span>
             </router-link>
-            <router-link v-if="!modal.idCompany" :to="`/admin/company/card/${modal.id}`" class="nav-link">
+            <router-link v-else :to="`/app/company/card/${modal.id}`" class="nav-link">
               <span class="d-block">Cadastrar</span>
             </router-link>
           </li>
@@ -228,9 +228,9 @@
                 </div>
                 <b-alert v-if="!modal.comment.length" show variant="info">Nenhum comentário foi adicionado</b-alert>
               </div>
-              <div class="comment-area" v-if="modal.isCreator">
+              <div class="comment-area">
                 <div class="text-area">
-                  <input type="text" v-model=modal.txtComment>
+                  <input type="text" v-model="modal.txtComment">
                   <button @click="addComment(modal.id)" class="btn btn-info">
                     <div v-if="processing" class="lds-ripple"><div></div><div></div></div>
                     <div v-else :class="'glyph-icon simple-icon-paper-plane'"/>

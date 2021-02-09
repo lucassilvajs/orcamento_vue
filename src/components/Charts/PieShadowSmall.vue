@@ -24,11 +24,23 @@ const PieShadow = generateChart('pie-with-shadow', 'pieWithShadow')
 
 export default {
   extends: PieShadow,
-  props: ['data', 'myOption'],
+  props: ['data'],
   data () {
-    computed: {
-      options = () => {
-        return this.MyOption.length ? this.MyOption : pieChartOptions;
+    return {
+      options: {
+        legend: {
+          display: false,
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+        title: {
+          display: false
+        },
+        layout: {
+          padding: {
+            bottom: 5
+          }
+        },
       }
     }
   },

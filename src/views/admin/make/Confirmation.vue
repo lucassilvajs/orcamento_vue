@@ -1,10 +1,10 @@
 <template>
 <div>
-    <my-breadcrumb />
+    <my-breadcrumb v-if="order" :distribuidor="order.type_user == 'distribuidor'" />
     <b-row>
         <b-colxx xxs="12">
             <b-card class="mb-4" title="Confirmação da solicitação">
-                <b-row>
+                <b-row v-if="order.type_user != 'distribuidor'">
                     <b-colxx md="3" lg="3" class="">
                         <h5 class="mb-2 mt-4 card-title">Dados do colaborador</h5>
                         <div v-if="order && order.info">
@@ -52,10 +52,46 @@
                         </div>
                     </b-colxx>
                 </b-row>
+                <b-row v-else>
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>Nome</th>
+                        <th>Quantidade</th>
+                        <th>Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(item, index) in order.distribuidorCard" :key="index">
+                        <td>
+                          {{item.filter((r, i) => {
+                            if(r.attr == 'nome') return r
+                          })[0].value}}
+
+                          {{item.filter((r, i) => {
+                            if(r.attr == 'Cor') return r
+                          })[0].value}}
+
+                          {{item.filter((r, i) => {
+                            if(r.attr == 'Tamanho Comercial') return r
+                          })[0].value}}
+                        </td>
+                        <td>{{item.filter((r, i) => {
+                            if(r.attr == 'qtd') return r
+                          })[0].value}}</td>
+                        <td>
+                          <button class="btn btn-outline-danger btn-xs" @click="order.distribuidorCard.splice(index,1)">
+                            <i class="simple-icon-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </b-row>
             </b-card>
         </b-colxx>
     </b-row>
-    <b-row>
+    <b-row v-if="order.type_user != 'distribuidor'">
         <b-colxx class="d-flex justify-content-end">
           <button class="show-success btn btn-info mb-3 btn-multiple-state btn-shadow ml-3" @click="() => {
               if(order) {
@@ -79,6 +115,27 @@
                 'show-spinner': processing,
                 'show-success': !processing && uploadError===false,
                 'show-fail': !processing && uploadError }" @click="sendInfo">
+                <span class="spinner d-inline-block">
+                    <span class="bounce1"></span>
+                    <span class="bounce2"></span>
+                    <span class="bounce3"></span>
+                </span>
+                <span class="icon success">
+                    Enviar Solicitação
+                </span>
+                <span class="icon fail">
+                    <i class="simple-icon-exclamation"></i>
+                </span>
+                <span class="label">Enviar Solicitação</span>
+            </b-button>
+        </b-colxx>
+    </b-row>
+    <b-row v-else>
+        <b-colxx class="d-flex justify-content-end">
+            <b-button v-if="awaitingOrders.length == 0" variant="success" :disabled="processing" :class="{'mb-3 btn-multiple-state btn-shadow ml-3': true,
+                'show-spinner': processing,
+                'show-success': !processing && uploadError===false,
+                'show-fail': !processing && uploadError }" @click="sendInfoDistribuidor">
                 <span class="spinner d-inline-block">
                     <span class="bounce1"></span>
                     <span class="bounce2"></span>
@@ -193,6 +250,42 @@ export default {
             let data = response.data;
             if(data.status == 'success') {
                 this.$notify("success", order.new ? 'Sucesso' : `Pedido #${data.data.order.id}`, data.message, {
+                    duration: 3000,
+                    permanent: false
+                });
+
+                window.localStorage.removeItem('order');
+                this.$router.push(data.data.order.target);
+            }else{
+                this.uploadError = false;
+                this.$notify("error", 'Opsss...!', data.message, {
+                    duration: 3000,
+                    permanent: false
+                });
+                this.processing = false
+            }
+
+            this.getAwaitingOrders();
+          }
+      },
+      sendInfoDistribuidor: async function(){
+          if(false) {
+              this.$notify("error", "Faltam algumas coisas", this.valido.message, {
+                  duration: 3000,
+                  permanent: false
+              });
+          }else{
+            this.processing = true;
+            let order = JSON.parse(window.localStorage.getItem('order'));
+            if(this.order.new) { // Verifica se o usuário necessita cadastrar multiplos pedidos antes de efetuar a proposta
+              order.new = true;
+            }
+
+            order.distribuidor = this.type_user == 'distribuidor';
+            const response = await api.post('/orderadmin', order);
+            let data = response.data;
+            if(data.status == 'success') {
+                this.$notify("success", `Pedido #${data.data.order.id}`, data.message, {
                     duration: 3000,
                     permanent: false
                 });

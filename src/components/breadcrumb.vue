@@ -19,11 +19,29 @@ import {
 } from "vuex";
 
 export default {
+    props: ["distribuidor"],
+    computed: {
+      itemsOrder(){
+        if(this.distribuidor) {
+          return [
+                {
+                    text: 'Selecionar produto',
+                    link: '/app/order/products'
+                },
+                {
+                    text: 'Confirmação dos dados',
+                    link: '/app/order/confirmation'
+                },
+            ]
+        }
+        return this.itemsOrderObj;
+      }
+    },
     data() {
         return {
-            itemsOrder: [
+            itemsOrderObj: [
                 {
-                    text: 'Dados do Colaborador',
+                    text: 'Selecionar empresa',
                     link: '/app/order/information'
                 },
                 {

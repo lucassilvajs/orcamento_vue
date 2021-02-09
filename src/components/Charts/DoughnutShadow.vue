@@ -34,6 +34,13 @@ export default {
   mounted () {
     this.addPlugin(centerTextPlugin)
     this.renderChart(this.data, this.options)
+  },
+  watch: {
+    data: function() {
+      this.$data._chart.update()
+      // this._chart.destroy();
+      this.renderChart(this.data, this.options);
+    }
   }
 }
 </script>

@@ -6,14 +6,6 @@
             <b-card class="mb-3" v-if="companies">
                 <b-row v-if="companiesValue">
                     <b-colxx>
-                      <b-form-group label="Tipo de proposta" class="has-float-label mb-4">
-                        <b-form-select v-model="order.type" :options="[
-                          { value: '0', text: 'Óculos completo' },
-                          { value: '1', text: 'Distribuidor' }
-                        ]" plain />
-                      </b-form-group>
-                    </b-colxx>
-                    <b-colxx>
                         <b-form-group label="Selecione a empresa" class="has-float-label mb-4">
                             <v-select v-model="setCompany"
                                 :options="companiesValue" dir="ltr"></v-select>
@@ -22,7 +14,7 @@
                 </b-row>
             </b-card>
 
-            <b-card class="mb-4" title="Dados do colaborador" v-if="order.type == 0">
+            <b-card class="mb-4" title="Dados do colaborador">
                 <b-row>
                     <b-colxx v-if="fields">
                         <form @submit.prevent="formStepOne" class="form" v-if="false && setCompany || !this.fields.colaborador ">
@@ -46,14 +38,6 @@
                         </form>
                     </b-colxx>
                 </b-row>
-            </b-card>
-            <b-card class="mb-4" title="Cliente" v-else>
-
-              <b-row>
-                <b-colxx>
-                  <router-link to="/admin/make/distribuicao" class="btn btn-success">Prosseguir</router-link>
-                </b-colxx>
-              </b-row>
             </b-card>
         </b-colxx>
     </b-row>
@@ -95,7 +79,7 @@ export default {
 
     },
     methods: {
-        formStepOne: function(){
+        formStepOne: function(type = 'products'){
             let form = {};
             form['name'] = this.values[0];
             this.fields.forEach((el, index) => {
@@ -110,9 +94,11 @@ export default {
             }
 
             order.info = form;
+            order.type_user = type;
+
             if(this.company) order.company = this.company;
             window.localStorage.setItem('order', JSON.stringify(order));
-            this.$router.push("/admin/make/products");
+            this.$router.push(`/admin/make/products`);
         },
         getItemsAdd: async function() {
           const itemsFields = await api.get('admin/company/fields');
@@ -161,6 +147,9 @@ export default {
             this.fields = ["Chapa", "Setor", "Turno"];
           }
           this.company = this.companies[novo.code].idCompany
+          if(this.companies[novo.code].type_user == 1) {
+            this.formStepOne('distribuidor');
+          }
           let info = window.localStorage.getItem('order');
           if(info) {
               info = JSON.parse(info).info;

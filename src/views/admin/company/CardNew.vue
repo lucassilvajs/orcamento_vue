@@ -1,8 +1,8 @@
 <template>
-<div v-if="company.cnpj">
+<div>
     <b-row>
         <b-colxx xxs="12">
-            <h1>Editar empresa</h1>
+            <h1>Nova empresa</h1>
             <div class="separator mb-5"></div>
         </b-colxx>
     </b-row>
@@ -122,7 +122,7 @@
                 <b-colxx md="4" lg="3">
                   <b-form-group label="Forma de pagamento" class="has-float-label mb-4">
                     <select class="form-control" v-model="company.pagamento">
-                      <option v-for="(pay, indexPay) in option.pagamento" :key="pay" :value="indexPay">{{pay}}</option>
+                      <option v-for="(pay, indexPay) in option.pagamento" :key="indexPay" :value="indexPay">{{pay}}</option>
                     </select>
                   </b-form-group>
                 </b-colxx>
@@ -379,7 +379,7 @@
                 </b-row>
             </b-card>
 
-            <b-card class="mb-4" title="Usuários de acesso">
+            <b-card class="mb-4" title="Acesso e contato">
                 <b-colxx md="12" lg="12">
                     <b-alert variant="info" show  dismissible>Se o campo senha for preenchido, significa que você está cadastrando um usuário de acesso ao sistema, se não for preenchida corresponde a informação de um contato</b-alert>
                     <div v-for="(user, index) in company.users" :key="index">
@@ -398,7 +398,7 @@
                                 <b-form-group label="Senha" class="has-float-label mb-4" v-if="user.user_isContact != '1'">
                                     <b-form-input v-model="user.password" type="text" placeholder="Senha" />
                                 </b-form-group>
-                                <b-alert variant="info" show  dismissible v-else>Usuário para contato</b-alert>
+                                <b-alert variant="info" show  dismissible>Usuário de contato</b-alert>
                            </b-colxx>
 
                             <b-colxx md="1" lg="1">
@@ -419,19 +419,19 @@
         <b-colxx>
             <b-button variant="success" :disabled="processing" :class="{'mb-3 btn-multiple-state btn-shadow ml-3': true,
                 'show-spinner': processing,
-                'show-success': !processing }" @click="editCompany">
+                'show-success': !processing }" @click="addCompany">
                 <span class="spinner d-inline-block">
                     <span class="bounce1"></span>
                     <span class="bounce2"></span>
                     <span class="bounce3"></span>
                 </span>
                 <span class="icon success">
-                    Editar empresa
+                    Cadastrar empresa
                 </span>
                 <span class="icon fail">
                     <i class="simple-icon-exclamation"></i>
                 </span>
-                <span class="label">Editar empresa</span>
+                <span class="label">Cadastrar empresa</span>
             </b-button>
         </b-colxx>
     </b-row>
@@ -449,16 +449,19 @@ import {Money} from '@/vmoney.js';
 import {TheMask} from 'vue-the-mask';
 import {api, baseURL} from '@/constants/config';
 import VueDropzone from 'vue2-dropzone';
-import InputTag from '@/components/Form/InputTag'
+import InputTag from '@/components/Form/InputTag';
+import vSelect from 'vue-select';
 export default {
     components:{
         'vue-dropzone': VueDropzone,
         'input-tag': InputTag,
+        'v-select': vSelect,
         Money,
         TheMask
     },
     data() {
         return {
+          processing: false,
           newProduct:[
             {
               name: '',
@@ -471,7 +474,7 @@ export default {
             sizes: [],
             colors: []
           },
-            company: {
+          company: {
               name: '',
               cnpj: '',
               email: '',
@@ -480,39 +483,39 @@ export default {
               bairro: '',
               cidade: '',
               uf: '',
-                fields: [],
-                users: [
-                    {
-                        email: '',
-                        password: '',
-                        name: ''
-                    }
-                ],
-                restrictions: {
-                    sizes: [],
-                    colors: []
-                },
-            },
-            product:null,
-            products: [],
-            baseURL,
-            color: {
-                name: '',
-                image: ''
-            },
-            file: null,
-            check,
-            checked,
-            allProduct: null,
-            processing: false,
-            requestError: false,
-            productsProcessing:false,
-            filter: [],
-            productDistribuidor: null,
-            addPrices: 0,
-            precificaveis: [],
-            restricoes: [],
-            option: {
+              fields: [],
+              users: [
+                  {
+                      email: '',
+                      password: '',
+                      name: ''
+                  }
+              ],
+              restrictions: {
+                  sizes: [],
+                  colors: []
+              },
+          },
+          product:null,
+          products: [],
+          baseURL,
+          color: {
+              name: '',
+              image: ''
+          },
+          file: null,
+          check,
+          checked,
+          allProduct: null,
+          processing: false,
+          requestError: false,
+          productsProcessing:false,
+          filter: [],
+          productDistribuidor: null,
+          addPrices: 0,
+          precificaveis: [],
+          restricoes: [],
+          option: {
             pagamento: [],
             transporte: [],
             pdfanexo: []
@@ -576,38 +579,11 @@ export default {
         completeUpload(file) {
             this.company.image = JSON.parse(file.xhr.response).data;
         },
-        async getCompany() {
-            const response = await api.get(`admin/company/${this.$route.params.id}`);
-            this.company = response.data.data;
-            this.company.users = this.company.users.map(r => {
-                r.deleted = false
-                return r;
-            });
-
-            this.restricoes = response.data.data.restrictions;
-
-            this.newProduct = this.company.newProduct;
-            this.newProduct.push({
-              name: '',
-              price: '',
-              type: ''
-            });
-            this.restrictions = this.company.restrictions;
-        },
         async getAllProducts() {
-          let company = this.$route.params.id;
-          const response = await api.get('admin/product', {
-            params: {
-              company
-            }
-          });
+          const response = await api.get('admin/product');
           let vv = this.company
           this.allProduct = response.data.data.map(function(r) {
-            if(vv.dynamic[r.id]){
-              r.valueD = vv.dynamic[r.id].price
-            }else{
-              r.valueD = 0;
-            }
+            r.valueD = 0;
             return r;
           });
         },
@@ -621,17 +597,15 @@ export default {
                 this.company.users[index].deleted = true;
             }
         },
-        removeItem() {
+        removeItem(){
         },
         async editCompany() {
           this.company.restrictions = this.restrictions;
-          this.processing = true;
           const response = await api.put(`admin/company/${this.$route.params.id}`, {company: this.company, dynamic: this.allProduct, newProduct: this.newProduct, restricoes: this.restricoes});
           this.$notify('success', "Sucesso", "Empresa editada com sucesso", {
             duration: 3000,
             permanent: false
           });
-          this.processing = false;
           this.$router.push("/admin/company/view");
         },
         addVariationRestrict(product, value, type) {
@@ -673,21 +647,18 @@ export default {
           this.products = products.data.data;
           this.productsProcessing = false;
         },
-
         async getPrecificavel(idProduct){
           this.precificaveis = [idProduct]
           let company = this.$route.params.id;
           const products = await api.get(`admin/distribution/item/${company}/${idProduct}`, {params: this.filter});
           this.productDistribuidor = products.data.data.products[0];
         },
-
         addSelected(){
           this.precificaveis = this.products.products.filter(r => r.checked).map(r => r.id);
           this.productDistribuidor = {price: [
             { "qty": 1, "value": "0" }
           ]}
         },
-
         addItemProduct(){
           if(this.productDistribuidor.price.filter(r => r.qty == this.addPrices).length > 0){
             this.$notify("error", "Opsss...!", "Você já tem essa quantia parametrizada", {
@@ -716,6 +687,38 @@ export default {
         addRestrition(value){
           this.restricoes.push(value)
         },
+        async buscaCep(){
+          if(this.company.cep.length == 8) {
+            var requestOptions = {
+              method: 'GET',
+              redirect: 'follow'
+            };
+            fetch(`https://viacep.com.br/ws/${this.company.cep}/json`, requestOptions)
+              .then(response => response.json())
+              .then(result => {
+                this.company.endereco = result.logradouro;
+                this.company.bairro = result.bairro;
+                this.company.cidade = result.localidade;
+                this.company.uf = result.uf;
+
+                if(result.logradouro == '') {
+                  this.$notify("error", "Opsss...!!", "Não foi possível localizar seu endereço. Por favor insira manualmente", {
+                    duration: 5000,
+                    permanent: false
+                  });
+                }
+
+                this.$refs.numero.focus();
+              })
+              .catch(error => {
+                console.log('error', error);
+                this.$notify("error", "Opsss...!!", "Não foi possível localizar seu endereço. Por favor insira manualmente", {
+                  duration: 5000,
+                  permanent: false
+                });
+              });
+          }
+        },
         async getOption(){
           [{id: 1, type: 'pagamento'}, {id: 2, type: 'transporte'}].forEach(async e => {
             const data = await api.get(`/option/${e.id}`)
@@ -726,9 +729,33 @@ export default {
           const consultores = await api.get('admin/consult');
           this.consultores = consultores.data.data.consult;
         },
+        async addCompany(){
+          this.processing = true;
+          const data = await api.post('admin/company', {company: this.company, dynamic: this.allProduct, newProduct: this.newProduct, restricoes: this.restricoes, card: this.$route.params.id});
+          this.processing = false;
+          let response = data.data;
+          this.$notify(response.status, response.status == 'success' ? 'Sucesso' : 'Opsss!!!', response.message, {
+            duration: 5000,
+            permanent: false
+          });
+
+          if(response.status == 'success') {
+            this.$router.push("/admin/company/view");
+          }
+        },
+        async getCard() {
+            let id = this.$route.params.id
+            const data = await api.get(`crm/card/${id}`);
+            let resp = data.data.data;
+            this.company.celular = resp.celular;
+            this.company.email = resp.email;
+            this.company.fone = resp.fone;
+            this.company.name = resp.name;
+            this.company.cnpj = resp.cnpj;
+        }
       },
       async created(){
-          await this.getCompany();
+          await this.getCard();
           await this.getAllProducts();
           await this.getProducts();
           await this.getOption();

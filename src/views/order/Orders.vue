@@ -131,24 +131,30 @@
                     <td>{{it.date}}</td>
                     <td>{{it.multiple == 'pending' ? 'Proposta agendada' : it.status}}</td>
                     <td>
-                      <button @click="getInfoOrder(index)" v-b-modal.modalright class="btn btn-outline-info">
-                        <div class="simple-icon-eye"/>
-                      </button>
 
-                      <button v-if="it.status != 'Aprovado' && it.status != 'Aguardando'" @click="swalsendOrder(it.id)" v-b-modal.modalright class="d-none btn btn-outline-success">
+                      <!-- <button v-if="it.status != 'Aprovado' && it.status != 'Aguardando'" @click="swalsendOrder(it.id)" v-b-modal.modalright class="d-none btn btn-outline-success">
                         <div class="simple-icon-doc"/>
                       </button>
                       <button v-if="it.status == 'Aguardando'" @click="swalsendOrderMulti(it.id)" v-b-modal.modalright class="d-none btn btn-outline-success">
                         <div class="simple-icon-docs"/>
-                      </button>
+                      </button> -->
                       <span @click="getInfoOrder(index)">
                         <button v-if="it.status == 'Reprovado' && !it.feedback && !consultor" v-b-modal.modalright2 class="btn btn-outline-danger">
                           <div class="simple-icon-pencil"/>
                         </button>
                       </span>
-                      <a v-if="it.rastreio && it.rastreio.codigoRastreamento" target="_blank" :href="`https://www.linkcorreios.com.br/${it.rastreio.codigoRastreamento}`" class="btn btn-success">
+                      <a v-if="it.rastreio" target="_blank" :href="`https://www.linkcorreios.com.br/${it.rastreio}`" class="btn btn-success">
                           <div class="simple-icon-envelope"/>
                       </a>
+                      <b-dropdown id="ddown1" text="Ações" variant="outline-primary">
+                        <b-dropdown-item @click="getInfoOrder(index)" v-b-modal.modalright>Informações do pedido</b-dropdown-item>
+
+                        <b-dropdown-item v-if="it.status == 'Pendente'">
+                          <router-link :to="`/admin/company/edit`">
+                            Cadastrar e-mail XML
+                          </router-link>
+                        </b-dropdown-item>
+                      </b-dropdown>
                       <!-- <span @click="pc.order = it.id">
                         <button v-if="it.status == 'Aprovado' && !it.attr.pc && it.pedidoCompra != 222 && !consultor" class="btn btn-outline-warning" v-b-modal.modalright1>
                           <div class="simple-icon-doc"/>

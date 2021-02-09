@@ -1,6 +1,6 @@
 <template>
   <div>
-    <my-breadcrumb />
+    <my-breadcrumb :distribuidor="distribuidor" />
      <b-row>
       <b-colxx xxs="12">
         <b-card class="mb-4" title="Selecione o item">
@@ -12,11 +12,15 @@
 						</div>
 						<b-card-body>
 							<form @submit.prevent="setProduct(pro)">
-								<p class="mb-2 card-subtitle">{{pro.information.pro_name}} <sub>CA: {{pro.information.pro_ca}}</sub> </p>
+								<p class="mb-2 card-subtitle">{{pro.information.pro_name}} <sub v-if="pro.information.pro_ca">CA: {{pro.information.pro_ca}}</sub> </p>
 								<div class="separator mb-2"></div>
-                  <b-form-group v-for="(attr, indexAttr) in pro.attrs" :key="`${indexAttr}_${i}`" :label="indexAttr" class="has-float-label mb-4">
-                    <b-form-select :options="option(attr)" plain v-model="pro['items_'+indexAttr]" />
-                  </b-form-group>
+                <b-form-group v-for="(attr, indexAttr) in pro.attrs" :key="`${indexAttr}_${i}`" :label="indexAttr" class="has-float-label mb-4">
+                  <b-form-select :options="option(attr)" plain v-model="pro['items_'+indexAttr]" />
+                </b-form-group>
+								<div v-if="distribuidor" class="separator mb-2"></div>
+                <b-form-group v-if="distribuidor" label="Quantidade" class="has-float-label mb-4">
+                  <b-form-input type="number" plain v-model="pro.qtd" />
+                </b-form-group>
 								<div class="separator my-2"></div>
 								<button class="btn btn-outline-success float-right w-100">Adicionar</button>
 							</form>
@@ -30,6 +34,55 @@
         </b-card>
       </b-colxx>
     </b-row>
+
+
+    <button v-b-modal.cart v-if="distribuidor" class="btn btn-success btn-cart">
+      <i class="iconsminds-shopping-cart"></i>
+      <div class="myBadge-danger" v-if="distribuidorCard.length">{{distribuidorCard.length}}</div>
+    </button>
+
+    <b-modal id="cart" ref="cart" title="Carrinho">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Quantidade</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in distribuidorCard" :key="index">
+            <td>
+              {{item.filter((r, i) => {
+                if(r.attr == 'nome') return r
+              })[0].value}}
+
+              {{item.filter((r, i) => {
+                if(r.attr == 'Cor') return r
+              })[0].value}}
+
+              {{item.filter((r, i) => {
+                if(r.attr == 'Tamanho Comercial') return r
+              })[0].value}}
+            </td>
+            <td>{{item.filter((r, i) => {
+                if(r.attr == 'qtd') return r
+              })[0].value}}</td>
+            <td>
+              <button class="btn btn-outline-danger btn-xs" @click="distribuidorCard.splice(index,1)">
+                <i class="simple-icon-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <template slot="modal-footer">
+        <b-button variant="secondary" @click="hideModal('cart')">Fechar</b-button>
+        <b-button variant="primary" @click="finalizarPedido()" class="mr-1">Finalizar pedido</b-button>
+      </template>
+    </b-modal>
+
+
   </div>
 </template>
 
@@ -40,33 +93,73 @@ export default {
 	data() {
 		return {
 			products: null,
-      baseURL
+      baseURL,
+      distribuidor: false,
+      distribuidorCard: []
 		}
 	},
     components: {
         'my-breadcrumb': myBreadCrumb
 	},
 	methods: {
-		setProduct: function (item) {
+    addProductToCard(item){
+
+
+      console.log(item)
+
       let attr = [];
-      for(let i in item) {
-        if(i.indexOf('items_') >= 0) {
-          attr.push({attr: i.replace('items_', ''), value: item[i]})
+        for(let i in item) {
+          if(i.indexOf('items_') >= 0) {
+            attr.push({attr: i.replace('items_', ''), value: item[i]})
+          }
         }
-      }
 
       attr.push({attr: 'model', value: item.information.pro_id});
+      attr.push({attr: 'nome', value: item.information.pro_name});
+      attr.push({attr: 'qtd', value: item.qtd});
 
-      let order = window.localStorage.getItem('order');
-			if(order){
-				order = JSON.parse(order);
-			}else{
-				order = {};
+      this.$notify("success", 'Sucesso', "Item adicionado com sucesso", {
+          duration: 3000,
+          permanent: false
+      });
+
+      this.distribuidorCard.push(attr);
+
+
+    },
+
+    finalizarPedido(){
+        let order = JSON.parse(window.localStorage.getItem('order'));
+        order.distribuidorCard = this.distribuidorCard
+        console.log(order)
+        window.localStorage.setItem('order', JSON.stringify(order));
+        this.$router.push("/admin/make/confirmation");
+    },
+
+		setProduct: function (item) {
+      if(this.distribuidor) {
+        this.addProductToCard(item)
+      }else{
+        let attr = [];
+        for(let i in item) {
+          if(i.indexOf('items_') >= 0) {
+            attr.push({attr: i.replace('items_', ''), value: item[i]})
+          }
+        }
+
+        attr.push({attr: 'model', value: item.information.pro_id});
+
+        let order = window.localStorage.getItem('order');
+        if(order){
+          order = JSON.parse(order);
+        }else{
+          order = {};
+        }
+
+        order.product = attr
+        window.localStorage.setItem('order', JSON.stringify(order));
+        this.$router.push("/admin/make/lens");
       }
-
-      order.product = attr
-      window.localStorage.setItem('order', JSON.stringify(order));
-			this.$router.push("/admin/make/lens");
 
 
 		},
@@ -74,6 +167,13 @@ export default {
 		getProducts: async function()
 		{
       let order = JSON.parse(window.localStorage.getItem('order'));
+
+      if(order.distribuidorCard) {
+        this.distribuidorCard = order.distribuidorCard
+      }
+
+      this.distribuidor = order.type_user == 'distribuidor';
+
       let user = JSON.parse(window.localStorage.getItem('user'));
       let company = '';
       console.log(order)
@@ -104,9 +204,12 @@ export default {
       return retorno
     },
     getProductImage(item){
+
       let image = item.variation[0].filter(r => {
         if(r.label == 'Imagem'){return r}
       })[0].value;
+
+      console.log(image)
 
       let attr = [];
 
@@ -156,6 +259,15 @@ export default {
 
       return image
     },
+
+    hideModal (refname) {
+      this.$refs[refname].hide()
+      console.log('hide modal:: ' + refname)
+
+      if (refname === 'modalnestedinline') {
+        this.$refs['modalnested'].show()
+      }
+    },
 	},
 	created() {
 		this.getProducts();
@@ -169,5 +281,25 @@ export default {
 	height: 25px;
 	border-radius: 50%;
 	background: #a00
+}
+
+.btn-cart {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  font-size: 1.5rem;
+  z-index: 10;
+}
+
+.myBadge-danger {
+  font-size: .7rem;
+  position: absolute;
+  top: 5px;
+  right: 20px;
+  background: red;
+  border-radius: 50%;
+  display: block;
+  width: 17px;
+  height: 17px;
 }
 </style>

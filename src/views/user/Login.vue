@@ -91,7 +91,6 @@ export default {
             // this.$v.$touch();
             // this.$v.form.$touch();
            // if (!this.$v.form.$anyError) {
-               console.log('Olls')
                 this.login({
                     email: this.form.email,
                     password: this.form.password
@@ -104,14 +103,13 @@ export default {
     },
     watch: {
         currentUser(val) {
-          console.log('VAL: ',  val);
             if (val && val.token && val.token.length > 0) {
                 // setTimeout(() => {
                 //     }, 200);
                 if(!val.user.level) {
                   this.$router.push(`/app`);
                 }else{
-                  this.$router.push(`/${val.user.level}`);
+                  this.$router.push(`/${val.user.level}/make/information`);
                 }
             }
         },

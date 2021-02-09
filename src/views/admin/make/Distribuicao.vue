@@ -205,10 +205,11 @@ export default {
 
     },
     proPrice(idProduct){
+
       let produto = this.productSelected.filter(r => r.id == idProduct)[0];
       let preco = 0;
       produto.price.forEach(r => {
-        if(produto.qtd >= Number(r.qty)) {
+        if(Number(produto.qtd) >= Number(r.qty)) {
           preco = r.value
         }
       });

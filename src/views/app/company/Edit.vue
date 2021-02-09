@@ -36,13 +36,6 @@
                         </b-form-group>
                     </b-colxx>
                     <b-colxx md="4" lg="3">
-                        <b-form-group label="Vendedor" class="has-float-label mb-4">
-                          <select class="form-control" v-model="company.vendedor">
-                            <option v-for="(consult, consultIndex) in consultores" :key="consultIndex" :value="consult.vendedor">{{consult.vendedor}}</option>
-                          </select>
-                        </b-form-group>
-                    </b-colxx>
-                    <b-colxx md="4" lg="3">
                         <b-form-group label="E-mail NF" class="has-float-label mb-4">
                             <b-form-input v-model="company.email_nf" type="text" placeholder="E-mail NF" />
                         </b-form-group>
@@ -399,7 +392,7 @@
                                     <b-form-input v-model="user.password" type="text" placeholder="Senha" />
                                 </b-form-group>
                                 <b-alert variant="info" show  dismissible v-else>Usuário para contato</b-alert>
-                           </b-colxx>
+                            </b-colxx>
 
                             <b-colxx md="1" lg="1">
                                 <button v-if="company.users.filter(r => !r.deleted).length > 1" @click="company.users = company.users.map((r,i) => {if(i == index){ r.deleted = true} return r});" class="btn btn-outline-danger"><i class="glyph-icon simple-icon-trash"></i></button>
@@ -625,14 +618,12 @@ export default {
         },
         async editCompany() {
           this.company.restrictions = this.restrictions;
-          this.processing = true;
           const response = await api.put(`admin/company/${this.$route.params.id}`, {company: this.company, dynamic: this.allProduct, newProduct: this.newProduct, restricoes: this.restricoes});
           this.$notify('success', "Sucesso", "Empresa editada com sucesso", {
             duration: 3000,
             permanent: false
           });
-          this.processing = false;
-          this.$router.push("/admin/company/view");
+          this.$router.push("/app/company/view");
         },
         addVariationRestrict(product, value, type) {
           this.restrictions[type].push(`${product}_${value}`);

@@ -9,43 +9,69 @@
     <b-alert variant="info" show  dismissible>Você pode parametrizar o preço e as variações disponíveis na tela de cadastro/edição da empresa que você quiser!</b-alert>
     <b-row v-if="productInfo.type">
         <b-colxx xxs="12">
-          <b-card class="mb-4" title="Informações gerais">
-            <b-row>
-                <b-colxx md="4" lg="3">
-                    <b-form-group label="Nome do Produto" class="has-float-label mb-4">
+          <b-card class="mb-4" title="Informações">
+            <div class="border position-relative mb-4">
+              <span class="position-absolute label">Dados gerais</span>
+                <div class="pt-4 px-3">
+                  <b-row>
+                    <b-colxx md="4" lg="3">
+                      <b-form-group label="Nome do Produto" class="has-float-label">
                         <b-form-input v-model="product.name" type="text" placeholder="Nome do Produto" />
-                    </b-form-group>
-                </b-colxx>
-                <b-colxx md="4" lg="3">
-                    <b-form-group label="Preço" class="has-float-label mb-4">
-                        <fieldset class="form-group has-float-label mb-4">
-                            <legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0">Preço</legend>
-                            <div tabindex="-1" role="group" class="bv-no-focus-ring">
-                                <Money class="form-control" v-model="product.price" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
-                            </div>
-                        </fieldset>
-                    </b-form-group>
-                </b-colxx>
-                <b-colxx md="4" lg="3">
-                  <b-form-group label="Status" class="has-float-label mb-4">
-                    <b-form-select v-model="product.status" :options="[{value: 'Active', text: 'Ativo'}, {value: 'Inactive', text: 'Inativo'}]" />
-                  </b-form-group>
-                </b-colxx>
-                <b-colxx md="4" lg="3">
-                  <b-form-group label="Tipo do produto" class="has-float-label mb-4">
-                    <b-form-select v-model="product.type" :options="productInfo.type.map(r => {
-                      return {value: r.id,
-                      text: r.name}
-                      })" />
-                  </b-form-group>
-                  <b-form-group v-if="productInfo.type.filter(r => {if(r.id == product.type) return r;})[0].parent" label="Sub categoria" class="has-float-label mb-4">
-                    <b-form-select v-model="product.subtype" :options="productInfo.type.filter(r => {if(r.id == product.type) return r;})[0].parent.map(r => {
-                      return {value: r.id,
-                      text: r.name}
-                      })" />
-                  </b-form-group>
-                </b-colxx>
-            </b-row>
+                      </b-form-group>
+                    </b-colxx>
+                    <b-colxx md="4" lg="3">
+                        <b-form-group label="Preço" class="has-float-label">
+                            <fieldset class="form-group has-float-label">
+                                <legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0">Preço</legend>
+                                <div tabindex="-1" role="group" class="bv-no-focus-ring">
+                                    <Money class="form-control"  v-model="product.price" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: false,}"/>
+                                </div>
+                            </fieldset>
+                        </b-form-group>
+                    </b-colxx>
+                    <b-colxx md="4" lg="3">
+                      <b-form-group label="Status" class="has-float-label">
+                        <b-form-select v-model="product.status" :options="[{value: 'Active', text: 'Ativo'}, {value: 'Inactive', text: 'Inativo'}]" />
+                      </b-form-group>
+                    </b-colxx>
+                    <b-colxx md="4" lg="3">
+                      <b-form-group label="Tipo do produto" class="has-float-label">
+                        <b-form-select v-model="product.type" :options="productInfo.type.map(r => {
+                          return {value: r.id,
+                          text: r.name}
+                          })" />
+                      </b-form-group>
+                      <b-form-group v-if="productInfo.type.filter(r => {if(r.id == product.type) return r;})[0].parent" label="Sub categoria" class="has-float-label">
+                        <b-form-select v-model="product.subtype" :options="productInfo.type.filter(r => {if(r.id == product.type) return r;})[0].parent.map(r => {
+                          return {value: r.id,
+                          text: r.name}
+                          })" />
+                      </b-form-group>
+                    </b-colxx>
+                  </b-row>
+                  <b-row>
+                    <b-colxx md="4" lg="3">
+                      <b-form-group label="Origem" class="has-float-label">
+                            <b-form-select v-model="product.origem" :options='[
+                              {text:"0 - Nacional, exceto as indicadas nos códigos 3, 4, 5 e 8",value:"0"},
+                              {text:"1 - Estrangeira - Importação direta, exceto a indicada no código 6",value:"1"},
+                              {text:"2 - Estrangeira - Adquirida no mercado interno, exceto a indicada no código 7",value:"2"},
+                              {text:"3 - Nacional, mercadoria ou bem com Conteúdo de Importação superior a 40% e inferior ou igual a 70%",value:"3"},
+                              {text:"4 - Nacional, cuja produção tenha sido feita em conformidade com os processos produtivos básicos de que tratam as legislações citadas nos Ajustes",value:"4"},
+                              {text:"5 - Nacional, mercadoria ou bem com Conteúdo de Importação inferior ou igual a 40%",value:"5"},
+                              {text:"6 - Estrangeira - Importação direta, sem similar nacional, constante em lista da CAMEX",value:"6"},
+                              {text:"7 - Estrangeira - Adquirida no mercado interno, sem similar nacional, constante em lista da CAMEX",value:"7"},
+                              {text:"8 - Nacional, mercadoria ou bem com Conteúdo de Importação superior a 70%",value:"8"}]'></b-form-select>
+                          </b-form-group>
+                    </b-colxx>
+                    <b-colxx md="4" lg="3">
+                      <b-form-group label="NCM" class="has-float-label">
+                        <b-form-input v-model="product.ncm" type="text" placeholder="NCM" />
+                      </b-form-group>
+                    </b-colxx>
+                  </b-row>
+                </div>
+            </div>
           </b-card>
         </b-colxx>
 
@@ -61,13 +87,16 @@
           </b-card>
         </b-colxx>
 
-        <b-colxx lg="8" xxs="12">
+        <b-colxx lg="8" xxs="12" v-if="product.type == 1">
           <b-card class="mb-4" title="Criar seu produto">
             <div class="area-drop">
               <draggable class="row min-height" :list="createdProduct" :group="{ name: 'people'}" @change="refreshElements">
                 <b-colxx class="my-2" md="4" v-for="(element, index) in createdProduct" :key="index">
                   <b-form-group v-if="element.type == 'text'" :label="element.label" class="has-float-label mb-4">
                     <b-form-input v-model="element.value" type="text" :placeholder="element.label" />
+                  </b-form-group>
+                  <b-form-group v-if="element.type == 'money'" :label="element.label" class="has-float-label mb-4">
+                    <Money class="form-control" v-model="element.value" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: false,}"/>
                   </b-form-group>
                   <div v-if="element.type == 'img'" class="image-hover position-relative">
                     <img class="w-100" :src="baseURL +  element.value" alt="">
@@ -98,7 +127,7 @@
           </b-card>
         </b-colxx>
 
-        <b-colxx lg="4" xxs="12" v-if="productInfo.attributes">
+        <b-colxx lg="4" xxs="12" v-if="productInfo.attributes && product.type == 1">
           <b-card class="mb-4" title="Atributos">
             <draggable class="list-group min-height" :list="productInfo.attributes" :group="{ name: 'people', pull: 'clone'}" @change="refreshElements">
               <div class="list-group-item" v-for="(element, index) in productInfo.attributes" :key="index">
@@ -115,7 +144,9 @@
               <b-colxx md="3" v-for="(attr, attrIndex) in product.attributes" :key="attrIndex">
                 <div v-for="(item, itemIndex) in attr" :key="itemIndex">
                   <b>{{item.label}}</b>:
-                  <img v-if="item.type == 'img'" :src="baseURL + item.value" alt="Imagem do produto" class="d-block w-100"> <span v-else>{{item.value}}</span>
+                  <img v-if="item.type == 'img'" :src="baseURL + item.value" alt="Imagem do produto" class="d-block w-100">
+                  <span v-else-if="item.type == 'text'">{{item.value}}</span>
+                  <span v-else-if="item.type == 'money'">{{item.value | numeroPreco}}</span>
                 </div>
                 <button style="opacity:1;" class="btn btn-outline-danger mt-3" @click="() => {
                       product.attributes.splice(attrIndex, 1);
@@ -232,14 +263,14 @@ export default {
     },
     computed: {
         dropzoneOptions: function() {
-            const token = window.localStorage.getItem('token');
-            return {
-                url: `${baseURL}saveFile/product`,
-                thumbnailWidth: 150,
-                headers: { "X-Auth-Token": token },
-                dictDefaultMessage: "Adicionar imagens do produto",
-                previewTemplate: this.dropzoneTemplate(),
-            }
+          const token = window.localStorage.getItem('token');
+          return {
+              url: `${baseURL}saveFile/product`,
+              thumbnailWidth: 150,
+              headers: { "X-Auth-Token": token },
+              dictDefaultMessage: "Adicionar imagens do produto",
+              previewTemplate: this.dropzoneTemplate(),
+          }
         }
     },
     methods: {
@@ -420,5 +451,15 @@ export default {
 
 .form-my {
   border:2px solid #ccc; height:26px; width:100px; border-radius: 3px;
+}
+
+.border {
+  min-height: 40px;
+}
+.border.position-relative .label{
+    top: -15px;
+    left: 10px;
+    padding: 5px;
+    background: #fff;
 }
 </style>

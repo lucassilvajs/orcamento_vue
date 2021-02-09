@@ -94,6 +94,7 @@
                 <th>#</th>
                 <th>Empresa</th>
                 <th>CNPJ</th>
+                <th>Pedido de compra</th>
                 <th>NF</th>
                 <th>Colaborador</th>
                 <th>Valor</th>
@@ -111,9 +112,10 @@
                     </div>
                   </div>
                 </td>
-                <td>{{100000 + parseInt(item.id)}}</td>
+                <td>{{item.id}}</td>
                 <td>{{item.empresa}} <span v-if="item.pedido_compra == 1 && !item.object.pc" class="badge badge-danger">PC Pendente</span></td>
                 <td>{{item.cnpj}}</td>
+                <td>{{item.numeroPedido}} <router-link :to="`/admin/company/edit/${item.idCompany}`"><span v-if="!item.emailNf" class="badge badge-danger">E-mail XML não cadastrado</span></router-link> </td>
                 <td>{{item.nota}}</td>
                 <td v-if="isPage('proposal')">{{item.parents.map(r => JSON.parse(r.attr).info.name).join(', ')}}</td>
                 <td v-else>{{item.name}}</td>
@@ -124,7 +126,7 @@
                 </td>
                 <td>
                   <b-dropdown id="ddown1" text="Ações" variant="outline-primary">
-                      <b-dropdown-item v-if="!item.nota" @click="() => {
+                      <b-dropdown-item v-if="!item.nota && item.emailNf" @click="() => {
                     $swal.fire({
                       title: `Você tem certeza?`,
                       text: `Deseja realmente emitir essa nota?`,
@@ -140,7 +142,8 @@
                         generateNf(order)
                       }
                     });
-                  }">Gerar Nota Fiscal</b-dropdown-item>
+                  }">Gerar Nota Fiscal </b-dropdown-item>
+                      <b-dropdown-item v-if="!item.emailNf"><router-link :to="`/admin/company/edit/${item.idCompany}`">Cadastrar e-mail XML</router-link></b-dropdown-item>
                       <b-dropdown-item @click="getInfoOrder(index)" v-b-modal.modalright>Informações do pedido</b-dropdown-item>
                       <b-dropdown-item>
                         <router-link :to="`/admin/order/measure/${item.id}`" :id="`measure${item.id}`">Eye Measure</router-link>
@@ -399,10 +402,12 @@ export default {
       const response = await api.post(`/admin/order/generateNF`, {
         order: idOrder
       });
+
+      let data = response.data;
       this.$swal.fire({
-        title: `Sucesso!`,
-        text: `Notas geradas com sucesso`,
-        icon: 'success',
+        title: `${data.status == 'success' ? 'Sucesso' : 'Ops..!'}`,
+        text: `${data.message}`,
+        icon: `${data.status}`,
       });
       this.getOrder();
 

@@ -1,24 +1,15 @@
-import {api, baseURL, firebaseConfig} from '@/constants/config';
-import { generateChart } from 'vue-chartjs';
-import Firebase from 'firebase';
-
-
+import {api, baseURL} from '@/constants/config';
 export default {
   state: {
-    awaitingOrders: null,
-    erpNotifications: null
+    awaitingOrders: null
   },
   getters: {
-    awaitingOrders: state => state.awaitingOrders,
-    erpNotifications: state => state.erpNotifications,
+    awaitingOrders: state => state.awaitingOrders
   },
   mutations: {
     setAwaitingOrders(state, payload) {
       state.awaitingOrders = payload
-    },
-    setErpNotifications(state, payload) {
-      state.erpNotifications = payload
-    },
+    }
   },
   actions: {
     async getAwaitingOrders({commit}, payload){
@@ -27,17 +18,7 @@ export default {
           status: 'awaiting',
         }
       });
-
-      if(response.data.data.orders){
-        commit('setAwaitingOrders', response.data.data.orders.map(r => {r.item = false; return r;}));
-      }
-    },
-    async getErpNotifications({commit}, payload){
-      const response = await api.get('/sac/notifications');
-
-      if(response.data.data.sac){
-        commit('setErpNotifications', response.data.data.sac);
-      }
+      commit('setAwaitingOrders', response.data.data.orders.map(r => {r.item = false; return r;}));
     },
 
     async sendAwaitingOrders({commit}, payload) {
@@ -48,6 +29,6 @@ export default {
 
       const response = await api.put('/order/awaiting', {items});
       return true;
-    },
+    }
   }
 }

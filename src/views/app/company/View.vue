@@ -2,7 +2,7 @@
 <div>
   <b-row>
     <b-colxx xxs="12">
-      <h1>Empresas</h1>
+      <h1>Empresas Consultor</h1>
       <div class="separator mb-5"></div>
     </b-colxx>
   </b-row>
@@ -70,13 +70,7 @@
               </td>
               <td>{{com.date | date}}</td>
               <td>
-                <router-link class="btn btn-outline-info mr-1" :to="`/admin/company/edit/${com.id}`"><div class="glyph-icon simple-icon-pencil"></div></router-link>
-                <button class="btn btn-outline-danger" @click="deleteItem(index)">
-                  <div class="glyph-icon simple-icon-trash"></div>
-                </button>
-                <!-- <button class="btn btn-danger" @click="deleteItem(index)" v-else>
-                  <div class="glyph-icon simple-icon-exclamation flash"></div>
-                </button> -->
+                <router-link class="btn btn-outline-info mr-1" :to="`/app/company/edit/${com.id}`"><div class="glyph-icon simple-icon-pencil"></div></router-link>
               </td>
             </tr>
           </tbody>
@@ -119,28 +113,6 @@ export default {
       const response = await api.get('admin/company');
       this.company = response.data.data.company;
       this.total = response.data.data.total;
-    },
-    deleteItem(item){
-
-      this.$swal.fire({
-        title: "Você está certo disso?",
-        text: "Você deseja realmente deletar essa empresa",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonText: 'Deletar',
-        confirmButtonColor: '#d33',
-        cancelButtonText: "Cancelar",
-        showLoaderOnConfirm: true,
-        preConfirm: async (login) => {
-            this.company = this.company.filter((r,i) => {if(i != item) return r; else api.put(`admin/company/delete/${r.id}`) })
-        },
-        allowOutsideClick: () => !this.$swal.isLoading()
-      }).then((result) => {
-        this.$notify('success', "Sucesso", "empresa deletada com sucesso", {
-          duration: 3000,
-          permanent: false
-        });
-      })
     },
     hideButton(index) {
       this.company[index].inDelete = true;

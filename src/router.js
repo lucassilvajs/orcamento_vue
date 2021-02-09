@@ -83,10 +83,35 @@ const routes = [
           import("./views/bi/Analytics")
       },
       {
+        path: "/app/crm",
+        component: () =>
+          import("./views/crm/Dashboard")
+      },
+      {
+        path: "/app/company/view",
+        component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/app/company/View")
+      },
+      {
+        path: "/app/company/new",
+        component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/app/company/New")
+      },
+      {
+        path: "/app/company/edit/:id",
+        component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/app/company/Edit")
+      },
+      {
+        path: "/app/company/card/:id",
+        component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/company/CardNew")
+      },
+      {
         path: "/logout",
         component: () =>
           import("./views/order/Confirmation")
-      }
+      },
     ]
   },
   {
@@ -141,12 +166,27 @@ const routes = [
       {
         path: "/admin/dashboard",
         component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/bi/BiTwo")
+      },
+      {
+        path: "/admin/bi",
+        component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/bi/Bi")
+      },
+      {
+        path: "/admin/bi/tv",
+        component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/bi/BiTv")
       },
       {
         path: "/admin/crm",
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/crm/Dashboard")
+      },
+      {
+        path: "/admin/crm/config",
+        component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/crm/Config")
       },
       {
         path: "/admin/sac",
@@ -169,6 +209,11 @@ const routes = [
           import(/* webpackChunkName: "dashboards" */ "./views/admin/proposal/View")
       },
       {
+        path: "/admin/distribuidor/:status",
+        component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/distribuidor/View")
+      },
+      {
         path: "/admin/proposal/edit/:id",
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/proposal/Edit")
@@ -181,7 +226,7 @@ const routes = [
       {
         path: "/admin/bi",
         component: () =>
-          import(/* webpackChunkName: "dashboards" */ "./views/admin/bi/Bi")
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/bi/BiTwo")
       },
       {
         path: "/admin/product/view",
@@ -197,6 +242,11 @@ const routes = [
         path: "/admin/product/edit/:id",
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/product/Edit")
+      },
+      {
+        path: "/admin/product/test/:id",
+        component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/product/Test")
       },
       {
         path: "/admin/consult/view",
@@ -224,6 +274,11 @@ const routes = [
           import(/* webpackChunkName: "dashboards" */ "./views/admin/company/New")
       },
       {
+        path: "/admin/company/card/:id",
+        component: () =>
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/company/CardNew")
+      },
+      {
         path: "/admin/company/edit/:id",
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/company/Edit")
@@ -249,14 +304,14 @@ const routes = [
           import("./views/admin/make/Information")
       },
       {
-        path: "/admin/make/Distribuicao",
-        component: () =>
-          import("./views/admin/make/Distribuicao")
-      },
-      {
         path: "/admin/make/products",
         component: () =>
           import("./views/admin/make/Products")
+      },
+      {
+        path: "/admin/make/distribuidor",
+        component: () =>
+          import("./views/admin/make/Distribuidor")
       },
       {
         path: "/admin/make/lens",

@@ -38,7 +38,7 @@
                 <td>{{user.vendedor ? user.vendedor : 'Não atribuido'}}</td>
                 <td>{{user.email}}</td>
                 <td>
-                  <router-link v-if="current == user.id" :to="`/admin/user/edit/${user.id}`" class="btn btn-outline-info">
+                  <router-link :to="`/admin/user/edit/${user.id}`" class="btn btn-outline-info">
                     <div class="glyph-icon simple-icon-pencil"></div>
                   </router-link>
                 </td>

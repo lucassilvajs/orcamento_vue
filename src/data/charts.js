@@ -2,11 +2,11 @@ import { ThemeColors } from '../utils'
 const colors = ThemeColors()
 
 export const lineChartData = {
-  labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  labels: ['Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
   datasets: [
     {
       label: '',
-      data: [54, 63, 60, 65, 60, 68, 60],
+      data: [210, 320, 314, 412, 360, 468, 560],
       borderColor: colors.themeColor1,
       pointBackgroundColor: colors.foregroundColor,
       pointBorderColor: colors.themeColor1,
@@ -36,8 +36,9 @@ export const polarAreaChartData = {
   ]
 }
 
+
 export const areaChartData = {
-  labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+  labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'],
   datasets: [
     {
       label: '',
@@ -53,6 +54,21 @@ export const areaChartData = {
       fill: true,
       borderWidth: 2,
       backgroundColor: colors.themeColor1_10
+    },
+    {
+      label: '',
+      data: [50, 65, 50, 70, 42, 80, 55],
+      borderColor: colors.themeColor2,
+      pointBackgroundColor: colors.foregroundColor,
+      pointBorderColor: colors.themeColor2,
+      pointHoverBackgroundColor: colors.themeColor2,
+      pointHoverBorderColor: colors.foregroundColor,
+      pointRadius: 4,
+      pointBorderWidth: 2,
+      pointHoverRadius: 5,
+      fill: true,
+      borderWidth: 2,
+      backgroundColor: colors.themeColor2_10
     }
   ]
 }
@@ -93,20 +109,27 @@ export const scatterChartData = {
 }
 
 export const barChartData = {
-  labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+  labels: ['Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
   datasets: [
     {
-      label: 'Cakes',
+      label: 'Ano Atual',
       borderColor: colors.themeColor1,
       backgroundColor: colors.themeColor1_10,
       data: [456, 479, 324, 569, 702, 600],
       borderWidth: 2
     },
     {
-      label: 'Desserts',
+      label: 'Ano Anterior',
       borderColor: colors.themeColor2,
       backgroundColor: colors.themeColor2_10,
       data: [364, 504, 605, 400, 345, 320],
+      borderWidth: 2
+    },
+    {
+      label: 'Meta',
+      borderColor: colors.themeColor3,
+      backgroundColor: colors.themeColor3_10,
+      data: [550, 550, 600, 600, 650, 650],
       borderWidth: 2
     }
   ]

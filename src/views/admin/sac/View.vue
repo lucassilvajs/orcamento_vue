@@ -230,7 +230,7 @@ export default {
     this.getSacChat();
     this.clear = setInterval(() => {
       this.getSacChat();
-    }, 1000 * 10);
+    }, 1000 * 50);
   },
   watch: {
     $route(){
