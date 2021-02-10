@@ -55,7 +55,7 @@ import axios from "axios";
 
 let base = "";
 if(window.location.href.indexOf('localhost') >= 0) {
-  base = "http://localhost/producao/";
+  base = "http://localhost/orcamento_api/";
 }else{
   base = "https://api.idsafety.com.br/";
 }

@@ -480,6 +480,7 @@ export default {
               bairro: '',
               cidade: '',
               uf: '',
+              informacaoContato: '',
                 fields: [],
                 users: [
                     {
