@@ -628,12 +628,19 @@ export default {
           this.company.restrictions = this.restrictions;
           this.processing = true;
           const response = await api.put(`admin/company/${this.$route.params.id}`, {company: this.company, dynamic: this.allProduct, newProduct: this.newProduct, restricoes: this.restricoes});
-          this.$notify('success', "Sucesso", "Empresa editada com sucesso", {
-            duration: 3000,
-            permanent: false
-          });
+          if(response.data.status == 'success') {
+            this.$notify('success', "Sucesso", "Empresa editada com sucesso", {
+              duration: 3000,
+              permanent: false
+            });
+            this.$router.push("/admin/company/view");
+          }else{
+            this.$notify('error', "Opsss", response.data.message, {
+              duration: 3000,
+              permanent: false
+            });
+          }
           this.processing = false;
-          this.$router.push("/admin/company/view");
         },
         addVariationRestrict(product, value, type) {
           this.restrictions[type].push(`${product}_${value}`);

@@ -1,36 +1,34 @@
 <template>
 <b-row class="h-100">
-    <b-colxx xxs="12" md="10" class="mx-auto my-auto">
+    <b-colxx xxs="12" md="6" class="mx-auto my-auto">
         <b-card class="auth-card" no-body>
-            <div class="position-relative image-side">
-                <p class="text-white h2">{{ $t('dashboards.magic-is-in-the-details') }}</p>
-                <p class="white mb-0">
-                    Please use your credentials to login.
-                    <br />If you are not a member, please
-                    <router-link tag="a" to="/user/register" class="white">register</router-link>.
-                </p>
-            </div>
-            <div class="form-side">
+            <div class="form-side w-100">
                 <router-link tag="a" to="/">
                     <span class="logo-single" />
                 </router-link>
                 <h6 class="mb-4">{{ $t('user.login-title')}}</h6>
 
-                <b-form @submit.prevent="formSubmit" class="av-tooltip tooltip-label-bottom">
-                    <b-form-group :label="$t('user.password')" class="has-float-label mb-4">
-                        <b-form-input type="password" v-model="$v.form.password.$model" :state="!$v.form.password.$error" />
-                        <b-form-invalid-feedback v-if="!$v.form.password.required">Please enter your password</b-form-invalid-feedback>
-                        <b-form-invalid-feedback v-else-if="!$v.form.password.minLength || !$v.form.password.maxLength">Your password must be between 4 and 16 characters</b-form-invalid-feedback>
-                    </b-form-group>
-                    <b-form-group :label="$t('user.password-again')" class="has-float-label mb-4">
-                        <b-form-input type="password" v-model="$v.form.passwordAgain.$model" :state="!$v.form.passwordAgain.$error" />
-                        <b-form-invalid-feedback v-if="!$v.form.passwordAgain.required">Please enter your password again</b-form-invalid-feedback>
-                        <b-form-invalid-feedback v-else-if="!$v.form.passwordAgain.sameAsPassword">Your inputs does not match</b-form-invalid-feedback>
+                <b-alert show variant="primary">
+                    Um e-mail com o código de validação foi enviado para seu e-mail. Por favor insira o mesmo no campo abaixo e também a sua nova senha.
+                </b-alert>
 
+
+                <b-form @submit.prevent="formSubmit" class="av-tooltip tooltip-label-bottom">
+                    <b-form-group label="Código de segurança" class="has-float-label mb-4">
+                        <b-form-input type="text" v-model="$v.form.code.$model" :state="!$v.form.code.$error" />
+                    </b-form-group>
+                    <b-form-group label="Nova senha" class="has-float-label mb-4">
+                        <b-form-input type="password" v-model="$v.form.password.$model" :state="!$v.form.password.$error" />
+                        <b-form-invalid-feedback v-if="!$v.form.password.required">Por favor insira sua senha</b-form-invalid-feedback>
+                        <b-form-invalid-feedback v-else-if="!$v.form.password.minLength || !$v.form.password.maxLength">Sua senha tem que ter entre 4 e 16 caracteres</b-form-invalid-feedback>
+                    </b-form-group>
+                    <b-form-group label="Confirmar nova senha" class="has-float-label mb-4">
+                        <b-form-input type="password" v-model="$v.form.passwordAgain.$model" :state="!$v.form.passwordAgain.$error" />
+                        <b-form-invalid-feedback v-if="!$v.form.passwordAgain.required">Por favor insira a senha novamente</b-form-invalid-feedback>
+                        <b-form-invalid-feedback v-else-if="!$v.form.passwordAgain.sameAsPassword">Senhas não conferem</b-form-invalid-feedback>
                     </b-form-group>
 
                     <div class="d-flex justify-content-between align-items-center">
-                        <router-link tag="a" to="/user/forgot-password">{{ $t('user.forgot-password-question')}}</router-link>
                         <b-button type="submit" variant="primary" size="lg" :disabled="processing" :class="{'btn-multiple-state btn-shadow': true,
                     'show-spinner': processing,
                     'show-success': !processing && loginError===false,
@@ -46,7 +44,7 @@
                             <span class="icon fail">
                                 <i class="simple-icon-exclamation"></i>
                             </span>
-                            <span class="label">{{ $t('user.reset-password-button') }}</span>
+                            <span class="label">ATUALIZAR</span>
                         </b-button>
                     </div>
                 </b-form>
@@ -92,7 +90,9 @@ export default {
             passwordAgain: {
                 required,
                 sameAsPassword: sameAs('password')
-
+            },
+            code: {
+                required
             },
         }
     },
@@ -114,7 +114,7 @@ export default {
     watch: {
         loginError(val) {
             if (val != null) {
-                this.$notify("error", "Reset Password Error", val, {
+                this.$notify("error", "Erro na redefinição de senha", val, {
                     duration: 3000,
                     permanent: false
                 });
@@ -125,12 +125,14 @@ export default {
             if (val) {
                 this.$notify(
                     "success",
-                    "Reset Password Success",
-                    "Reset password success", {
+                    "Sucesso na redefinição",
+                    "Sua redefinição de senha foi realizada com sucesso", {
                         duration: 3000,
                         permanent: false
                     }
                 );
+
+                this.$router.push(`/login`);
             }
         }
     }

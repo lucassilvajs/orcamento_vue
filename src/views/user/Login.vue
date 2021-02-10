@@ -17,7 +17,7 @@
                         <b-form-input type="password" v-model="$v.form.password.$model" :state="!$v.form.password.$error" />
                     </b-form-group>
                     <div class="d-flex justify-content-between align-items-center">
-                        <!-- <router-link tag="a" to="/forgot-password">Esqueceu sua senha?</router-link> -->
+                        <router-link tag="a" to="/forgot-password">Esqueceu sua senha?</router-link>
                         <b-button type="submit" variant="primary" size="lg" :disabled="processing" :class="{'btn-multiple-state btn-shadow': true,
                     'show-spinner': processing,
                     'show-success': !processing && loginError===false,

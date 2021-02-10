@@ -103,6 +103,8 @@ export default {
             permanent: false
           }
         );
+
+        this.$router.push(`/reset-password`);
       }
     }
   }
