@@ -151,9 +151,39 @@ const routes = [
           import(/* webpackChunkName: "user" */ "./views/user/ForgotPassword")
       },
       {
-        path: "reset-password",
+        path: "reset-password/:hash",
         component: () =>
           import(/* webpackChunkName: "user" */ "./views/user/ResetPassword")
+      },
+      {
+        path: "sap-order/:hash",
+        component: () =>
+          import(/* webpackChunkName: "user" */ "./views/sap/Information")
+      },
+      {
+        path: "/sap/products",
+        component: () =>
+          import("./views/sap/Products")
+      },
+      {
+        path: "/sap/lens",
+        component: () =>
+          import("./views/sap/Lens")
+      },
+      {
+        path: "/sap/face",
+        component: () =>
+          import("./views/sap/Face")
+      },
+      {
+        path: "/sap/recipe",
+        component: () =>
+          import("./views/sap/Recipe")
+      },
+      {
+        path: "/sap/confirmation",
+        component: () =>
+          import("./views/sap/Confirmation")
       },
     ]
   },

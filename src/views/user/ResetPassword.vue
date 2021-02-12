@@ -6,17 +6,9 @@
                 <router-link tag="a" to="/">
                     <span class="logo-single" />
                 </router-link>
-                <h6 class="mb-4">{{ $t('user.login-title')}}</h6>
-
-                <b-alert show variant="primary">
-                    Um e-mail com o código de validação foi enviado para seu e-mail. Por favor insira o mesmo no campo abaixo e também a sua nova senha.
-                </b-alert>
-
+                <h6 class="mb-4">Crie sua nova senha</h6>
 
                 <b-form @submit.prevent="formSubmit" class="av-tooltip tooltip-label-bottom">
-                    <b-form-group label="Código de segurança" class="has-float-label mb-4">
-                        <b-form-input type="text" v-model="$v.form.code.$model" :state="!$v.form.code.$error" />
-                    </b-form-group>
                     <b-form-group label="Nova senha" class="has-float-label mb-4">
                         <b-form-input type="password" v-model="$v.form.password.$model" :state="!$v.form.password.$error" />
                         <b-form-invalid-feedback v-if="!$v.form.password.required">Por favor insira sua senha</b-form-invalid-feedback>
@@ -28,7 +20,10 @@
                         <b-form-invalid-feedback v-else-if="!$v.form.passwordAgain.sameAsPassword">Senhas não conferem</b-form-invalid-feedback>
                     </b-form-group>
 
+
+
                     <div class="d-flex justify-content-between align-items-center">
+                        <router-link tag="a" to="/login">Login</router-link>
                         <b-button type="submit" variant="primary" size="lg" :disabled="processing" :class="{'btn-multiple-state btn-shadow': true,
                     'show-spinner': processing,
                     'show-success': !processing && loginError===false,
@@ -91,9 +86,6 @@ export default {
                 required,
                 sameAsPassword: sameAs('password')
             },
-            code: {
-                required
-            },
         }
     },
     computed: {
@@ -106,7 +98,8 @@ export default {
             if (!this.$v.form.$anyError) {
                 this.resetPassword({
                     newPassword: this.form.password,
-                    resetPasswordCode: this.$route.query.oobCode || ""
+                    resetPasswordCode: this.$route.query.oobCode || "",
+                    hash: this.$route.params.hash
                 });
             }
         }

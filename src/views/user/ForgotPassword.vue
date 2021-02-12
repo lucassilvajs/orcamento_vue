@@ -88,7 +88,7 @@ export default {
     loginError(val) {
       if (val != null) {
         this.$notify("error", "Erro ao recuperar senha", val, {
-          duration: 3000,
+          duration: 5000,
           permanent: false
         });
       }
@@ -99,12 +99,12 @@ export default {
           "success",
           "Redefinição solicitada com sucesso",
           "Por favor verifique seu e-mail.", {
-            duration: 3000,
+            duration: 5000,
             permanent: false
           }
         );
 
-        this.$router.push(`/reset-password`);
+        this.$router.push(`/login`);
       }
     }
   }

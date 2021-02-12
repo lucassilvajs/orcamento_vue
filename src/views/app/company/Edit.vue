@@ -624,7 +624,7 @@ export default {
               duration: 3000,
               permanent: false
             });
-            this.$router.push("/admin/company/view");
+            this.$router.push("/app/company/view");
           }else{
             this.$notify('error', "Opsss", response.data.message, {
               duration: 3000,

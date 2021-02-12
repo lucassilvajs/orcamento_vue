@@ -31,6 +31,7 @@ export default {
     setProcessing(state, payload) {
       state.processing = payload
       state.loginError = null
+      state.forgotMailSuccess=false
     },
     setError(state, payload) {
       state.loginError = payload

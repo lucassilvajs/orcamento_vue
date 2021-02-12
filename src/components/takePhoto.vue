@@ -92,7 +92,11 @@ export default {
             return this.devices.find(n => n.deviceId === this.deviceId);
         },
         totem() {
-          return JSON.parse(window.localStorage.getItem('user')).user.totem;
+          if(JSON.parse(window.localStorage.getItem('user'))) {
+            return JSON.parse(window.localStorage.getItem('user')).user.totem;
+          }else{
+            return false;
+          }
         }
     },
 	methods: {
@@ -203,7 +207,11 @@ export default {
                   duration: 3000,
                   permanent: false
                 });
-                this.$router.push(`/app/order/${redirect}`);
+                if(JSON.parse(window.localStorage.getItem('user'))) {
+                  this.$router.push(`/app/order/${redirect}`);
+                }else{
+                  this.$router.push(`/sap/${redirect}`);
+                }
               }
 
               if(this.sac) {
@@ -249,7 +257,12 @@ export default {
             duration: 3000,
             permanent: false
           });
-          this.$router.push(`/app/order/${redirect}`);
+          if(JSON.parse(window.localStorage.getItem('user'))) {
+            this.$router.push(`/app/order/${redirect}`);
+          }else{
+            this.$router.push(`/sap/${redirect}`);
+
+          }
         }
 
         if(this.sac) {
@@ -312,7 +325,10 @@ export default {
     //Captura elemento de vídeo
 
       document.querySelector('.count').classList.add('flash');
-      const timer = JSON.parse(window.localStorage.getItem('user')).user.totem
+      let timer = false;
+      if(JSON.parse(window.localStorage.getItem('user'))) {
+        timer = JSON.parse(window.localStorage.getItem('user')).user.totem
+      }
       if(!timer) {
         this.timeAwait = 0;
         document.querySelector('.counter').classList.add('d-none');
