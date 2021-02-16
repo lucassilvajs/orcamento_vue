@@ -41,6 +41,9 @@
                   <router-link :to="`/admin/user/edit/${user.id}`" class="btn btn-outline-info">
                     <div class="glyph-icon simple-icon-pencil"></div>
                   </router-link>
+                  <b-button variant="outline-danger" @click="deleteUser(user.id)">
+                    <div class="glyph-icon simple-icon-trash"></div>
+                  </b-button>
                 </td>
               </tr>
             </tbody>
@@ -52,7 +55,7 @@
           </table>
         </div>
         <div v-else>
-          <div class="alert alert-info">Nenhuma solicitação foi encontrada!</div>
+          <div class="alert alert-info">Nenhum usuário foi encontrado!</div>
         </div>
       </b-card>
     </b-colxx>
@@ -90,17 +93,20 @@ export default {
       this.data = response.data.data;
       this.current = response.data.data.current;
     },
-    async changeStatus(status) {
-      const response = await api.put(`admin/sac/${this.modal.id}`, {status, info: this.modal});
-      let res = response.data;
-      this.$notify(res.status, res.status == 'success' ? 'Sucesso' : 'Opsss!', res.message, {
-        duration: 3000,
-        permanent: false
-      });
-
-      this.data = response.data.data;
-
-
+    async deleteUser(id) {
+      const response = await api.put(`admin/user/delete/${id}`);
+      if(response.data.status == 'success') {
+        this.$notify("success", "Sucesso", "Usuário excluído com sucesso", {
+            duration: 3000,
+            permanent: false
+        });
+        this.getUserAdmin();
+      }else{
+        this.$notify("error", "Ops!!!", response.data.message, {
+            duration: 3000,
+            permanent: false
+        });
+      }
     }
   },
   created () {

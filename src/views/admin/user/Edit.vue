@@ -38,6 +38,28 @@
                   </b-colxx>
                 </b-row>
             </b-card>
+            <b-card title="Privilégios" v-if="false">
+                <b-row>
+                    <b-colxx>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td>Módulo</td>
+                                    <td>Permissão</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Bi</td>
+                                    <td>
+                                        <select name="" id=""></select>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </b-colxx>
+                </b-row>
+            </b-card>
         </b-colxx>
     </b-row>
 </div>
@@ -64,7 +86,7 @@ export default {
             user: {},
             baseURL,
             file: null,
-            image: null
+            image: null,
         }
     },
     computed: {
