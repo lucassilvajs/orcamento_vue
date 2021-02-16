@@ -175,7 +175,7 @@
                     <b-form-group label="Tipo de comprador" class="has-float-label mb-4">
                       <select class="form-control" v-model="company.type_user">
                         <option value="0">Convencional</option>
-                        <option value="1">Distribuidor</option>
+                        <option  v-if="false" value="1">Distribuidor</option>
                       </select>
                     </b-form-group>
                   </b-colxx>

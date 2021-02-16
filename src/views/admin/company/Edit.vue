@@ -228,12 +228,12 @@
                       <thead>
                         <tr>
                           <th>#</th>
-                          <th>ID</th>
+                          <th>SKU</th>
                           <th>Nome</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="(pro, proIndex) in allProduct" :key="proIndex">
+                        <tr v-for="(pro, proIndex) in allProduct.filter(r => !r.parent && r.sku)" :key="proIndex">
                           <td>
                             <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
                               <div class="itemCheck mb-0 custom-control custom-checkbox">
@@ -244,10 +244,10 @@
                             </div>
                           </td>
                           <td>
-                            {{pro.id}}
+                            {{pro.sku}}
                           </td>
                           <td>
-                            {{pro.name}} {{pro.subname}}
+                            {{pro.name}}
                           </td>
                           <!-- <td>
                             <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
@@ -690,7 +690,7 @@ export default {
         },
 
         addSelected(){
-          this.precificaveis = this.products.products.filter(r => r.checked).map(r => r.id);
+          this.precificaveis = this.allProduct.filter(r => r.checked).map(r => r.id);
           this.productDistribuidor = {price: [
             { "qty": 1, "value": "0" }
           ]}

@@ -363,6 +363,11 @@ const routes = [
         component: () =>
           import("./views/admin/make/Confirmation")
       },
+      {
+        path: "/admin/ariba",
+        component: () =>
+          import("./views/admin/ariba/View")
+      },
     ]
   },
   {
