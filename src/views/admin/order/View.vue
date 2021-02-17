@@ -252,6 +252,7 @@ export default {
       return existe.length
     },
     async getOrder() {
+      document.querySelector('.load-generic').classList.toggle('d-flex');
       this.processing = true;
       const items = await api.get('/admin/order', {params: this.filter});
       this.items = items.data.data.orders.map(r => {
@@ -261,7 +262,8 @@ export default {
 
       this.processing = false;
       this.total = items.data.data.total
-      this.smoothScrollTo(0, 0, 500)
+      this.smoothScrollTo(0, 0, 500);
+      document.querySelector('.load-generic').classList.toggle('d-flex');
     },
     getInfoOrder(index) {
       this.index = index;
@@ -461,7 +463,7 @@ export default {
     },
 
 
-    
+
   },
   created(){
     this.getOrder();

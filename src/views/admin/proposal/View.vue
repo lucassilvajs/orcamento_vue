@@ -195,7 +195,7 @@ export default {
       return existe.length
     },
     async getOrder() {
-      document.querySelector('.load-generic').classList.toggle = 'd-flex';
+      document.querySelector('.load-generic').classList.toggle('d-flex');
       this.items = null;
       const items = await api.get('/admin/proposal', {
         params: this.filter
@@ -214,7 +214,7 @@ export default {
       });
 
       this.total = items.data.data.total;
-
+      document.querySelector('.load-generic').classList.toggle('d-flex');
       this.smoothScrollTo(0,0,500);
     },
     getInfoOrder(index) {
