@@ -10,7 +10,7 @@
                             <p v-for="(field, index) in order.info" :key="index"><b>{{index == 'name' ? 'Nome': index}}: </b>{{field}}</p>
                         </div>
                         <div v-else>
-                            <p class="text-center">Você não inseriu dados do coladorador <router-link to="/app/order/information">Clique aqui</router-link> para adicionar</p>
+                            <p class="text-center">Você não inseriu dados do coladorador <router-link to="/sap/information">Clique aqui</router-link> para adicionar</p>
                         </div>
                     </b-colxx>
                     <b-colxx md="3" lg="3" class="">
@@ -27,7 +27,7 @@
                             <img class="w-100" :src="`${baseURL}${order.product.image}`" alt="">
                         </div>
                         <div v-else>
-                            <p class="text-center">Você ainda não selecionou o óculos <router-link to="/app/order/products">Clique aqui</router-link> para adicionar</p>
+                            <p class="text-center">Você ainda não selecionou o óculos <router-link to="/sap/products">Clique aqui</router-link> para adicionar</p>
                         </div>
                     </b-colxx>
                     <b-colxx md="3" lg="3" class="">
@@ -37,7 +37,7 @@
                             <iframe style="height:300px;" :src="`${baseURL}${order.face}`" v-else frameborder="0"></iframe>
                         </div>
                         <div v-else>
-                            <p class="text-center">Você ainda não anexou a face <router-link to="/app/order/face">Clique aqui</router-link> para anexar</p>
+                            <p class="text-center">Você ainda não anexou a face <router-link to="/sap/face">Clique aqui</router-link> para anexar</p>
                         </div>
                     </b-colxx>
                     <b-colxx md="3" lg="3" class="">
@@ -47,7 +47,7 @@
                             <iframe style="height:300px;" :src="`${baseURL}${order.recipe}`" v-else frameborder="0"></iframe>
                         </div>
                         <div v-else>
-                            <p class="text-center">Você ainda não anexou a receita <router-link to="/app/order/recipe">Clique aqui</router-link> para anexar</p>
+                            <p class="text-center">Você ainda não anexou a receita <router-link to="/sap/recipe">Clique aqui</router-link> para anexar</p>
                         </div>
                     </b-colxx>
                     <b-colxx class="d-flex justify-content-end mt-4">

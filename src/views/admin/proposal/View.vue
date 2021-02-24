@@ -87,7 +87,7 @@
                   </div>
                 </td>
                 <td>{{item.id}}</td>
-                <td>{{item.empresa}}</td>
+                <td>{{item.empresa}} <span v-if="item.type == 4" class="badge badge-success">ARIBA: Aguardando aprovação interna!</span></td>
                 <td>{{item.cnpj}}</td>
                 <td>{{
                   item.parents.map(r => JSON.parse(r.attr).info.name).join(', ')
@@ -133,6 +133,30 @@
       <b>Feedback: </b>{{order.feedback.feedback}}<br />
       <b>Nota: </b><stars :disabled="true" v-model="order.feedback.rate"></stars><br />
       <hr>
+      <div v-if="order.type == 4">
+        <h5>Pedido está ok?</h5>
+        <p>Você pode confirmar o pedido ou reprovar ele!</p>
+        <div class="alert alert-info">Preencher somente em caso de rejeição</div>
+        <b-form-group label="Razão da rejeição" class="has-float-label mb-2">
+            <select class="form-control" v-model="sap.reason">
+              <option value="incorrectDeliveryDate">Data de entrega inválida</option>
+              <option value="incorrectDescription">Descrição incorreta</option>
+              <option value="incorrectPrice">Preço incorreto</option>
+              <option value="incorrectQuantity">Qauntidade incorreta</option>
+              <option value="incorrectStockPartNumber">Estoque / número da peça incorreto</option>
+              <option value="incorrectUOM">UOM inválido</option>
+              <option value="unabletoSupplyItem">Item indisponível</option>
+              <option value="other">Outro</option>
+            </select>
+        </b-form-group>
+        <b-form-group label="Comente sua decisão">
+            <b-form-input v-model="sap.comment" type="text" placeholder="Comente sua decisão" />
+        </b-form-group>
+        <div class="d-flex mb-4">
+          <button class="btn btn-xs btn-success mr-3" @click="responseSap('approved')">Aprovar</button>
+          <button class="btn btn-xs btn-danger" @click="responseSap('reproved')">Reprovar</button>
+        </div>
+      </div>
       <!-- <div v-for="item in order.object.lens" :key="item.code">
         <b>{{item.type}}</b> {{item.name}}
       </div> -->
@@ -186,7 +210,10 @@ export default {
       selectAll: false,
       filter: {},
       total: 0,
-      suggestions: []
+      suggestions: [],
+      sap: {
+        comment: null
+      }
     }
   },
   methods: {
@@ -195,7 +222,7 @@ export default {
       return existe.length
     },
     async getOrder() {
-      document.querySelector('.load-generic').classList.toggle('d-flex');
+      // document.querySelector('.load-generic').classList.toggle('d-flex');
       this.items = null;
       const items = await api.get('/admin/proposal', {
         params: this.filter
@@ -214,7 +241,7 @@ export default {
       });
 
       this.total = items.data.data.total;
-      document.querySelector('.load-generic').classList.toggle('d-flex');
+      // document.querySelector('.load-generic').classList.toggle('d-flex');
       this.smoothScrollTo(0,0,500);
     },
     getInfoOrder(index) {
@@ -409,7 +436,14 @@ export default {
         window.scroll(newX, newY);
       }, 1000 / 60); // 60 fps
     },
-  },
+
+    async responseSap(response){
+      console.log(this.order)
+      const data = await api.put('admin/ariba/response', {order: this.order.id, response, comment: this.sap.comment, reason: this.sap.reason});
+    }
+
+
+},
   created(){
     this.getOrder();
   }
