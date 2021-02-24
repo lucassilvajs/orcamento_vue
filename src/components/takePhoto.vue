@@ -144,8 +144,9 @@ export default {
       this.fileObject = e.target.files[0];
       file.readAsDataURL(e.target.files[0]);
 		},
-		async sendImage() {
-			if(this.img.length > 100){
+  async sendImage() {
+      let erroUpload = false;
+    	if(this.img.length > 100){
         this.processing = true;
         let file = '';
         let fileToCompress = null;
@@ -163,7 +164,7 @@ export default {
 
           ext = contentType.split('/')[1];
           // Convert it to a blob to upload
-          ext = '.'+contentType.split('/')[1];
+          ext = contentType.split('/')[1];
           var blob = this.b64toBlob(realData, contentType);
           fileToCompress = blob;
         }
@@ -173,63 +174,73 @@ export default {
         if(fileToCompress.type.split('/')[0] == 'image'){
           let imageCompress = null;
           new Compressor(fileToCompress, {
-            minWidth: 1000,
-            minHeight:1000,
-            quality: 0.95,
+            maxWidth: 1024,
+            maxHeight:1024,
+            quality: 0.7,
             success: async (result) => {
-              fd.append('file', result, result.name+ext);
+              fd.append('file', result, 'fileimage.'+ext);
               file = await api.post(`saveFile/${this.target}`, fd);
               if(file.data.status != 'success') {
+                erroUpload = true;
+                this.$notify("error", "Opsss", file.data.message, {
+                  duration: 3000,
+                  permanent: false
+                });
+
                 this.uploadError = true
                 setTimeout(() => {
                   this.uploadError = false
                 }, 3500);
               }
 
-              if(!this.sac){
-                if(file.data.status == 'success') {
-                  let order = window.localStorage.getItem('order');
-                  if(order) {
-                    order = JSON.parse(order)
-                  }else{
-                    order = {};
-                  }
+        if(!this.sac){
+          if(file.data.status == 'success') {
+            let order = window.localStorage.getItem('order');
+            if(order) {
+              order = JSON.parse(order)
+            }else{
+              order = {};
+            }
 
-                  order[this.target] = file.data.data;
+            order[this.target] = file.data.data;
 
-                  window.localStorage.setItem('order', JSON.stringify(order));
-                }
-              }
+            window.localStorage.setItem('order', JSON.stringify(order));
+          }
+        }
 
-              if(!this.sac) {
-                const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
-                this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-                  duration: 3000,
-                  permanent: false
-                });
-                if(JSON.parse(window.localStorage.getItem('user'))) {
-                  this.$router.push(`/app/order/${redirect}`);
-                }else{
-                  this.$router.push(`/sap/${redirect}`);
-                }
-              }
+        if(!this.sac) {
+          const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
+          if(!erroUpload) {
+            this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
+              duration: 3000,
+              permanent: false
+            });
+            this.$router.push(`/app/order/${redirect}`);
+          }
+        }
 
-              if(this.sac) {
-                console.log(file);
-                this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-                  duration: 3000,
-                  permanent: false
-                });
-
-                window.localStorage.setItem('sac', file.data.data);
-              }
-              this.processing = false;
+        if(this.sac) {
+          console.log(file);
+          if(!erroUpload) {
+            this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
+              duration: 3000,
+              permanent: false
+            });
+            window.localStorage.setItem('sac', file.data.data);
+          }
+        }
+        this.processing = false;
             }
           });
         }else{
           fd.append('file', fileToCompress, 'file.'+ext);
           file = await api.post(`saveFile/${this.target}`, fd);
           if(file.data.status != 'success') {
+            erroUpload = true;
+            this.$notify("error", "Opsss", file.data.message, {
+              duration: 3000,
+              permanent: false
+            });
           this.uploadError = true
           setTimeout(() => {
             this.uploadError = false
@@ -251,36 +262,27 @@ export default {
           }
         }
 
+        this.processing = false;
         if(!this.sac) {
-          const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
-          this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-            duration: 3000,
-            permanent: false
-          });
-          if(JSON.parse(window.localStorage.getItem('user'))) {
-            this.$router.push(`/app/order/${redirect}`);
-          }else{
-            this.$router.push(`/sap/${redirect}`);
+            const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
+            if(!erroUpload) {
+              this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
+                duration: 3000,
+                permanent: false
+              });
+              this.$router.push(`/app/order/${redirect}`);
+            }
 
           }
         }
-
-        if(this.sac) {
-          console.log(file);
-          this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-            duration: 3000,
-            permanent: false
-          });
-
-          window.localStorage.setItem('sac', file.data.data);
-        }
-        this.processing = false;
-        }
       }else{
-        const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
-        this.$router.push(`/app/order/${redirect}`);
+        if(!erroUpload) {
+          const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
+          this.$router.push(`/app/order/${redirect}`);
+        }
+
       }
-		},
+    },
 		checkImg() {
 			let order = window.localStorage.getItem('order');
 			if(order){

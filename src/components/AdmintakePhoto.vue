@@ -130,6 +130,7 @@ export default {
       file.readAsDataURL(e.target.files[0]);
 		},
 		async sendImage() {
+      let erroUpload = false;
     	if(this.img.length > 100){
         this.processing = true;
         let file = '';
@@ -165,11 +166,17 @@ export default {
               fd.append('file', result, 'fileimage.'+ext);
               file = await api.post(`saveFile/${this.target}`, fd);
               if(file.data.status != 'success') {
-          this.uploadError = true
-          setTimeout(() => {
-            this.uploadError = false
-          }, 3500);
-        }
+                erroUpload = true;
+                this.$notify("error", "Opsss", file.data.message, {
+                  duration: 3000,
+                  permanent: false
+                });
+
+                this.uploadError = true
+                setTimeout(() => {
+                  this.uploadError = false
+                }, 3500);
+              }
 
         if(!this.sac){
           if(file.data.status == 'success') {
@@ -188,21 +195,24 @@ export default {
 
         if(!this.sac) {
           const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
-          this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-            duration: 3000,
-            permanent: false
-          });
-          this.$router.push(`/admin/make/${redirect}`);
+          if(!erroUpload) {
+            this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
+              duration: 3000,
+              permanent: false
+            });
+            this.$router.push(`/admin/make/${redirect}`);
+          }
         }
 
         if(this.sac) {
           console.log(file);
-          this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-            duration: 3000,
-            permanent: false
-          });
-
-          window.localStorage.setItem('sac', file.data.data);
+          if(!erroUpload) {
+            this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
+              duration: 3000,
+              permanent: false
+            });
+            window.localStorage.setItem('sac', file.data.data);
+          }
         }
         this.processing = false;
             }
@@ -211,6 +221,11 @@ export default {
           fd.append('file', fileToCompress, 'file.'+ext);
           file = await api.post(`saveFile/${this.target}`, fd);
           if(file.data.status != 'success') {
+            erroUpload = true;
+            this.$notify("error", "Opsss", file.data.message, {
+              duration: 3000,
+              permanent: false
+            });
           this.uploadError = true
           setTimeout(() => {
             this.uploadError = false
@@ -235,17 +250,21 @@ export default {
         this.processing = false;
         if(!this.sac) {
             const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
-            this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
-              duration: 3000,
-              permanent: false
-            });
-            this.$router.push(`/admin/make/${redirect}`);
+            if(!erroUpload) {
+              this.$notify("success", "Sucesso", "Imagem salva com sucesso", {
+                duration: 3000,
+                permanent: false
+              });
+              this.$router.push(`/admin/make/${redirect}`);
+            }
 
           }
         }
       }else{
-        const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
-        this.$router.push(`/admin/make/${redirect}`);
+        if(!erroUpload) {
+          const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
+          this.$router.push(`/admin/make/${redirect}`);
+        }
 
       }
     },

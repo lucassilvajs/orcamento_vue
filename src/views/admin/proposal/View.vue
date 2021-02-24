@@ -444,7 +444,7 @@ export default {
 
 
 },
-  created(){
+   created(){
     this.getOrder();
   }
 }
