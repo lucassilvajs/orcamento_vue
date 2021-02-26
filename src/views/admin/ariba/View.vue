@@ -114,7 +114,7 @@ export default {
       this.processing = true;
       let status = this.$route.params.status
       const items = await api.get('/admin/ariba', {params: {...this.filter, status}});
-      this.items = items.data.data.orders.map(r => {
+      this.items = items.data.data.map(r => {
         r.checked = false;
         return r
       });

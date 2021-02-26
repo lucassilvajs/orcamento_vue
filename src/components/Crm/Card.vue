@@ -1,15 +1,18 @@
 <template>
   <div class="content position-relative">
+
     <div v-if="pipe.items.filter(r => ['11'].indexOf(r.id) > -1 ).length > 0">
-
-      <div v-for="(c, ci) in pipe.items.filter(r => ['11'].indexOf(r.id) > -1 )" :key="ci"  :style="{background: JSON.parse(pipe.items.filter(r => ['11'].indexOf(r.id) > -1 )[0].aux).filter(r => r.value == c.value)[0].color}" class="color" :id="'pop-'+ci" >
-        <b-tooltip :target="'pop-'+ci"
-          placement="top"
-          :title="c.value">
-        </b-tooltip>
+      <div v-for="(c, ci) in pipe.items.filter(r => ['11'].indexOf(r.id) > -1 )" :key="ci">
+        <div v-if="c.value" :style="{background: JSON.parse(pipe.items.filter(r => ['11'].indexOf(r.id) > -1 )[0].aux).filter(r => r.value == c.value)[0].color}" class="color" :id="'pop-'+ci" >
+          <b-tooltip :target="'pop-'+ci"
+            placement="top"
+            :title="c.value">
+          </b-tooltip>
+        </div>
       </div>
-
     </div>
+
+
     <span class="py-0 px-2 position-absolute label right" :class="{label: true, 'color-white': true, 'bg-warning': differenceDays(pipe.added) < 90 && differenceDays(pipe.added) > 70, 'bg-success': differenceDays(pipe.added) <= 70, 'bg-danger': differenceDays(pipe.added) >= 90}"> {{ differenceDays(pipe.added) < 70 ? 'No prazo' : (differenceDays(pipe.added) < 90 && differenceDays(pipe.added) > 70) ? 'Atrasado' : 'Expirado'  }} </span>
 
     <span class="d-block"><b>{{pipe.title}}</b></span>
@@ -27,12 +30,12 @@
       </span>
       <span class="profile">
         <div v-for="(photo, photoIndex) in pipe.assign" :key="photoIndex">
-          <button @click="deleteCard" class="btn btn-xs btn-outline-danger">
-            <div class="glyph-icon simple-icon-trash"/>
-          </button>
           <!-- <img class="mr-1" :src="photo.image ? photo.image : 'http://via.placeholder.com/30'" :id="'photo-'+photo.id+pipe.id" alt="">
           <b-tooltip :target="'photo-'+photo.id+pipe.id" placement="top" :title="photo.name"></b-tooltip> -->
         </div>
+          <button @click="deleteCard" class="btn btn-xs btn-outline-danger">
+            <div class="glyph-icon simple-icon-trash"/>
+          </button>
       </span>
     </div>
   </div>
@@ -58,7 +61,7 @@ export default {
         return true;
       },
       async deleteCard(cardId){
-        // const
+        console.log(this.pipe)
       }
     },
     watch: {

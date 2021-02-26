@@ -136,7 +136,7 @@
       <div v-if="order.type == 4">
         <h5>Pedido está ok?</h5>
         <p>Você pode confirmar o pedido ou reprovar ele!</p>
-        <div class="alert alert-info">Preencher somente em caso de rejeição</div>
+        <div class="alert alert-warning">Preencher somente em caso de <b>rejeição</b>!</div>
         <b-form-group label="Razão da rejeição" class="has-float-label mb-2">
             <select class="form-control" v-model="sap.reason">
               <option value="incorrectDeliveryDate">Data de entrega inválida</option>
@@ -156,6 +156,7 @@
           <button class="btn btn-xs btn-success mr-3" @click="responseSap('approved')">Aprovar</button>
           <button class="btn btn-xs btn-danger" @click="responseSap('reproved')">Reprovar</button>
         </div>
+        <hr>
       </div>
       <!-- <div v-for="item in order.object.lens" :key="item.code">
         <b>{{item.type}}</b> {{item.name}}
@@ -440,6 +441,13 @@ export default {
     async responseSap(response){
       console.log(this.order)
       const data = await api.put('admin/ariba/response', {order: this.order.id, response, comment: this.sap.comment, reason: this.sap.reason});
+
+      this.getOrder();
+      this.$swal.fire({
+        title: data.data.status == 'success' ? 'Sucesso' : 'Opsss!!!',
+        text: data.data.message,
+        icon: data.data.status,
+      });
     }
 
 

@@ -31,7 +31,7 @@
           </b-card-header>
           <b-card-body class="p-1 card-area position-relative">
             <draggable :animation="100" :list="p.cards" :group="{ name: 'cards'}" style="height:100%;" @change="MoveCard">
-              <div v-for="(c, cIndex) in p.cards" :key="cIndex" @click="setInfoModal(indexPipe, cIndex)">
+              <div v-for="(c, cIndex) in p.cards" :key="cIndex" @click="setInfoModal(indexPipe, cIndex, $event)">
                 <card v-b-modal.modalCard class="mt-2 mb-3 p-3" :pipe="c" :stage="p.id" />
               </div>
             </draggable>
@@ -303,8 +303,12 @@ export default {
 
           let preenchido = this.modal.items.filter( j => {
             if(j.id == r.id) {
-              if(['checkbox'].indexOf(j.type) >= 0 && j.value.length > 0) {
-                j.value = JSON.parse(j.value);
+              try {
+                if(['checkbox'].indexOf(j.type) >= 0 && j.value.length > 0) {
+                  j.value = JSON.parse(j.value);
+                }
+              } catch (error) {
+                j.value = false;
               }
               return j
             }
@@ -316,20 +320,13 @@ export default {
             inputMesclado.push(r)
           }
         });
-
-        console.log('inputMesclado', inputMesclado)
-        this.modal.items = inputMesclado;
+          this.modal.items = inputMesclado;
       },
       hideModal (refname) {
-        this.$refs[refname].hide()
-
-        if (refname === 'modalnestedinline') {
-          this.$refs['modalnested'].show()
-        }
+        this.somethingModal(refname)
       },
       somethingModal (refname) {
         this.$refs[refname].hide()
-        console.log('something modal:: ' + refname)
 
         if (refname === 'modalnestedinline') {
           this.$refs['modalnested'].show()
@@ -337,7 +334,7 @@ export default {
       },
       async getPipe(){
         const data = await api.get('crm');
-        this.pipeBkp = this.pipe = data.data.data.pipe;
+        this.pipe = data.data.data.pipe;
         this.consultores = data.data.data.consultores;
         this.cardsInput = data.data.data.field;
       },
@@ -432,7 +429,6 @@ export default {
         card.edit = true
       },
       async editItem(card, cardId){
-
         setTimeout(async () => {
           const data = await api.put('crm/card', {
             value: card.value,
@@ -455,7 +451,10 @@ export default {
       addValue(card, value){
         console.log(card)
         this.card.value = value
-
+      },
+      // v-b-modal.modalCard
+      openModal(e) {
+        console.log(e)
       }
     },
     created(){
