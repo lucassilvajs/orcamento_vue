@@ -1,7 +1,7 @@
 <template>
 <div>
     <div class="load-generic d-none justify-content-center align-items-center">
-        <h1>Buscando pedidos...</h1>
+        <h1>Carregando</h1>
     </div>
     <footer class="page-footer">
         <div class="footer-content">

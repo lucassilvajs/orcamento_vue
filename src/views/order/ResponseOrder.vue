@@ -93,7 +93,6 @@
           <b-form-group label="Número do pedido" class="has-float-label mb-4">
               <b-form-input type="text" v-model="pc.number" />
           </b-form-group>
-          {{pc.file}}
           <b-input-group class="mb-3">
             <b-form-file v-model="pc.file" placeholder="Anexar"></b-form-file>
           </b-input-group>

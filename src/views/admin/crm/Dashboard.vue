@@ -3,21 +3,28 @@
     <b-row class="mb-3">
       <b-colxx>
         <b-card>
-          <b-row class="align-items-center justify-content-between">
-            <b-colxx xl="3" xs="12">
-              <div class="d-block d-md-inline-block pt-1 w-100">
-                  <div class="search-sm d-inline-block float-md-left mr-1 align-top w-100">
-                      <b-input placeholder="Buscar" v-model="search" @keyup="filterPipe" />
-                  </div>
-              </div>
+          <b-row v-if="pipe">
+            <b-colxx xs="12" lg="3">
+              <b-form-group label="Nome" class="has-float-label mb-2">
+                <b-form-input type="text" v-model="filter.name" />
+              </b-form-group>
             </b-colxx>
+            <b-colxx xs="12" lg="3">
+                <b-form-group label="Consultor" class="has-float-label mb-4">
+                    <b-form-select v-model="filter.consultor" :options="['TODOS',...consultores]" plain />
+                </b-form-group>
+            </b-colxx>
+            <b-colxx xl="3" xs="12"></b-colxx>
             <b-colxx xl="3" xs="12">
-              <b-button v-b-modal.modalPipe class="float-right" variant="outline-success"> <div class="glyph-icon simple-icon-plus"/> </b-button>
+              <b-button @click="getPipe()" class="float-right" variant="success">Buscar</b-button>
             </b-colxx>
           </b-row>
         </b-card>
       </b-colxx>
     </b-row>
+    <b-card class="mb-4 py-0">
+      <b-button v-b-modal.modalPipe class="float-right" variant="outline-success">Criar contato <i class="glyph-icon simple-icon-plus"/> </b-button>
+    </b-card>
     <b-row class="flex-nowrap h-100" v-if="pipe.length">
       <b-colxx md="3" v-for="(p, indexPipe) in pipe" :key="indexPipe">
         <b-card class="full-height p-3" no-body>
@@ -25,14 +32,33 @@
             <h6 class="title">{{p.name}}</h6>
 
             <div class="text-right">
-              <span class="badge badge-info">{{p.cards.length}}</span>
+              <span class="badge badge-info">{{p.total}}</span>
             </div>
 
           </b-card-header>
           <b-card-body class="p-1 card-area position-relative">
             <draggable :animation="100" :list="p.cards" :group="{ name: 'cards'}" style="height:100%;" @change="MoveCard">
-              <div v-for="(c, cIndex) in p.cards" :key="cIndex" @click="setInfoModal(indexPipe, cIndex, $event)">
+              <div v-for="(c, cIndex) in p.cards" :key="cIndex" @click="setInfoModal(indexPipe, cIndex)">
                 <card v-b-modal.modalCard class="mt-2 mb-3 p-3" :pipe="c" :stage="p.id" />
+              </div>
+
+              <div v-if="p.cards.length < p.total && p.cards.length > 0" class="text-center">
+                <b-button variant="info" :disabled="processing" :class="{'text-white mb-3 btn-multiple-state btn-shadow ml-3': true,
+                  'show-spinner': processing}" @click="buscarMais(p.id, p.cards.length, indexPipe)">
+                  <span class="spinner d-inline-block">
+                      <span class="bounce1"></span>
+                      <span class="bounce2"></span>
+                      <span class="bounce3"></span>
+                  </span>
+                  <span class="icon success">
+                      Enviar Solicitação
+                  </span>
+                  <span class="icon fail">
+                      <i class="simple-icon-exclamation"></i>
+                  </span>
+                  <span class="label">Enviar Solicitação</span>
+                </b-button>
+                <span>Mostrando {{p.cards.length}} de {{p.total}}</span>
               </div>
             </draggable>
             <div v-if="p.cards.length == 0" class="w-100 d-flex align-items-start justify-content-center position-absolute" style="top:30px;">
@@ -87,9 +113,6 @@
             </b-input-group>
 
             <span v-for="(c, i) in aux.arrConsult" :key="c" href="#" class="tag-label">{{consultores.filter(r => r.value == c)[0].text}} <button @click="aux.arrConsult.splice(i,1)" >X</button> </span>
-              <!-- <b-form-group label="Consultor responsável" class="has-float-label mb-4">
-                <b-form-select v-model="cardValue[10]" :options="consultores"></b-form-select>
-              </b-form-group> -->
             </b-colxx>
           </b-row>
           <template slot="modal-footer">
@@ -112,14 +135,14 @@
           </li>
           <li class="nav-item step-done">
             <a v-b-toggle.collapseComments href="#" class="nav-link">
-              <span class="d-block">Comentário</span>
+              <span class="d-block">Comentários</span>
             </a>
           </li>
-          <li class="nav-item step-done" v-if="[4,5,6,7,8].indexOf(parseInt(modal.stage)) >= 0 && modal.isCreator">
-            <router-link v-if="modal.idCompany" :to="`/admin/company/edit/${modal.idCompany}`" class="nav-link">
+          <li class="nav-item step-done" v-if="[4,5,6,7,8].indexOf(parseInt(modal.stage)) >= 0">
+            <router-link v-if="modal.idCompany" :to="`/app/company/edit/${modal.idCompany}`" class="nav-link">
               <span class="d-block">Cadastrar</span>
             </router-link>
-            <router-link v-if="!modal.idCompany" :to="`/admin/company/card/${modal.id}`" class="nav-link">
+            <router-link v-else :to="`/app/company/card/${modal.id}`" class="nav-link">
               <span class="d-block">Cadastrar</span>
             </router-link>
           </li>
@@ -228,9 +251,9 @@
                 </div>
                 <b-alert v-if="!modal.comment.length" show variant="info">Nenhum comentário foi adicionado</b-alert>
               </div>
-              <div class="comment-area" v-if="modal.isCreator">
+              <div class="comment-area">
                 <div class="text-area">
-                  <input type="text" v-model=modal.txtComment>
+                  <input type="text" v-model="modal.txtComment">
                   <button @click="addComment(modal.id)" class="btn btn-info">
                     <div v-if="processing" class="lds-ripple"><div></div><div></div></div>
                     <div v-else :class="'glyph-icon simple-icon-paper-plane'"/>
@@ -284,7 +307,10 @@ export default {
         search: '',
         modal: false,
         processing: false,
-
+        filter: {
+          name: '',
+          consultor: 0
+        }
       }
     },
     methods:{
@@ -303,12 +329,8 @@ export default {
 
           let preenchido = this.modal.items.filter( j => {
             if(j.id == r.id) {
-              try {
-                if(['checkbox'].indexOf(j.type) >= 0 && j.value.length > 0) {
-                  j.value = JSON.parse(j.value);
-                }
-              } catch (error) {
-                j.value = false;
+              if(['checkbox'].indexOf(j.type) >= 0 && j.value.length > 0) {
+                j.value = JSON.parse(j.value);
               }
               return j
             }
@@ -320,21 +342,28 @@ export default {
             inputMesclado.push(r)
           }
         });
-          this.modal.items = inputMesclado;
+
+        console.log('inputMesclado', inputMesclado)
+        this.modal.items = inputMesclado;
       },
       hideModal (refname) {
-        this.somethingModal(refname)
-      },
-      somethingModal (refname) {
         this.$refs[refname].hide()
 
         if (refname === 'modalnestedinline') {
           this.$refs['modalnested'].show()
         }
       },
+      somethingModal (refname) {
+        this.$refs[refname].hide()
+        console.log('something modal:: ' + refname)
+
+        if (refname === 'modalnestedinline') {
+          this.$refs['modalnested'].show()
+        }
+      },
       async getPipe(){
-        const data = await api.get('crm');
-        this.pipe = data.data.data.pipe;
+        const data = await api.get('crm', {params: this.filter});
+        this.pipeBkp = this.pipe = data.data.data.pipe;
         this.consultores = data.data.data.consultores;
         this.cardsInput = data.data.data.field;
       },
@@ -395,10 +424,13 @@ export default {
         }
       },
       async MoveCard(evt){
-        let pipeId = '';
-        let cardId = '';
 
         if(evt.added) {
+          document.querySelector('.load-generic h1').innerHTML = 'Salvando alterações...';
+          document.querySelector('.load-generic').classList.toggle('d-flex');
+          let pipeId = '';
+          let cardId = '';
+
           cardId = evt.added.element.id;
           this.pipe.forEach(r => {
             r.cards.forEach(p => {
@@ -410,25 +442,34 @@ export default {
 
           const data = await api.put('crm', {
             stage: pipeId,
-            card: cardId
+            card: cardId,
+            filter: this.filter
           });
 
-          this.pipe.forEach(r => {
+          this.pipe.forEach((r, i) => {
+            r.total = data.data.data.pipe[i].total
             r.cards.forEach(p => {
               if(p.id == cardId) {
-                p.comment = data.data.data.comment;
-                p.historic = data.data.data.historic;
+                p.comment = data.data.data.card.comment;
+                p.historic = data.data.data.card.historic;
               }
             });
+
+            r = r;
           });
 
+          document.querySelector('.load-generic').classList.toggle('d-flex');
+          document.querySelector('.load-generic h1').innerHTML = 'Buscando';
         }
+
+
 
       },
       async editForm(card){
         card.edit = true
       },
       async editItem(card, cardId){
+
         setTimeout(async () => {
           const data = await api.put('crm/card', {
             value: card.value,
@@ -439,8 +480,6 @@ export default {
           this.modal.comment = data.data.data.comment;
           this.modal.historic = data.data.data.historic;
         }, 500);
-
-
         card.edit = false
       },
       filterPipe(){
@@ -452,9 +491,17 @@ export default {
         console.log(card)
         this.card.value = value
       },
-      // v-b-modal.modalCard
-      openModal(e) {
-        console.log(e)
+      async buscarMais(id, total, index){
+        this.processing = true;
+        const data = await api.get(`crm/pipe/${id}`, {
+          params: {
+            total,
+            filter: this.filter
+          }
+        });
+
+        this.pipe[index].cards = this.pipe[index].cards.concat(data.data.data);
+        this.processing = false;
       }
     },
     created(){

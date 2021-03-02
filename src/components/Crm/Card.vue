@@ -3,7 +3,8 @@
 
     <div v-if="pipe.items.filter(r => ['11'].indexOf(r.id) > -1 ).length > 0">
       <div v-for="(c, ci) in pipe.items.filter(r => ['11'].indexOf(r.id) > -1 )" :key="ci">
-        <div v-if="c.value" :style="{background: JSON.parse(pipe.items.filter(r => ['11'].indexOf(r.id) > -1 )[0].aux).filter(r => r.value == c.value)[0].color}" class="color" :id="'pop-'+ci" >
+        <div v-if="c.value"
+          :style="{background: JSON.parse(pipe.items.filter(r => ['11'].indexOf(r.id) > -1 )[0].aux).filter(r => r.value == c.value)[0].color}" class="color" :id="'pop-'+ci" >
           <b-tooltip :target="'pop-'+ci"
             placement="top"
             :title="c.value">
