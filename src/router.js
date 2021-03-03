@@ -131,6 +131,10 @@ const routes = [
     component: () => import(/* webpackChunkName: "error" */ "./views/Error")
   },
   {
+    path: "/politica-seguranca-privacidade",
+    component: () => import(/* webpackChunkName: "error" */ "./views/app/politica-seguranca-privacidade")
+  },
+  {
     path: "/",
     component: () => import(/* webpackChunkName: "user" */ "./views/user"),
     redirect: "/login",

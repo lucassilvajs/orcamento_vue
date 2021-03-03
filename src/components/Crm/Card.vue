@@ -31,12 +31,11 @@
       </span>
       <span class="profile">
         <div v-for="(photo, photoIndex) in pipe.assign" :key="photoIndex">
-          <!-- <img class="mr-1" :src="photo.image ? photo.image : 'http://via.placeholder.com/30'" :id="'photo-'+photo.id+pipe.id" alt="">
-          <b-tooltip :target="'photo-'+photo.id+pipe.id" placement="top" :title="photo.name"></b-tooltip> -->
+
         </div>
-          <button @click="deleteCard" class="btn btn-xs btn-outline-danger">
-            <div class="glyph-icon simple-icon-trash"/>
-          </button>
+        <button @click="deleteCard" class="btn btn-xs btn-outline-danger">
+          <div class="glyph-icon simple-icon-trash"/>
+        </button>
       </span>
     </div>
   </div>

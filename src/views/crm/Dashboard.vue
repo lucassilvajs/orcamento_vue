@@ -392,15 +392,6 @@ export default {
 
       },
       async addCard(){
-        if(!this.aux.arrConsult || this.aux.arrConsult.length == 0) {
-          this.$notify("error", 'Opsss...!', "Por favor adicione um responsável para o card", {
-            duration: 3000,
-            permanent: false
-          });
-
-          return false;
-        }
-        this.cardValue.consultor = this.aux.arrConsult;
         const data = await api.post('crm', this.cardValue);
         // this.pipe[0].cards.unshift(data.data.data);
         this.getPipe()
