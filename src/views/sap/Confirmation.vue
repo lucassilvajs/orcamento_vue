@@ -1,7 +1,10 @@
 <template>
 <div>
     <b-row v-if="!success">
-        <b-colxx xxs="12">
+        <b-colxx xxs="3" md="3" class="mt-4" v-if="company && false">
+          <list-sap :company="company" @setOrder="setOrder" />
+        </b-colxx>
+        <b-colxx xxs="12" class="mt-4">
             <b-card class="mb-4" title="Confirmação da solicitação">
                 <b-row v-if="order.type_user != 'distribuidor'">
                     <b-colxx md="3" lg="3" class="">
@@ -74,13 +77,21 @@
         </b-colxx>
     </b-row>
     <b-row v-if="success" class="text-center align-items-center justify-content-center h-100">
-      <b-card>
-        <b-colxx class="text-success">
-          <h3>Pedido concluído com sucesso!</h3>
-          <h5>Seu pedido foi concluído com sucesso e já está em processo de confecção.</h5>
-        </b-colxx>
+      <b-colxx xxs="3" md="3" class="mt-4" v-if="company && false">
+        <list-sap :company="company" @setOrder="setOrder" />
+      </b-colxx>
+      <b-colxx class="mt-4" xxs="12" md="12">
+        <b-card>
+          <b-colxx>
+            <h2 class="text-success" v-if="!link">Pedido concluído com sucesso!</h2>
+            <h2 class="text-success" v-if="link">Linha inserida com sucesso</h2>
+            <h5 v-if="!link">Seu pedido foi concluído com sucesso e já está em processo de confecção.</h5>
+            <h5 v-if="link">A linha na qual você preencheu foi concluída com sucesso! <br /> Você tem outras linhas pendentes se quiser conclui-lás clique no botão abaixo</h5>
 
-      </b-card>
+            <router-link v-if="link" :to="`/sap-order/${link}`" class="btn btn-outline-success">Nova solicitação</router-link>
+          </b-colxx>
+        </b-card>
+      </b-colxx>
     </b-row>
 </div>
 </template>
@@ -93,9 +104,12 @@ import {
 } from 'vuex'
 import {api, baseURL} from '@/constants/config';
 import myBreadCrumb from '@/components/breadcrumb';
+import listSap from '@/components/ListSap';
+
 export default {
     components: {
-        'my-breadcrumb': myBreadCrumb
+        'my-breadcrumb': myBreadCrumb,
+        'list-sap': listSap,
     },
     data() {
         return {
@@ -104,7 +118,9 @@ export default {
             processing: false,
             uploadError: false,
             orderAwaiting: 0,
-            success: false
+            success: false,
+            company: JSON.parse(window.localStorage.getItem('information')),
+            link: null
         }
     },
 
@@ -179,8 +195,27 @@ export default {
               order.new = true;
             }
 
-            order.order_id = order.company.order
-            order.company = null;
+            let orderSeted = 0;
+            let information = JSON.parse(window.localStorage.getItem('information'));
+
+            if(information.orders.length > 1) {
+              let used = information.orders.filter(r => r.used);
+              console.log(used)
+              if(used.length == 0) {
+                this.$notify("error", 'Opsss...!', 'Você precisa selecionar um pedido para vincularmos a essa solicitação', {
+                    duration: 10000,
+                    permanent: false
+                });
+                this.processing = false;
+                return false;
+              }else{
+                orderSeted = used[0].order;
+              }
+            }else{
+              orderSeted = order.company.order;
+            }
+
+            order.order_id = orderSeted;
 
             const response = await api.put('/ariba/order', order);
             let data = response.data;
@@ -190,43 +225,20 @@ export default {
                     permanent: false
                 });
 
+                information.orders = information.orders.map(r => {
+                  if(r.used) r.status = 'complete'
+                  return r
+                });
+
                 window.localStorage.removeItem('order');
                 this.success = true
-            }else{
-                this.uploadError = false;
-                this.$notify("error", 'Opsss...!', data.message, {
-                    duration: 3000,
-                    permanent: false
-                });
-                this.processing = false
-            }
 
-          }
-      },
-      sendInfoDistribuidor: async function(){
-          if(false) {
-              this.$notify("error", "Faltam algumas coisas", this.valido.message, {
-                  duration: 3000,
-                  permanent: false
-              });
-          }else{
-            this.processing = true;
-            let order = JSON.parse(window.localStorage.getItem('order'));
-            if(this.order.new) { // Verifica se o usuário necessita cadastrar multiplos pedidos antes de efetuar a proposta
-              order.new = true;
-            }
+                if(information.orders.filter(r => r.status == 'incomplete').length > 0) {
+                  this.link = data.redirect
+                }
 
-            order.distribuidor = this.type_user == 'distribuidor';
-            const response = await api.post('/order', order);
-            let data = response.data;
-            if(data.status == 'success') {
-                this.$notify("success", `Pedido #${data.data.order.id}`, data.message, {
-                    duration: 3000,
-                    permanent: false
-                });
-
+                window.localStorage.setItem('information', JSON.stringify(information));
                 window.localStorage.removeItem('order');
-                this.$router.push(data.data.order.target);
             }else{
                 this.uploadError = false;
                 this.$notify("error", 'Opsss...!', data.message, {
@@ -235,6 +247,8 @@ export default {
                 });
                 this.processing = false
             }
+
+
           }
       },
       infoOrder: function() {
@@ -243,6 +257,16 @@ export default {
               this.$router.push('/login');
           }
       },
+
+      setOrder: function(order){
+        let information = JSON.parse(window.localStorage.getItem('information'));
+        information.orders = information.orders.map((r, i) => {
+          r.used = i == order ? true : false;
+          return r
+        });
+
+        window.localStorage.setItem('information', JSON.stringify(information))
+      }
     },
     created() {
         this.infoOrder();

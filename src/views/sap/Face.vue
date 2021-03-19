@@ -16,10 +16,12 @@
 <script>
 import takePhoto from '@/components/TakePhotoDefault';
 import myBreadCrumb from '@/components/breadcrumb';
+import listSap from '@/components/ListSap';
 export default {
     components: {
         'my-breadcrumb': myBreadCrumb,
         'take-photo': takePhoto,
+        'list-sap': listSap,
 	},
 	methods: {
     photoInfo(info){

@@ -1,38 +1,40 @@
 <template>
 <div>
-    <b-row>
-      <b-colxx xxs="12" md="12" class="mt-4">
-        <b-row>
-            <b-colxx xxs="12">
-                <b-card class="mb-4" title="Dados do pedido">
-                    <b-row>
-                        <b-colxx>
-                            <form @submit.prevent="formStepOne" class="form" v-if="company && company.fields">
-                                <b-row>
-                                    <b-colxx lg="4">
-                                        <b-form-group label="Nome do colaborador" class="has-float-label mb-4">
-                                            <b-form-input type="text" v-model="values[0]" />
-                                        </b-form-group>
-                                    </b-colxx>
-                                    <b-colxx lg="4" v-for="(field, index) in company.fields" :key="index">
-                                        <b-form-group :label="field" class="has-float-label mb-4">
-                                            <b-form-input type="text" v-model="values[index+1]" />
-                                        </b-form-group>
-                                    </b-colxx>
-                                </b-row>
-                                <b-row>
-                                    <b-colxx lg="12">
-                                        <button type="submit" class="btn btn-outline-success float-right">Próximo</button>
-                                    </b-colxx>
-                                </b-row>
-                            </form>
-                        </b-colxx>
-                    </b-row>
-                </b-card>
+    <b-row class="justify-content-center">
 
-            </b-colxx>
-        </b-row>
+      <b-colxx class="mt-4 bg-white" v-if="company && !isSetted">
+        <h6 class="text-center my-2">Selecione abaixo qual linha você gostaria concluir o seu pedido</h6>
+        <list-sap :company="company" @setOrder="setOrder" />
       </b-colxx>
+
+      <b-colxx v-if="isSetted" class="mt-4">
+          <b-card class="mb-4" title="Dados do pedido">
+              <b-row>
+                  <b-colxx>
+                      <form @submit.prevent="formStepOne" class="form" v-if="company && company.fields">
+                          <b-row>
+                              <b-colxx lg="4">
+                                  <b-form-group label="Nome do colaborador" class="has-float-label mb-4">
+                                      <b-form-input type="text" v-model="values[0]" />
+                                  </b-form-group>
+                              </b-colxx>
+                              <b-colxx lg="4" v-for="(field, index) in company.fields" :key="index">
+                                  <b-form-group :label="field" class="has-float-label mb-4">
+                                      <b-form-input type="text" v-model="values[index+1]" />
+                                  </b-form-group>
+                              </b-colxx>
+                          </b-row>
+                          <b-row>
+                              <b-colxx lg="12">
+                                  <button type="submit" class="btn btn-outline-success float-right">Próximo</button>
+                              </b-colxx>
+                          </b-row>
+                      </form>
+                  </b-colxx>
+              </b-row>
+          </b-card>
+      </b-colxx>
+
     </b-row>
 </div>
 </template>
@@ -42,14 +44,17 @@
 import vSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
 import myBreadCrumb from '@/components/breadcrumb';
+import listSap from '@/components/ListSap';
 import {api, baseURL} from '@/constants/config';
 export default {
     components: {
+        'list-sap': listSap,
         'my-breadcrumb': myBreadCrumb,
         'v-select': vSelect,
     },
     data() {
         return {
+          isSetted: false,
           baseURL,
             form: {
                 name: '',
@@ -114,6 +119,17 @@ export default {
             window.localStorage.setItem('order', JSON.stringify(order));
             this.$router.push("/sap/products");
         },
+
+        setOrder: function(order){
+          this.isSetted = true;
+          let information = JSON.parse(window.localStorage.getItem('information'));
+          information.orders = information.orders.map((r, i) => {
+            r.used = i == order ? true : false;
+            return r
+          });
+
+          window.localStorage.setItem('information', JSON.stringify(information))
+        }
     },
 
     watch: {
@@ -124,3 +140,9 @@ export default {
     }
 }
 </script>
+
+<style>
+a{
+    color: #00b3b7
+}
+</style>

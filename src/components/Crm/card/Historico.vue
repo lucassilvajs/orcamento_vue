@@ -1,0 +1,52 @@
+<template>
+  <div class="historic d-flex flex-column justify-content-end" v-if="history">
+    <div class="comments-area" style="overflow: auto;">
+      <div class="actives mb-3 d-flex flex-column" v-for="(historic, historicIndex) in history" :key="historicIndex">
+        <div class="d-flex align-items-start">
+          <div :class="'mr-3 status-item ' + historic.color">
+            <div :class="'glyph-icon ' + historic.icon"/>
+          </div>
+          <div>
+            <h3 class="title-active mb-0">{{historic.title}}</h3>
+            <span class="time">{{historic.added}}</span>
+          </div>
+        </div>
+        <div v-if="historic.description" class="description" v-html="historic.description">
+        </div>
+      </div>
+      <b-alert v-if="!history" show variant="info">Nenhuma atividade foi encontrada</b-alert>
+    </div>
+  </div>
+  <div v-else class="d-flex align-items-center justify-content-center">
+    <h1>Buscando histórico</h1>
+  </div>
+</template>
+
+<script>
+import {TheMask} from 'vue-the-mask';
+import {Money} from '@/vmoney.js';
+import VueDropzone from 'vue2-dropzone';
+import {api, baseURL, firebaseConfig} from '@/constants/config';
+
+export default {
+    props: ['history'],
+    data() {
+      return {
+        selectedValueSingle: null
+      }
+    },
+    components: {
+      TheMask,
+      Money,
+    },
+    computed: {
+    },
+    methods: {
+    },
+    watch: {
+    }
+}
+</script>
+<style>
+
+</style>

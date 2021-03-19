@@ -2,7 +2,7 @@
 <div class="sidebar" @mouseenter="isMenuOver=true" @mouseleave="isMenuOver=false" @touchstart="isMenuOver=true">
     <div class="main-menu">
         <vue-perfect-scrollbar class="scroll" :settings="{ suppressScrollX: true, wheelPropagation: false }">
-            <ul class="list-unstyled">
+            <ul class="list-unstyled" v-if="menuItems">
                 <li v-for="(item,index) in menuItems" :class="{ 'active' : (selectedParentMenu === item.id && viewingParentMenu === '') || viewingParentMenu === item.id }" :key="`parent_${item.id}`" :data-flag="item.id">
                     <a v-if="item.newWindow" :href="item.to" rel="noopener noreferrer" target="_blank">
                         <i :class="item.icon" />
@@ -10,17 +10,18 @@
                     </a>
                     <a v-else-if="item.subs && item.subs.length>0" @click.prevent="openSubMenu($event,item)" :href="`#${item.to}`"><i :class="item.icon" />
                         {{ $t(item.label) }}</a>
-                    <router-link v-else @click.native="changeSelectedParentHasNoSubmenu(item.id)" :to="item.to"><i :class="item.icon" />
-                        {{ $t(item.label) }}</router-link>
+                    <router-link v-else @click.native="changeSelectedParentHasNoSubmenu(item.id)" :to="item.to"><i class="position-relative" :class="item.icon"><span class="my-badge" v-if="item.notification">{{item.notification}}</span></i>
+                        {{ $t(item.label) }}
+                    </router-link>
                 </li>
             </ul>
         </vue-perfect-scrollbar>
     </div>
 
     <div class="sub-menu">
-        <vue-perfect-scrollbar class="scroll" :settings="{ suppressScrollX: true, wheelPropagation: false }">
+        <vue-perfect-scrollbar class="scroll" :settings="{ suppressScrollX: true, wheelPropagation: false }" v-if="menuItems">
             <ul v-for="(item,itemIndex) in menuItems" :class="{'list-unstyled':true, 'd-block' : (selectedParentMenu === item.id && viewingParentMenu === '') || viewingParentMenu === item.id }" :data-parent="item.id" :key="`sub_${item.id}`">
-                <li v-for="(sub,subIndex) in item.subs" :class="{'has-sub-item' : sub.subs && sub.subs.length > 0 , 'active' : $route.path.indexOf(sub.to)>-1}">
+                <li v-for="(sub,subIndex) in item.subs" :class="{'has-sub-item' : sub.subs && sub.subs.length > 0 , 'active' : $route.path.indexOf(sub.to)>-1}" :key="subIndex">
                     <a v-if="sub.newWindow" :href="sub.to" rel="noopener noreferrer" target="_blank">
                         <i :class="sub.icon" />
                         <span>{{ $t(sub.label) }}</span>
@@ -37,7 +38,9 @@
 
                                     <router-link v-else :to="thirdLevelSub.to">
                                         <i :class="thirdLevelSub.icon" />
-                                        <span>{{ $t(thirdLevelSub.label) }}</span>
+                                        <span class="position-relative">{{ $t(thirdLevelSub.label) }}
+                                          <span class="my-badge" v-if="thirdLevelSub.notification">{{thirdLevelSub.notification}}</span>
+                                        </span>
                                     </router-link>
                                 </li>
                             </ul>
@@ -46,7 +49,9 @@
                     </template>
                     <router-link v-else :to="sub.to">
                         <i :class="sub.icon" />
-                        <span>{{ $t(sub.label) }}</span>
+                        <span class="position-relative">{{ $t(sub.label) }}
+                          <span class="my-badge" v-if="sub.notification">{{sub.notification}}</span>
+                        </span>
                     </router-link>
                 </li>
             </ul>
@@ -64,14 +69,15 @@ import {
     menuHiddenBreakpoint,
     subHiddenBreakpoint
 } from '@/constants/config'
-import menuItems from '@/constants/admin/menu'
+// import menuItems from '@/constants/admin/menu';
+import { api, baseURL } from '@/constants/config';
 
 export default {
     data() {
         return {
             selectedParentMenu: '',
             isMenuOver: false,
-            menuItems,
+            menuItems: null,
             viewingParentMenu: ''
         }
     },
@@ -113,7 +119,6 @@ export default {
 
             return isCurrentMenuHasSubItem;
         },
-
         changeSelectedParentHasNoSubmenu(parentMenu) {
             this.selectedParentMenu = parentMenu
             this.viewingParentMenu = parentMenu
@@ -124,7 +129,6 @@ export default {
                 selectedMenuHasSubItems: false
             })
         },
-
         openSubMenu(e, menuItem) {
             const selectedParent = menuItem.id;
             const hasSubMenu = menuItem.subs && menuItem.subs.length > 0;
@@ -251,6 +255,10 @@ export default {
             }
             return nextClasses
         },
+        async getMenu(){
+          const data = await api.get('admin/menu');
+          this.menuItems = data.data.data.menu;
+        }
     },
     computed: {
         ...mapGetters({
@@ -261,6 +269,7 @@ export default {
     },
     watch: {
         '$route'(to, from) {
+          this.getMenu()
             if (to.path !== from.path) {
 
                 const toParentUrl = to.path.split('/').filter(x => x !== '')[1];
@@ -280,6 +289,23 @@ export default {
                 window.scrollTo(0, top)
             }
         }
+    },
+    created(){
+      this.getMenu()
     }
 }
 </script>
+<style scoped>
+.my-badge {
+    position: absolute;
+    top: -5px;
+    color: #fff;
+    background: #c00;
+    font-size: .7rem;
+    width: 17px;
+    height: 17px;
+    padding: 0;
+    text-align: center;
+    border-radius: 50%;
+}
+</style>

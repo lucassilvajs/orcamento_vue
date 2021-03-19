@@ -24,7 +24,7 @@ import vuePerfectScrollbar from 'vue-perfect-scrollbar'
 import contentmenu from 'v-contextmenu'
 import VueLineClamp from 'vue-line-clamp'
 import VCalendar from 'v-calendar'
-import 'v-calendar/lib/v-calendar.min.css'
+// import 'v-calendar/lib/v-calendar.min.css'
 import VueScrollTo from 'vue-scrollto'
 import VueSweetalert2 from 'vue-sweetalert2';
 
@@ -83,6 +83,38 @@ Vue.filter("numeroPreco", valor => {
   } else {
     return "";
   }
+});
+
+
+Vue.filter("timeSince", date => {
+  var seconds = Math.floor((new Date() - (new Date(date)) ) / 1000);
+
+  var interval = seconds / 31536000;
+
+  if (interval > 1) {
+    return Math.floor(interval) + " Anos";
+  }
+
+  interval = seconds / 2592000;
+  if (interval > 1) {
+    return Math.floor(interval) + " Meses";
+  }
+
+  interval = seconds / 86400;
+  if (interval > 1) {
+    return Math.floor(interval) + " Dias";
+  }
+
+  interval = seconds / 3600;
+  if (interval > 1) {
+    return Math.floor(interval) + " Horas";
+  }
+
+  interval = seconds / 60;
+  if (interval > 1) {
+    return Math.floor(interval) + " Minutos";
+  }
+  return Math.floor(seconds) + " Segundos";
 });
 
 Vue.filter("capitalize", valor => {

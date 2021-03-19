@@ -8,7 +8,7 @@
             <mobile-menu-icon />
         </a>
 
-                  <b-modal id="modalbackdrop" ref="modalbackdrop" size="lg" title="Seus pedidos pendentes">
+          <b-modal id="modalbackdrop" ref="modalbackdrop" size="lg" title="Seus pedidos pendentes">
             <table class="table">
               <thead>
                 <tr>
@@ -55,9 +55,9 @@
             </b-button>
                 <b-button variant="secondary" @click="hideModal('modalbackdrop')">Fechar</b-button>
             </template>
-        </b-modal>
+          </b-modal>
 
-                <div v-if="true" class="header-icons d-inline-block align-middle">
+          <div v-if="true" class="header-icons d-inline-block align-middle">
             <div class="position-relative d-inline-block">
                 <b-dropdown variant="empty" size="sm" right toggle-class="header-icon notificationButton" menu-class="position-absolute mt-3 notificationDropdown" no-caret>
                     <template slot="button-content">
@@ -91,7 +91,7 @@
                     </b-button>
                 </div>
             </div>
-        </div>
+          </div>
 
 
     </div>

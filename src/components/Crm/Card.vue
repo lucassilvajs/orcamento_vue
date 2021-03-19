@@ -13,30 +13,27 @@
       </div>
     </div>
 
+    <span v-if="differenceDays(pipe.added) < 90 && differenceDays(pipe.added) > 70" class="py-0 px-2 label right color-white bg-warning">Atrasado</span>
+    <span v-else-if="differenceDays(pipe.added) <= 70" class="py-0 px-2 label right color-white bg-success">No prazo</span>
+    <span v-else class="py-0 px-2 label right color-white bg-danger">Atrasado</span>
 
-    <span class="py-0 px-2 position-absolute label right" :class="{label: true, 'color-white': true, 'bg-warning': differenceDays(pipe.added) < 90 && differenceDays(pipe.added) > 70, 'bg-success': differenceDays(pipe.added) <= 70, 'bg-danger': differenceDays(pipe.added) >= 90}"> {{ differenceDays(pipe.added) < 70 ? 'No prazo' : (differenceDays(pipe.added) < 90 && differenceDays(pipe.added) > 70) ? 'Atrasado' : 'Expirado'  }} </span>
+
+    <!-- <span class="py-0 px-2 label right" :class="{label: true, 'color-white': true, 'bg-warning': , 'bg-success': , 'bg-danger': differenceDays(pipe.added) >= 90}"> {{ differenceDays(pipe.added) < 70 ? 'No prazo' : (differenceDays(pipe.added) < 90 && differenceDays(pipe.added) > 70) ? 'Atrasado' : 'Expirado'  }} </span> -->
+
 
     <span class="d-block"><b>{{pipe.title}}</b></span>
     <hr class="my-1">
     <span class="d-block" v-for="(info, infoIndex) in pipe.items.filter(r => r.id  == 3)" :key="infoIndex"><b>{{info.label}}:</b> <div v-if="info.type == 'checkbox'"> <span class="d-block" v-for="(v,i) in JSON.parse(info.value)" :key="i">- {{v}} </span> </div> <span v-else>{{info.value}}</span> </span>
-    <span class="d-block"><b>Responsável: </b>{{pipe.assign[0].name}}</span>
+    <span class="d-block" v-if="pipe.creator"><b>Responsável: </b>{{pipe.creator.name}}</span>
+    <span class="d-block" v-else><b>Responsável: </b>Não atríbuido</span>
     <div class="controller d-flex justify-content-between mt-4">
       <span class="comments d-flex align-items-center">
         <div class="glyph-icon iconsminds-speach-bubble-2"/>
-        <span class="value mx-2"> {{pipe.comment.length}} </span>
+        <span class="value mx-2"> {{pipe.comment}} </span>
       </span>
       <span class="comments d-flex align-items-center">
         <div class="glyph-icon simple-icon-clock"/>
-        <span class="value mx-2"> {{pipe.historic.length}} </span>
-      </span>
-      <span class="profile">
-        <div v-for="(photo, photoIndex) in pipe.assign" :key="photoIndex">
-          <!-- <img class="mr-1" :src="photo.image ? photo.image : 'http://via.placeholder.com/30'" :id="'photo-'+photo.id+pipe.id" alt="">
-          <b-tooltip :target="'photo-'+photo.id+pipe.id" placement="top" :title="photo.name"></b-tooltip> -->
-        </div>
-          <button @click="deleteCard" class="btn btn-xs btn-outline-danger">
-            <div class="glyph-icon simple-icon-trash"/>
-          </button>
+        <span class="value mx-2"> {{pipe.historic}} </span>
       </span>
     </div>
   </div>
@@ -45,30 +42,19 @@
 <script>
 import RadialProgressBar from 'vue-radial-progress'
 export default {
-    props: ['pipe', 'stage'],
+    props: ['pipe'],
     components: {
         'radial-progress-bar' : RadialProgressBar
     },
     methods: {
       differenceDays(start, end = new Date()){
-        return new Date().getTime(end) / 1000 /60 /60 /24 - new Date(start).getTime() / 1000 /60 /60 /24
-      },
-      isJson(str) {
-        try {
-            JSON.parse(str);
-        } catch (e) {
-            return false;
-        }
-        return true;
+        return new Date().getTime(end) /1000/60/60/24 - new Date(start).getTime() /1000/60/60/24
       },
       async deleteCard(cardId){
         console.log(this.pipe)
       }
     },
     watch: {
-      stage: function(newVal, oldVal) {
-        console.log(newVal, oldVal)
-      }
     }
 }
 </script>
@@ -77,6 +63,7 @@ export default {
   background: #ededed;
   border-radius: 3px;
   cursor: move;
+  box-shadow: 2px 2px 4px rgba(100,100,100,.3);
 }
 
 span.label {
