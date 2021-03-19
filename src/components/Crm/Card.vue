@@ -19,7 +19,7 @@
     <span class="d-block"><b>{{pipe.title}}</b></span>
     <hr class="my-1">
     <span class="d-block" v-for="(info, infoIndex) in pipe.items.filter(r => r.id  == 3)" :key="infoIndex"><b>{{info.label}}:</b> <div v-if="info.type == 'checkbox'"> <span class="d-block" v-for="(v,i) in JSON.parse(info.value)" :key="i">- {{v}} </span> </div> <span v-else>{{info.value}}</span> </span>
-    <span class="d-block"><b>Responsável: </b>{{pipe.assign[0].name}}</span>
+    <span class="d-block" v-if="pipe.creator"><b>Responsável: </b>{{pipe.creator.name}}</span>
     <div class="controller d-flex justify-content-between mt-4">
       <span class="comments d-flex align-items-center">
         <div class="glyph-icon iconsminds-speach-bubble-2"/>
@@ -30,9 +30,6 @@
         <span class="value mx-2"> {{pipe.historic.length}} </span>
       </span>
       <span class="profile">
-        <div v-for="(photo, photoIndex) in pipe.assign" :key="photoIndex">
-
-        </div>
         <button @click="deleteCard" class="btn btn-xs btn-outline-danger">
           <div class="glyph-icon simple-icon-trash"/>
         </button>
