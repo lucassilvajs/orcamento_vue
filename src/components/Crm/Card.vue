@@ -20,15 +20,15 @@
 
     <!-- <span class="py-0 px-2 label right" :class="{label: true, 'color-white': true, 'bg-warning': , 'bg-success': , 'bg-danger': differenceDays(pipe.added) >= 90}"> {{ differenceDays(pipe.added) < 70 ? 'No prazo' : (differenceDays(pipe.added) < 90 && differenceDays(pipe.added) > 70) ? 'Atrasado' : 'Expirado'  }} </span> -->
 
-
     <span class="d-block"><b>{{pipe.title}}</b></span>
     <hr class="my-1">
     <span class="d-block" v-for="(info, infoIndex) in pipe.items.filter(r => r.id  == 3)" :key="infoIndex"><b>{{info.label}}:</b> <div v-if="info.type == 'checkbox'"> <span class="d-block" v-for="(v,i) in JSON.parse(info.value)" :key="i">- {{v}} </span> </div> <span v-else>{{info.value}}</span> </span>
     <span class="d-block" v-if="pipe.creator"><b>Responsável: </b>{{pipe.creator.name}}</span>
-    <span class="d-block" v-else><b>Responsável: </b>Não atríbuido</span>
+    <hr>
+    <span class="d-block mt-2" v-if="pipe.return"><b>Retorno: </b> {{pipe.return | datetime}}</span>
     <div class="controller d-flex justify-content-between mt-4">
       <span class="comments d-flex align-items-center">
-        <div class="glyph-icon iconsminds-speach-bubble-2"/>
+        <div class="glyph-icon iconsminds-speach-bubble"/>
         <span class="value mx-2"> {{pipe.comment}} </span>
       </span>
       <span class="comments d-flex align-items-center">

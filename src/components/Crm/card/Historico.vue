@@ -14,11 +14,11 @@
         <div v-if="historic.description" class="description" v-html="historic.description">
         </div>
       </div>
-      <b-alert v-if="!history" show variant="info">Nenhuma atividade foi encontrada</b-alert>
+      <b-alert v-if="history.length == 0" show variant="info">Nenhuma atividade foi encontrada</b-alert>
     </div>
   </div>
-  <div v-else class="d-flex align-items-center justify-content-center">
-    <h1>Buscando histórico</h1>
+  <div v-else class="d-flex align-items-center justify-content-center h-100">
+    <h3>Buscando histórico...</h3>
   </div>
 </template>
 
@@ -29,10 +29,11 @@ import VueDropzone from 'vue2-dropzone';
 import {api, baseURL, firebaseConfig} from '@/constants/config';
 
 export default {
-    props: ['history'],
+    props: ['id'],
     data() {
       return {
-        selectedValueSingle: null
+        selectedValueSingle: null,
+        history: null
       }
     },
     components: {
@@ -42,8 +43,18 @@ export default {
     computed: {
     },
     methods: {
+      async getHistory(){
+        const data = await api.get(`crm/card/history/${this.id}`);
+
+        if(data.data.status == 'success') {
+          this.history = data.data.data.historic;
+        }
+      }
     },
     watch: {
+    },
+    created(){
+      this.getHistory()
     }
 }
 </script>

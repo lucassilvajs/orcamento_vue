@@ -1,43 +1,45 @@
 <template>
-  <div v-if="info">
+  <div>
     <div class="my-modal-card" :class="{ativo}">
-      <div class="my-modal-content">
+    {{ativo}}
+      <div class="my-modal-content" v-if="card">
         <div class="my-modal-header d-flex justify-content-between align-items-center pb-4">
           <div class="card-info text-secondary">ID - #{{card}}</div>
-            <div class="card-settings d-flex align-items-center flex-end">
-                <div v-if="[4,5,6,7,8].indexOf(parseInt(info.card.idStage)) >= 0">
-                  <router-link v-if="info.card.idCompany" :to="`/app/company/edit/${info.card.idCompany}`" class="btn btn-success btn-xs mr-3" @click="getInfo">Cadastrar empresa <i class="glyph-icon simple-icon-plus"/> </router-link>
-                  <router-link v-else :to="`/app/company/card/${card}`" class="btn btn-success btn-xs mr-3" @click="getInfo">Cadastrar empresa <i class="glyph-icon simple-icon-plus"/> </router-link>
-                </div>
-                <div class="d-block d-md-inline-block pt-1">
-                  <b-dropdown id="ddown1" text='Configurações' variant="outline-dark" class="mr-1 float-md-left btn-group " size="xs">
-                      <b-dropdown-item >Excluir</b-dropdown-item>
-                  </b-dropdown>
-                </div>
-              <button class="close" @click="ativo = !ativo">X</button>
-            </div>
+          <div class="card-settings d-flex align-items-center flex-end" v-if="info">
+              <div v-if="[4,5,6,7,8].indexOf(parseInt(info.card.idStage)) >= 0">
+                <router-link v-if="info.card.idCompany" :to="`/app/company/edit/${info.card.idCompany}`" class="btn btn-success btn-xs mr-3 text-white">Cadastrar empresa <i class="glyph-icon simple-icon-plus"/> </router-link>
+                <router-link v-else :to="`/app/company/card/${card}`" class="btn btn-success btn-xs mr-3 text-white">Cadastrar empresa <i class="glyph-icon simple-icon-plus"/> </router-link>
+              </div>
+              <div class="d-block d-md-inline-block pt-1">
+                <b-dropdown id="ddown1" text='Configurações' variant="outline-dark" class="mr-1 float-md-left btn-group " size="xs">
+                    <b-dropdown-item @click="deleteCard">Excluir</b-dropdown-item>
+                </b-dropdown>
+              </div>
+            <button class="close" @click="ativo = !ativo">X</button>
+          </div>
+          <button v-else class="close" @click="ativo = !ativo">X</button>
         </div>
-        <div class="modal-card-body d-flex justify-content-between">
+        <div class="modal-card-body d-flex justify-content-between" v-if="info">
           <div class="form-area w-50 px-2">
             <h1 class="card-title mb-0 pb-0">{{info.card.title}}</h1>
             <h5 class="form-creator mb-3">Criado por {{info.card.consult}} - há {{info.card.date | timeSince}}</h5>
             <div class="control my-3">
               <button @click="areaActive = 1" :class="{'active' : (areaActive == 1)}"> <i class="glyph-icon iconsminds-filter-2"></i> Oportunidade </button>
               <button v-if="false" @click="areaActive = 2" :class="{'active' : (areaActive == 2)}"> <i class="simple-icon-paper-clip"></i> Anexos </button>
-              <button @click="areaActive = 3" :class="{'active' : (areaActive == 3)}"> <i class="glyph-icon simple-icon-calendar"></i> Retorno <span>5</span> </button>
-              <button @click="areaActive = 4" :class="{'active' : (areaActive == 4)}"> <i class="glyph-icon iconsminds-speach-bubble-6"></i> Comentários <span>5</span> </button>
-              <button @click="areaActive = 5" :class="{'active' : (areaActive == 5)}"> <i class="glyph-icon simple-icon-clock"></i> Histórico <span>5</span> </button>
+              <button @click="areaActive = 3" :class="{'active' : (areaActive == 3)}"> <i class="glyph-icon simple-icon-calendar"></i> Retorno </button>
+              <button @click="areaActive = 4" :class="{'active' : (areaActive == 4)}"> <i class="glyph-icon iconsminds-speach-bubble-6"></i> Comentários </button>
+              <button @click="areaActive = 5" :class="{'active' : (areaActive == 5)}"> <i class="glyph-icon simple-icon-clock"></i> Histórico </button>
             </div>
 
             <Oportunidade v-if="areaActive == 1 && info" :fields="filterFields(0)" :id="card"/>
 
             <Anexos v-if="areaActive == 2" />
 
-            <Retorno v-if="areaActive == 3" />
+            <Retorno v-if="areaActive == 3" :id="card"/>
 
-            <Comentarios v-if="areaActive == 4" :comments="comments"/>
+            <Comentarios v-if="areaActive == 4" :id="card"/>
 
-            <Historico v-if="areaActive == 5" :history="comments"/>
+            <Historico v-if="areaActive == 5" :id="card"/>
 
           </div>
           <div class="atual text-left w-50 px-2">
@@ -50,9 +52,11 @@
                   </b-dropdown>
                 </div>
             </div>
-            {{filterFields(info.card.idStage)}}
             <FormDinamic :fields="filterFields(info.card.idStage)" :id="card" />
           </div>
+        </div>
+        <div v-else class="d-flex align-items-center justify-content-center h-100">
+          <h3>Buscando informações...</h3>
         </div>
         <div class="modal-card-footer d-flex justify-content-end">
           <h6 v-if="isSave">Salvando...</h6>
@@ -90,7 +94,7 @@ export default {
   props:['card'],
   data () {
     return {
-      ativo: 1,
+      ativo: false,
       info: null, // Salva informações
       selectedValueSingle: '',
       step: [
@@ -147,9 +151,14 @@ export default {
       return true;
     },
     async getInfo(){
-      const data = await api.get(`crm/info/${this.card}`);
-      if(data.data.status == 'success') {
-        this.info = data.data.data
+      this.areaActive = 1;
+      this.ativo = true;
+      this.info = null
+      if(this.card) {
+        const data = await api.get(`crm/info/${this.card}`);
+        if(data.data.status == 'success') {
+          this.info = data.data.data
+        }
       }
     },
     async changeStatus(id){
@@ -159,12 +168,40 @@ export default {
       });
 
       this.getInfo();
+    },
+    async deleteCard(){
+      this.$swal.fire({
+        title: "Você está certo disso?",
+        text: 'Você deseja realmente excluir esse card',
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: 'Continuar',
+        confirmButtonColor: '#3d3',
+        cancelButtonText: "Cancelar",
+        showLoaderOnConfirm: true,
+        preConfirm: async (login) => {
+          const response = await api.delete(`/crm/${this.card}`);
+          this.$notify(response.data.status, response.data.status == 'error' ? 'Opsss' : 'Sucesso', response.data.message, {
+            duration: 3000,
+            permanent: false
+          });
+
+          if(response.data.status == 'success') {
+            this.ativo = false;
+          }
+
+          return response.data.status;
+        },
+        allowOutsideClick: () => !this.$swal.isLoading()
+      }).then((result) => {
+
+      })
     }
   },
-  created(){
-    this.getInfo();
-  },
   watch: {
+    card(){
+      this.getInfo();
+    },
     ativo(){
       this.$emit('modal', this.ativo)
     }
@@ -217,7 +254,7 @@ export default {
   }
 
   /* Card */
-  .card-title {
+  .my-modal-card .card-title {
     font-weight: bold;
     font-size: 1.2rem;
   }
@@ -330,6 +367,132 @@ export default {
     display: inline;
   }
 
+.status-item {
+    padding: 8px;
+    background: #eee;
+}
+
+.title-active{
+  font-size: 1rem;
+}
+
+span.time {
+    font-size: .75rem;
+    color: #aaa;
+}
+
+.description {
+    margin-left: calc(1rem + 28px);
+    border: 1px solid #aaa;
+    padding: 10px;
+    font-weight: bold;
+    color: #aaa;
+}
+
+.status-item.success {
+  background: #afa;
+  color: #363;
+}
+
+.status-item.info {
+  background: #4ad;
+  color: #059;
+}
+
+.status-item.warning {
+  background: #ff5;
+  color: #990;
+}
+
+.status-item.danger {
+  background: #faa;
+  color: #633;
+}
+
+.comments .profile {
+  border-radius: 50%;
+
+}
+
+.comments h3 {
+  font-size: 1rem;
+}
+
+.comments .description {
+  background: #efefef;
+  color: #466;
+}
+
+.description-info {
+  font-size: .7rem;
+  margin-top: 15px;
+  color: #899;
+}
+
+.text-area {
+  width: 100%;
+  padding: 20px 30px;
+  display: flex;
+  align-items: center;
+  background: #efefef;
+  justify-content: space-between;
+}
+
+.text-area input {
+  height: 50px;
+  border: 0;
+  width: 85%;
+  padding: 5px 10px;
+}
+
+.text-area button {
+  border-radius: 50%;
+  height: 50px;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+}
+
+.comments-area {
+  max-height: 40vh;
+  overflow: scroll;
+}
+
+/* Load */
+.lds-ripple {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.lds-ripple div {
+  position: absolute;
+  border: 4px solid #fff;
+  opacity: 1;
+  border-radius: 50%;
+  animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+.lds-ripple div:nth-child(2) {
+  animation-delay: -0.5s;
+}
+@keyframes lds-ripple {
+  0% {
+    top: 39px;
+    left: 3px;
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  100% {
+    top: 14px;
+    left: -22px;
+    width: 50px;
+    height: 50px;
+    opacity: 0;
+  }
+}
 
 
   @keyframes fadeInDown {

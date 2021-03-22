@@ -42,7 +42,7 @@
     </div>
     <div v-if="['date', 'dateTime'].indexOf(card.type) >= 0" class="label">
       <v-date-picker v-model="card.value" :mode="card.type" is24hr :minute-increment="5" :model-config="{type: 'date'}" show-current="2013-07-13">
-        <template v-slot="{ inputValue, inputEvents }">
+        <template v-slot="{inputEvents }">
           <b-form-group :label="card.label" class="has-float-label mb-4">
             <b-form-input v-if="card.value" ref="date" type="text" :value="typeof card.value == 'string' ? card.value : card.value.toISOString().substr(0, 10).split('-').reverse().join('/')" v-on="inputEvents"/>
             <b-form-input v-else ref="date" type="text" :value="card.value" v-on="inputEvents"/>
@@ -51,7 +51,8 @@
       </v-date-picker>
     </div>
     <b-form-group v-if="card.type == 'money'" :label="card.label" class="has-float-label mb-4">
-      <Money class="form-control" v-model="card.value" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: false,}"/>
+      <Money v-if="card.value || card.value == 0" class="form-control" v-model="card.value" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: false,}"/>
+      <the-mask v-else class="form-control" v-model="card.value" mask="##" />
     </b-form-group>
   </div>
   <button class="btn btn-success float-right">Salvar</button>

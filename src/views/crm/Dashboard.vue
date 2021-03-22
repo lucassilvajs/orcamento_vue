@@ -121,7 +121,7 @@
           </template>
       </b-modal>
 
-      <modal-card @modal="closeModal" :card="card" v-if="card" />
+      <modal-card :card="card" @modal="modalClose" />
 
 
 </div>
@@ -201,16 +201,22 @@ export default {
         document.querySelector('.load-generic').classList.toggle('d-flex');
       },
       async addCard(){
-        this.cardValue.consultor = this.aux.arrConsult;
         const data = await api.post('crm', this.cardValue);
-        // this.pipe[0].cards.unshift(data.data.data);
-        this.getPipe()
-        this.$notify("success", 'Sucesso', "Card criado com sucesso", {
-          duration: 3000,
-          permanent: false
-        });
 
-        this.hideModal('modalPipe');
+        if(data.data.status == 'success') {
+          this.$notify("success", 'Sucesso', "Card criado com sucesso", {
+            duration: 3000,
+            permanent: false
+          });
+
+          this.hideModal('modalPipe');
+        }else{
+          this.$notify("error", 'Opsss', data.data.message , {
+            duration: 3000,
+            permanent: false
+          });
+
+        }
 
       },
       async checkCnpj(){
@@ -246,17 +252,7 @@ export default {
             filter: this.filter
           });
 
-          this.pipe.forEach((r, i) => {
-            r.total = data.data.data.pipe[i].total
-            r.cards.forEach(p => {
-              if(p.id == cardId) {
-                p.comment = data.data.data.card.comment;
-                p.historic = data.data.data.card.historic;
-              }
-            });
-
-            r = r;
-          });
+          this.getPipe();
 
           document.querySelector('.load-generic').classList.toggle('d-flex');
           document.querySelector('.load-generic h1').innerHTML = 'Buscando';
@@ -304,9 +300,11 @@ export default {
       getCard(c){
         this.card = c;
       },
-      closeModal(){
-        this.card = null;
-      },
+      modalClose(info){
+        if(!info){
+          this.getPipe();
+        }
+      }
     },
     created(){
       setTimeout(() => {
