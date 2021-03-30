@@ -2,8 +2,7 @@
 <div>
     <b-row class="justify-content-center">
 
-      <b-colxx class="mt-4 bg-white" v-if="company && !isSetted">
-        <h6 class="text-center my-2">Selecione abaixo qual linha você gostaria concluir o seu pedido</h6>
+      <b-colxx class="mt-4" v-if="company && !isSetted">
         <list-sap :company="company" @setOrder="setOrder" />
       </b-colxx>
 

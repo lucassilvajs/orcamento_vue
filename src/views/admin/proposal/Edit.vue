@@ -7,11 +7,11 @@
             <div class="controllers">
               <button v-if="orders" class="btn btn-outline-dark" @click="splitOrder">Dividir pedidos</button>
               <b-button-group class="mb-2">
-                <b-dropdown variant="success" right text="Alterar status">
+                <!-- <b-dropdown variant="success" right text="Alterar status">
                     <b-dropdown-item :disabled="orders[0].order_status == 'pending'" @click="changeStatus('pending')">Pendente</b-dropdown-item>
                     <b-dropdown-item :disabled="orders[0].order_status == 'approved'" @click="changeStatus('approved')">Aprovado</b-dropdown-item>
                     <b-dropdown-item :disabled="orders[0].order_status == 'reproved'" @click="changeStatus('reproved')">Reprovado</b-dropdown-item>
-                </b-dropdown>
+                </b-dropdown> -->
               </b-button-group>
             </div>
 
@@ -42,7 +42,6 @@
               </b-row>
               <b-row>
                 <b-colxx md="4">
-                  <b>Total:</b> {{sum_array(order.order_attributes.lens.map(r => r.price)) | numeroPreco}}<br />
                   <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
                     <div class="itemCheck mb-0 custom-control custom-checkbox">
                       <input type="checkbox" autocomplete="off" class="custom-control-input" v-model="order.checked" :id="`check_${index}`">

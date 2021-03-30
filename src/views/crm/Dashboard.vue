@@ -9,7 +9,7 @@
                 <b-form-input type="text" v-model="filter.name" />
               </b-form-group>
             </b-colxx>
-            <b-colxx xs="12" lg="3">
+            <b-colxx xs="12" lg="3" v-if="false">
                 <b-form-group label="Consultor" class="has-float-label mb-4">
                     <b-form-select v-model="filter.consultor" :options="['TODOS',...consultores]" plain />
                 </b-form-group>

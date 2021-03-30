@@ -65,8 +65,8 @@
                   </td>
                   <td>
                     <b-dropdown id="ddown1" text="Ações" variant="outline-primary">
-                        <!-- <b-dropdown-item v-if="!item.pending" @click="getInfoOrder(index)" v-b-modal.modalright>Ver pedido</b-dropdown-item>
-                        <b-dropdown-item v-if="item.pending" @click="getInfoOrder(index)" v-b-modal.modalright>Reenviar e-mail de conclusão</b-dropdown-item> -->
+                        <b-dropdown-item v-if="!item.pending" @click="getInfoOrder(index)" v-b-modal.modalright>Ver pedido</b-dropdown-item>
+                        <b-dropdown-item v-if="item.pending" @click="getInfoOrder(index)" v-b-modal.modalright>Reenviar e-mail de conclusão</b-dropdown-item>
                         <b-dropdown-item><router-link :to="`/admin/proposal/edit/${item.id}`">Editar</router-link></b-dropdown-item>
                     </b-dropdown>
                   </td>
@@ -105,10 +105,14 @@
 
       <b-modal v-if="order" id="modalright" ref="modalright" :title="`Pedido #${order.id}`" modal-class="modal-right">
       <b>{{order.product.name}} {{order.product.color}} {{order.product.size}}</b>
-      <b>Data: </b>{{order.date}}<br />
+      <b>Número do pedido: </b>{{order.object.sap.orderId}}<br />
+      <b>Data da solicitação: </b>{{order.date}}<br />
       <b>Empresa: </b>{{order.empresa.split('-')[0]}}<br />
       <b>Colaborador: </b>{{order.object.info.name}}<br />
       <b>Valor: </b>{{order.value}}<br />
+      <b>Descrição: </b>{{order.object.sap.description}}<br />
+      <b>Linha: </b>{{order.object.sap.linha}}<br />
+      <b>Entrega esperada: </b>{{order.object.sap.requestedDeliveryDate | date}}<br />
       <div v-for="(or, ind) in order.parents.map(r => {
           return {
             order_id: r.order_id,
@@ -126,37 +130,6 @@
         <img class="w-100" :src="baseURL + or.attr.recipe" v-if="isImage(or.attr.recipe)" alt="">
         <iframe height="350" v-else class="w-100" :src="baseURL + or.attr.recipe" frameborder="0"></iframe>
         <hr class="my-3">
-      </div>
-      <div v-if="order.type == 4">
-        <h5>Pedido está ok?</h5>
-        <p>Você pode confirmar o pedido ou reprovar ele!</p>
-
-
-        <b-button @click="responseSap('approved')" v-b-toggle.collapseApprove variant="success" class="btn-xs">Aprovar</b-button>
-        <b-button v-b-toggle.collapseReprove variant="danger" class="btn-xs">Reprovar</b-button>
-        <b-collapse id="collapseReprove">
-            <b-form-group label="Razão da rejeição" class="has-float-label mt-4 mb-2">
-                <select class="form-control" v-model="sap.reason">
-                  <option value="incorrectDeliveryDate">Data de entrega inválida</option>
-                  <option value="incorrectDescription">Descrição incorreta</option>
-                  <option value="incorrectPrice">Preço incorreto</option>
-                  <option value="incorrectQuantity">Quantidade incorreta</option>
-                  <option value="incorrectStockPartNumber">Estoque / número da peça incorreto</option>
-                  <option value="incorrectUOM">UOM inválido</option>
-                  <option value="unabletoSupplyItem">Item indisponível</option>
-                  <option value="other">Outro</option>
-                </select>
-            </b-form-group>
-            <b-form-group label="Comente sua decisão">
-                <b-form-input v-model="sap.comment" type="text" placeholder="Comente sua decisão" />
-            </b-form-group>
-            <b-button @click="responseSap('reproved')" variant="danger" class="btn-xs">Confirmar reprovação</b-button>
-
-        </b-collapse>
-        <b-collapse id="collapseApprove">
-        </b-collapse>
-
-        <hr>
       </div>
       <template slot="modal-footer">
         <b-button v-if="false && order.status == 'Pendente'" variant="success" @click="changeStatus('approved', order.id)">Aprovar</b-button>

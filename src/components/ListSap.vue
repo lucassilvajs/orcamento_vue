@@ -1,6 +1,7 @@
 <template>
 <div>
     <b-card class="mb-4" title="Items da proposta" v-if="company && company.orders.length > 0">
+        <h6 class="text-center my-2">Selecione abaixo qual linha você gostaria concluir sua solicitação</h6>
         <div class="border" v-for="(order, indexOrder) in company.orders" :key="indexOrder">
             <b-button class="w-100" variant="link" @click="order.visible = !order.visible">Linha #{{order.linha}}
               <span v-if="order.status == 'incomplete' && indexOrder == used" class="float-right badge badge-info">Solicitando</span>
