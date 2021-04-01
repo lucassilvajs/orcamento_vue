@@ -26,6 +26,12 @@ const data = [
   to: "/app/order/approved"
 },
 {
+  id: "orders",
+  icon: "simple-icon-basket-loaded",
+  label: "Ariba",
+  to: "/app/order/ariba"
+},
+{
   id: "proposal",
   icon: "iconsminds-file-edit",
   label: "Propostas",

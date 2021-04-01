@@ -13,6 +13,16 @@ const routes = [
     beforeEnter: AuthRequired,
     children: [
       {
+        path: "/app/order/selection",
+        component: () =>
+          import("./views/order/Selection")
+      },
+      {
+        path: "/app/order/distribuidor",
+        component: () =>
+          import("./views/order/Distribuidor")
+      },
+      {
         path: "/app/order/information",
         component: () =>
           import("./views/order/Information")
@@ -46,6 +56,11 @@ const routes = [
         path: "/app/order/approved", // Aprovadas do consultor
         component: () =>
           import("./views/order/Orders")
+      },
+      {
+        path: "/app/order/ariba", // Aprovadas do consultor
+        component: () =>
+          import("./views/order/Ariba")
       },
       {
         path: "/app/order/proposal", // Pendentes consultor

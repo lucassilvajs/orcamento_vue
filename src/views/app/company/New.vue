@@ -221,7 +221,7 @@
                 </b-row>
             </b-card>
             <!-- Tabela de preços para clientes distribuidores -->
-            <b-card class="mb-4" title="Tabela de preços dinamica" v-if="company.type_user == 1">
+            <b-card class="mb-4" title="Tabela de preços dinamica">
               <b-row>
                   <b-colxx md="12" lg="12">
                     <table class="w-100 table-striped">
@@ -275,7 +275,7 @@
                   </b-colxx>
 
 
-                  <b-colxx v-if="productDistribuidor" class="mt-5">
+                  <b-colxx v-if="false && productDistribuidor" class="mt-5">
                     <h5 class="title">{{productDistribuidor.name}}</h5>
                     <table class="table w-100">
                       <thead>

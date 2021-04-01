@@ -206,7 +206,7 @@
             </b-card>
 
             <!-- Cliente convencionais -->
-            <b-card class="mb-4" title="Tabela de preços dinamica" v-if="company.type_user == 0">
+            <b-card class="mb-4" title="Tabela de preços dinamica">
                 <div class="alert alert-info">Para manter o preço original você pode deixar o campo do valor zerado</div>
                 <b-row>
                     <b-colxx md="3" lg="3" v-for="(pro, index) in allProduct.filter(r => !r.parent)" :key="index">
@@ -221,7 +221,7 @@
                 </b-row>
             </b-card>
             <!-- Tabela de preços para clientes distribuidores -->
-            <b-card class="mb-4" title="Tabela de preços dinamica" v-if="company.type_user == 1">
+            <b-card class="mb-4" title="Tabela de preços dinamica" v-if="false">
               <b-row>
                   <b-colxx md="12" lg="12">
                     <table class="w-100 table-striped">
