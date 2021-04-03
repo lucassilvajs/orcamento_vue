@@ -39,6 +39,14 @@
                     </b-colxx>
                 </b-row>
             </b-card>
+
+            <b-card class="mb-4" title="Aquira seu óculos sem grau ou acessórios">
+                <b-row>
+                    <b-colxx v-if="fields">
+
+                    </b-colxx>
+                </b-row>
+            </b-card>
         </b-colxx>
     </b-row>
 </div>

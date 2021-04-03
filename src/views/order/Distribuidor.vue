@@ -98,10 +98,8 @@
                   <input readonly type="text" name="" id="" v-model="product.qty">
                   <button class="qty" @click="product.qty += 1">+</button>
                 </div>
-                <button class="btn btn-success">Adicionar ao carrinho <span class="ml-3">{{product.qty * (product.price + getSelected()) | numeroPreco}}</span></button>
+                <button @click="addToCard" class="btn btn-success">Adicionar ao carrinho <span class="ml-3">{{product.qty * (product.price + getSelected()) | numeroPreco}}</span></button>
               </div>
-
-
             </b-colxx>
           </div>
       </b-modal>
@@ -380,6 +378,9 @@ export default {
       });
 
       return value
+    },
+    addToCard(){
+
     }
 	},
 	created() {
