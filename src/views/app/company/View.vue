@@ -51,6 +51,7 @@
             <tr>
               <th>ID</th>
               <th>Nome</th>
+              <th>CNPJ</th>
               <th>Email</th>
               <th>Flag</th>
               <th>Cadastro</th>
@@ -61,7 +62,12 @@
             <tr v-for="(com, index) in company" :key="index">
               <td>{{com.id}}</td>
               <td>{{com.name}}</td>
-              <td>{{com.email.split(',').join(';').split(';').join(', ').toLowerCase()}}</td>
+              <td>{{com.cnpj}}</td>
+              <td>
+                <div v-if="com.email">
+                  {{com.email.split(',').join(';').split(';').join(', ').toLowerCase()}}
+                </div>
+              </td>
               <td>
                 <span class="badge mb-1" :class="[{'badge-primary': com.has_contract == 0}, {'badge-success': 1 == com.has_contract}]">{{ com.has_contract == 1 ? 'Tem Contrato' : 'Sem Contrato' }}</span>
                 <span class="badge mb-1" :class="[{'badge-primary': com.pedido_compra == 0}, {'badge-success': 1 == com.pedido_compra}]">{{ com.pedido_compra == 1 ? 'PC Obrigatório' : 'PC não obrigatório' }}</span>

@@ -1,8 +1,6 @@
 <template>
   <div>
-     <b-row>
-      <b-colxx xxs="12">
-        <b-card class="mb-4" title="Selecione o item">
+    <b-card class="mb-4" title="Selecione o item">
 			<b-row v-if="products">
 				<b-colxx md="4" lg="3" v-for="(pro, i) in products" :key="i" v-b-modal.modallg>
 					<b-card @click="product = pro" class="mb-4" style="border:1px solid rgba(100,100,100,.5); border-radius:6px" no-body>
@@ -22,9 +20,7 @@
 			<b-row v-else class="align-items-center justify-content-center text-center">
 				<h2>Buscando produtos...</h2>
 			</b-row>
-        </b-card>
-      </b-colxx>
-    </b-row>
+    </b-card>
 
     <button v-b-modal.cart v-if="distribuidor" class="btn btn-success btn-cart">
       <i class="iconsminds-shopping-cart"></i>
@@ -60,56 +56,14 @@
       </template>
     </b-modal>
 
-    <div class="no-header">
-      <b-modal id="modallg" size="lg" title="Large Modal" hide-footer>
-          <div class="row" v-if="product">
-            <b-colxx md="6" sm="12" class="d-flex align-items-center">
-              <img class="w-100" :src="product.image" alt="">
-            </b-colxx>
-            <b-colxx md="6" sm="12">
-              <h5>{{product.name}}</h5>
-              <p>{{product.description}}</p>
-              <h5 class="price text-success">{{product.price | numeroPreco}}</h5>
-
-              <div class="attrs" v-for="(p, i) in product.attributes" :key="i">
-
-                <div class="type-img mb-4" v-if="p.type == 'img'">
-                  <p class="mb-1"><b>{{p.name}}: </b> {{p.selected.value}}</p>
-                  <div class="d-flex align-items-start flex-direct-row">
-                    <div class="w-100px" :class="{active: p.selected.value == item.value}" v-for="item in p.items" :key="item.value" @click="p.selected = item">
-                      <img class="w-100" :src="item.img" alt="">
-                    </div>
-                  </div>
-                </div>
-
-                <div class="type-circle mb-4" v-if="p.type == 'circle'">
-                  <p class="mb-1"><b>{{p.name}}: </b> {{p.selected.value}}</p>
-                  <div class="d-flex align-items-start flex-direct-row">
-                    <div class="circle-item" :class="{active: item.value == p.selected.value}" v-for="item in p.items" :key="item" @click="p.selected = item">
-                      {{item.value}}
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-              <div class="type-qty d-flex justify-content-between align-items-center">
-                <div class="control">
-                  <button class="qty" :disabled="product.qty <= 1" @click="product.qty -= 1">-</button>
-                  <input readonly type="text" name="" id="" v-model="product.qty">
-                  <button class="qty" @click="product.qty += 1">+</button>
-                </div>
-                <button @click="addToCard" class="btn btn-success">Adicionar ao carrinho <span class="ml-3">{{product.qty * (product.price + getSelected()) | numeroPreco}}</span></button>
-              </div>
-            </b-colxx>
-          </div>
-      </b-modal>
-    </div>
+    <modalItem  />
 
   </div>
 </template>
 
 <script>
 import myBreadCrumb from '@/components/breadcrumb';
+import modalItem from '@/components/Order/ModalItem';
 import {api, baseURL} from '@/constants/config';
 export default {
 	data() {
@@ -121,7 +75,7 @@ export default {
       product: null,
       products: [
         {
-          image: 'https://api.idsafety.com.br/public/upload/product/spray.png',
+          image: 'http://localhost/orcamento_api/public/upload/product/spray.png',
           name: 'SPRAY ANTIEMBAÇANTE 15ML',
           description: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quae adipisci laboriosam iure rem atque',
           price: 15,
@@ -149,7 +103,7 @@ export default {
           ]
         },
         {
-          image: 'https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf4.jpeg',
+          image: 'http://localhost/orcamento_api/public/upload/product/a94292edae5c2939ae6460e10ffbeaf4.jpeg',
           name: 'ARMAÇÃO EPI 101 R',
           description: 'Proteção total com ajuste de haste retrátil e fendas para ventilação. Armação e hastes injetadas em polímero de alta resistência.',
           price: 69,
@@ -176,17 +130,17 @@ export default {
               selected: '',
               items: [
                 {
-                  img: 'https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf4.jpeg',
+                  img: 'http://localhost/orcamento_api/public/upload/product/a94292edae5c2939ae6460e10ffbeaf4.jpeg',
                   value: 'Cristal',
                   price: 0
                 },
                 {
-                  img: 'https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf41.jpeg',
+                  img: 'http://localhost/orcamento_api/public/upload/product/a94292edae5c2939ae6460e10ffbeaf41.jpeg',
                   value: 'Fume',
                   price: 0
                 },
                 {
-                  img: 'https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf42.jpeg',
+                  img: 'http://localhost/orcamento_api/public/upload/product/a94292edae5c2939ae6460e10ffbeaf42.jpeg',
                   value: 'Branco',
                   price: 5
                 },
@@ -198,7 +152,8 @@ export default {
 		}
 	},
     components: {
-        'my-breadcrumb': myBreadCrumb
+        'my-breadcrumb': myBreadCrumb,
+        modalItem
 	},
 	methods: {
     addProductToCard(item){

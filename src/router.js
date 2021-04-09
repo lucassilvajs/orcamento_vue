@@ -120,7 +120,7 @@ const routes = [
       {
         path: "/app/company/card/:id",
         component: () =>
-          import(/* webpackChunkName: "dashboards" */ "./views/admin/company/CardNew")
+          import(/* webpackChunkName: "dashboards" */ "./views/app/company/CardNew")
       },
       {
         path: "/logout",
@@ -238,7 +238,7 @@ const routes = [
           import(/* webpackChunkName: "dashboards" */ "./views/admin/crm/Config")
       },
       {
-        path: "/admin/sac",
+        path: "/admin/sac/view",
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/sac/Show")
       },
@@ -246,6 +246,11 @@ const routes = [
         path: "/admin/sac/view/:id",
         component: () =>
         import(/* webpackChunkName: "dashboards" */ "./views/admin/sac/View")
+      },
+      {
+        path: "/admin/sac/new",
+        component: () =>
+        import(/* webpackChunkName: "dashboards" */ "./views/sac/New")
       },
       {
         path: "/admin/order",
@@ -385,7 +390,7 @@ const routes = [
       {
         path: "/admin/ariba",
         component: () =>
-          import("./views/admin/ariba/View")
+          import("./views/order/Ariba")
       },
     ]
   },

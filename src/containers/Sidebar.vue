@@ -11,7 +11,7 @@
                     <!-- <a v-else-if="item.subs && item.subs.length>0" @click.prevent="openSubMenu($event,item)" :href="`#${item.to}`"><i :class="item.icon" />
                         {{ $t(item.label) }}</a> -->
                     <router-link @click.native="changeSelectedParentHasNoSubmenu(item.id)" :to="item.to"><i :class="item.icon" />
-                        {{ $t(item.label) }}</router-link>
+                        {{ item.label }}</router-link>
                 </li>
             </ul>
         </vue-perfect-scrollbar>

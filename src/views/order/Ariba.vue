@@ -52,7 +52,7 @@
                       </div>
                     </div>
                   </td>
-                  <td>{{item.empresa}} <button v-b-modal.modalChange v-if="item.object.sap.orderType == 'update'" class="btn btn-info btn-xs">ChangeOrder</button> </td>
+                  <td>{{item.empresa}} <button v-if="item.object.sap.orderType == 'update'" class="btn btn-info btn-xs">ChangeOrder</button> </td>
                   <td>{{item.cnpj}}</td>
                   <td>{{item.name}}</td>
                   <td>{{item.object.sap.orderId}}</td>
@@ -65,8 +65,8 @@
                   </td>
                   <td>
                     <b-dropdown id="ddown1" text="Ações" variant="outline-primary">
+                        <b-dropdown-item @click="reenviarEmail(index)">Reenviar e-mail</b-dropdown-item>
                         <b-dropdown-item v-if="!item.pending" @click="getInfoOrder(index)" v-b-modal.modalright>Ver pedido</b-dropdown-item>
-                        <b-dropdown-item v-if="item.pending" @click="getInfoOrder(index)" v-b-modal.modalright>Reenviar e-mail de conclusão</b-dropdown-item>
                         <b-dropdown-item><router-link :to="`/admin/proposal/edit/${item.id}`">Editar</router-link></b-dropdown-item>
                     </b-dropdown>
                   </td>
@@ -266,7 +266,29 @@ export default {
         text: 'Pedidos respondidos com sucesso',
         icon: 'success',
       });
-
+    },
+    async reenviarEmail(index){
+      this.$swal.fire({
+        title: "Você está certo disso?",
+        text: "Deseja reenviar o e-mail da proposta?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: 'Reenviar',
+        confirmButtonColor: '#06f',
+        cancelButtonText: "Cancelar",
+        showLoaderOnConfirm: true,
+        preConfirm: async (login) => {
+            let orderId = this.items[index].id;
+            return await api.post('admin/helpers/sendMailAriba', {orderId});
+        },
+        allowOutsideClick: () => !this.$swal.isLoading()
+      }).then((result) => {
+        console.log(result.value.data)
+        this.$swal.fire({
+          text: result.value.data.message,
+          icon: result.value.data.status == 'success' ? 'success' : 'warning'
+        });
+      });
 
     }
   },

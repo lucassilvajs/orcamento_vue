@@ -40,13 +40,7 @@
                 </b-row>
             </b-card>
 
-            <b-card class="mb-4" title="Aquira seu óculos sem grau ou acessórios">
-                <b-row>
-                    <b-colxx v-if="fields">
-
-                    </b-colxx>
-                </b-row>
-            </b-card>
+            <distribuidor />
         </b-colxx>
     </b-row>
 </div>
@@ -57,11 +51,13 @@
 import vSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
 import myBreadCrumb from '@/components/breadcrumb';
+import distribuidor from '@/views/order/Distribuidor';
 import {api} from '@/constants/config';
 export default {
     components: {
         'my-breadcrumb': myBreadCrumb,
         'v-select': vSelect,
+        distribuidor
     },
     data() {
         return {

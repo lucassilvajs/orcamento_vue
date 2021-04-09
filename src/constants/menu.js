@@ -40,7 +40,7 @@ const data = [
 {
   id: "sac",
   icon: "iconsminds-headset",
-  label: "SAC",
+  label: "- S.A.C.",
   to: "/app/sac"
 },
 {
