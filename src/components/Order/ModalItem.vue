@@ -8,7 +8,7 @@
           <b-colxx md="6" sm="12">
             <h5>{{product.name}}</h5>
             <p>{{product.description}}</p>
-            <h5 class="price text-success">{{product.price | numeroPreco}}</h5>
+            <h5 class="price text-success">{{product.price + getSelected() | numeroPreco}}</h5>
 
             <div class="attrs" v-for="(p, i) in product.attributes" :key="i">
 
@@ -37,7 +37,7 @@
                 <input readonly type="text" name="" id="" v-model="product.qty">
                 <button class="qty" @click="product.qty += 1">+</button>
               </div>
-              <button @click="addToCard" class="btn btn-success">Adicionar ao carrinho <span class="ml-3">{{product.qty * (product.price + getSelected()) | numeroPreco}}</span></button>
+              <button class="btn btn-success">Adicionar ao carrinho <span class="ml-3">{{product.qty * (product.price + getSelected()) | numeroPreco}}</span></button>
             </div>
           </b-colxx>
         </div>
@@ -47,7 +47,19 @@
 
 <script>
 export default {
+    props:['product'],
     methods: {
+      getSelected(){
+        let value = 0;
+        this.product.attributes.forEach(r => {
+          if(r.selected) {
+            console.log(Number(r.selected.price))
+            value += Number(r.selected.price)
+          }
+        });
+        return value
+      }
+
     },
     watch: {
     }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-card class="mb-4" title="Selecione o item">
+    <b-card class="mb-4" title="Adquira seus óculos com lentes e acessórios">
 			<b-row v-if="products">
 				<b-colxx md="4" lg="3" v-for="(pro, i) in products" :key="i" v-b-modal.modallg>
 					<b-card @click="product = pro" class="mb-4" style="border:1px solid rgba(100,100,100,.5); border-radius:6px" no-body>
@@ -56,7 +56,7 @@
       </template>
     </b-modal>
 
-    <modalItem  />
+    <modalItem :product="products[1]" />
 
   </div>
 </template>
@@ -75,7 +75,7 @@ export default {
       product: null,
       products: [
         {
-          image: 'http://localhost/orcamento_api/public/upload/product/spray.png',
+          image: 'https://api.idsafety.com.br/public/upload/product/spray.png',
           name: 'SPRAY ANTIEMBAÇANTE 15ML',
           description: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quae adipisci laboriosam iure rem atque',
           price: 15,
@@ -103,7 +103,7 @@ export default {
           ]
         },
         {
-          image: 'http://localhost/orcamento_api/public/upload/product/a94292edae5c2939ae6460e10ffbeaf4.jpeg',
+          image: 'https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf4.jpeg',
           name: 'ARMAÇÃO EPI 101 R',
           description: 'Proteção total com ajuste de haste retrátil e fendas para ventilação. Armação e hastes injetadas em polímero de alta resistência.',
           price: 69,
@@ -130,17 +130,17 @@ export default {
               selected: '',
               items: [
                 {
-                  img: 'http://localhost/orcamento_api/public/upload/product/a94292edae5c2939ae6460e10ffbeaf4.jpeg',
+                  img: 'https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf4.jpeg',
                   value: 'Cristal',
                   price: 0
                 },
                 {
-                  img: 'http://localhost/orcamento_api/public/upload/product/a94292edae5c2939ae6460e10ffbeaf41.jpeg',
+                  img: 'https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf41.jpeg',
                   value: 'Fume',
                   price: 0
                 },
                 {
-                  img: 'http://localhost/orcamento_api/public/upload/product/a94292edae5c2939ae6460e10ffbeaf42.jpeg',
+                  img: 'https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf42.jpeg',
                   value: 'Branco',
                   price: 5
                 },
@@ -322,17 +322,6 @@ export default {
     getProductModal(index){
       this.product = this.products[index];
       console.log(index)
-    },
-    getSelected(){
-      let value = 0;
-      this.product.attributes.forEach(r => {
-        if(r.selected) {
-          console.log(Number(r.selected.price))
-          value += Number(r.selected.price)
-        }
-      });
-
-      return value
     },
     addToCard(){
 
