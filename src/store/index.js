@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 import app from '../main'
 import menu from './modules/menu'
 import user from './modules/user'
+import cart from './modules/cart'
 import chat from './modules/chat'
 import todo from './modules/todo'
 import survey from './modules/survey'
@@ -29,6 +30,7 @@ export default new Vuex.Store({
   modules: {
     menu,
     user,
+    cart,
     chat,
     todo,
     survey,

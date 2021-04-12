@@ -78,7 +78,7 @@
                           </div>
                         </div>
                         <div v-else class="h-100 text-center d-flex align-items-center justify-content-center">
-                          <h3>Você não possui nenhum pedido aguardando</h3>
+                          <h3>Você não possui nenhuma notificação</h3>
                         </div>
                     </vue-perfect-scrollbar>
                 </b-dropdown>
@@ -107,11 +107,8 @@
                         <img v-if="currentUser.user.logo.indexOf('http') >= 0" :alt="currentUser.user.title" :src="`${currentUser.user.logo}`" />
                     </span>
                 </template>
-                <!-- <b-dropdown-item>Account</b-dropdown-item>
-                <b-dropdown-item>Features</b-dropdown-item>
-                <b-dropdown-item>History</b-dropdown-item>
-                <b-dropdown-item>Support</b-dropdown-item>
-                <b-dropdown-divider /> -->
+                <!-- <b-dropdown-item>Configurações</b-dropdown-item> -->
+                <b-dropdown-divider />
                 <b-dropdown-item @click="logout">Sair</b-dropdown-item>
             </b-dropdown>
         </div>

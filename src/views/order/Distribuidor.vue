@@ -9,9 +9,9 @@
 						</div>
 						<b-card-body>
 							<form @submit.prevent="setProduct(pro)">
+                <h5 class="price text-success text-right">{{pro.price | numeroPreco}}</h5>
                 <h6 class="name-product">{{pro.name}}</h6>
                 <p class="text-muted">{{pro.description}}</p>
-                <h5 class="price text-success">{{pro.price | numeroPreco}}</h5>
 							</form>
 						</b-card-body>
 					</b-card>
@@ -56,7 +56,7 @@
       </template>
     </b-modal>
 
-    <modalItem :product="products[1]" />
+    <modalItem />
 
   </div>
 </template>
@@ -72,7 +72,6 @@ export default {
       distribuidor: false,
       distribuidorCard: [],
       inCart: [],
-      product: null,
       products: [
         {
           image: 'https://api.idsafety.com.br/public/upload/product/spray.png',
@@ -80,74 +79,16 @@ export default {
           description: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quae adipisci laboriosam iure rem atque',
           price: 15,
           qty: 0,
-          attributes: [
-            {
-              name: 'Quantidade',
-              type: 'circle',
-              items: [
-                {
-                  value: '15 ml',
-                  price: 0
-                },
-                {
-                  value: '30 ml',
-                  price: 5
-                },
-                {
-                  value: '100 ml',
-                  price: 15
-                },
-              ],
-              selected: ''
-            },
-          ]
+          id: 5,
         },
         {
-          image: 'https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf4.jpeg',
-          name: 'ARMAÇÃO EPI 101 R',
-          description: 'Proteção total com ajuste de haste retrátil e fendas para ventilação. Armação e hastes injetadas em polímero de alta resistência.',
-          price: 69,
+          image: 'https://api.idsafety.com.br/public/upload/product/spray.png',
+          name: 'SPRAY ANTIEMBAÇANTE 15ML',
+          description: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quae adipisci laboriosam iure rem atque',
+          price: 15,
           qty: 0,
-          attributes: [
-            {
-              name: 'Tamanho',
-              type: 'circle',
-              items: [
-                {
-                  value: '52',
-                  price: 0
-                },
-                {
-                  value: '56',
-                  price: 0
-                },
-              ],
-              selected: ''
-            },
-            {
-              name: 'Cor',
-              type: 'img',
-              selected: '',
-              items: [
-                {
-                  img: 'https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf4.jpeg',
-                  value: 'Cristal',
-                  price: 0
-                },
-                {
-                  img: 'https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf41.jpeg',
-                  value: 'Fume',
-                  price: 0
-                },
-                {
-                  img: 'https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf42.jpeg',
-                  value: 'Branco',
-                  price: 5
-                },
-              ]
-            }
-          ]
-        },
+          id: 5,
+        }
       ]
 		}
 	},
@@ -156,179 +97,8 @@ export default {
         modalItem
 	},
 	methods: {
-    addProductToCard(item){
-      console.log(item)
-      let attr = [];
-        for(let i in item) {
-          if(i.indexOf('items_') >= 0) {
-            attr.push({attr: i.replace('items_', ''), value: item[i]})
-          }
-        }
-
-      attr.push({attr: 'model', value: item.information.pro_id});
-      attr.push({attr: 'nome', value: item.information.pro_name});
-      attr.push({attr: 'qtd', value: item.qtd});
-
-      this.$notify("success", 'Sucesso', "Item adicionado com sucesso", {
-          duration: 3000,
-          permanent: false
-      });
-
-      this.distribuidorCard.push(attr);
-
-
-    },
-
-    finalizarPedido(){
-        let order = JSON.parse(window.localStorage.getItem('order'));
-        order.distribuidorCard = this.distribuidorCard
-        order = JSON.stringify(order);
-        console.log(order)
-        window.localStorage.setItem('order', JSON.stringify({type_user: 'distribuidor', distribuidorCard: this.distribuidorCard}));
-
-        this.$router.push("/app/order/confirmation");
-    },
-
-		setProduct: function (item) {
-      if(this.distribuidor) {
-        this.addProductToCard(item)
-      }else{
-        let attr = [];
-        for(let i in item) {
-          if(i.indexOf('items_') >= 0) {
-            attr.push({attr: i.replace('items_', ''), value: item[i]})
-          }
-        }
-
-        attr.push({attr: 'model', value: item.information.pro_id});
-
-        let order = window.localStorage.getItem('order');
-        if(order){
-          order = JSON.parse(order);
-        }else{
-          order = {};
-        }
-
-        order.product = attr
-        window.localStorage.setItem('order', JSON.stringify(order));
-        this.$router.push("/app/order/lens");
-      }
-
-
-		},
-
-		getProducts: async function()
-		{
-      let order = JSON.parse(window.localStorage.getItem('order'));
-      let user = JSON.parse(window.localStorage.getItem('user'));
-
-      if(user.user.distribuidor == '1') {
-        if(order.distribuidorCard) {
-          this.distribuidorCard = order.distribuidorCard
-        }
-      }
-
-      this.distribuidor = true;
-
-			// const products = await api.get(`/products/1730`);
-			// this.products = products.data
-    },
-
-    option(attr){
-      let retorno = [];
-      for(let i in attr) {
-        retorno.push({
-          value: attr[i],
-          text: attr[i]
-        });
-      }
-
-      return retorno
-    },
-
-    getProductImage(item){
-
-      let image = item.variation[0].filter(r => {
-        if(r.label == 'Imagem'){return r}
-      })[0].value;
-
-      console.log(image)
-
-      let attr = [];
-
-      for(let i in item) {
-        if(i.indexOf('items_') >= 0) {
-          attr.push({attr: i.replace('items_', ''), value: item[i]})
-        }
-      }
-
-      let color = attr.filter(r => {
-        if(r.attr == 'Cor') {
-          return r.value
-        }
-      });
-
-      let allAttr = []
-      if(color.length > 0) {
-        color = color[0].value;
-        for(let i in item.variation) {
-          let imagem = '';
-          let cor = '';
-          for(let j in item.variation[i]){
-            if(item.variation[i][j].label == 'Imagem') {
-              imagem = item.variation[i][j].value
-            }
-
-            if(item.variation[i][j].label == 'Cor') {
-              cor = item.variation[i][j].value
-            }
-          }
-          if(cor == color) {
-            allAttr.push({imagem, cor});
-          }
-        }
-
-        let myImage = allAttr.filter(r => {
-          if(r.cor == color) {
-            return r.imagem
-          }
-        });
-
-        if(allAttr.length > 0) {
-          image = allAttr[0].imagem
-        }
-
-      }
-
-      return image
-    },
-
-    hideModal (refname) {
-      this.$refs[refname].hide()
-      console.log('hide modal:: ' + refname)
-
-      if (refname === 'modalnestedinline') {
-        this.$refs['modalnested'].show()
-      }
-    },
-    somethingModal (refname) {
-      this.$refs[refname].hide()
-      console.log('something modal:: ' + refname)
-
-      if (refname === 'modalnestedinline') {
-        this.$refs['modalnested'].show()
-      }
-    },
-    getProductModal(index){
-      this.product = this.products[index];
-      console.log(index)
-    },
-    addToCard(){
-
-    }
 	},
 	created() {
-		this.getProducts();
 	}
 }
 </script>
