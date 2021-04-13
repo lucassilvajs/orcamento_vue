@@ -1,20 +1,9 @@
 <template>
   <div>
-    <b-card class="mb-4" title="Adquira seus óculos com lentes e acessórios">
+    <b-card class="mb-4" title="Adquira seus óculos sem grau e acessórios">
 			<b-row v-if="products">
 				<b-colxx md="4" lg="3" v-for="(pro, i) in products" :key="i" v-b-modal.modallg>
-					<b-card @click="product = pro" class="mb-4" style="border:1px solid rgba(100,100,100,.5); border-radius:6px" no-body>
-						<div class="position-relative">
-              <img :src="pro.image" alt="" class="card-img-top">
-						</div>
-						<b-card-body>
-							<form @submit.prevent="setProduct(pro)">
-                <h5 class="price text-success text-right">{{pro.price | numeroPreco}}</h5>
-                <h6 class="name-product">{{pro.name}}</h6>
-                <p class="text-muted">{{pro.description}}</p>
-							</form>
-						</b-card-body>
-					</b-card>
+					<card-product :product="pro" />
 				</b-colxx>
 			</b-row>
 			<b-row v-else class="align-items-center justify-content-center text-center">
@@ -22,48 +11,17 @@
 			</b-row>
     </b-card>
 
-    <button v-b-modal.cart v-if="distribuidor" class="btn btn-success btn-cart">
-      <i class="iconsminds-shopping-cart"></i>
-      <div class="myBadge-danger" v-if="distribuidorCard.length">{{distribuidorCard.length}}</div>
-    </button>
-
-    <b-modal id="cart" ref="cart" title="Carrinho">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th></th>
-            <th>Nome</th>
-            <th>Quantidade</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in products.filter(r=> r.qty > 0)" :key="index">
-            <td><img class="w-100px" :src="item.image" alt=""></td>
-            <td>{{item.name}}</td>
-            <td>{{item.qty}}</td>
-            <td>
-              <button class="btn btn-xs btn-danger">
-                <i class="simple-icon-trash" @click="item.qty = 0" />
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <template slot="modal-footer">
-        <b-button variant="secondary" @click="hideModal('cart')">Fechar</b-button>
-        <b-button variant="primary" @click="finalizarPedido()" class="mr-1">Finalizar pedido</b-button>
-      </template>
-    </b-modal>
-
-    <modalItem />
+    <ModalCart />
+    <ModalItem />
 
   </div>
 </template>
 
 <script>
 import myBreadCrumb from '@/components/breadcrumb';
-import modalItem from '@/components/Order/ModalItem';
+import ModalItem from '@/components/Order/ModalItem';
+import ModalCart from '@/components/Order/ModalCart';
+import CardProduct from '@/components/Order/CardProduct';
 import {api, baseURL} from '@/constants/config';
 export default {
 	data() {
@@ -78,23 +36,23 @@ export default {
           name: 'SPRAY ANTIEMBAÇANTE 15ML',
           description: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quae adipisci laboriosam iure rem atque',
           price: 15,
-          qty: 0,
-          id: 5,
+          id: 1,
         },
         {
           image: 'https://api.idsafety.com.br/public/upload/product/spray.png',
           name: 'SPRAY ANTIEMBAÇANTE 15ML',
           description: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quae adipisci laboriosam iure rem atque',
           price: 15,
-          qty: 0,
-          id: 5,
+          id: 2,
         }
       ]
 		}
 	},
     components: {
         'my-breadcrumb': myBreadCrumb,
-        modalItem
+        ModalItem,
+        ModalCart,
+        'card-product': CardProduct
 	},
 	methods: {
 	},
@@ -109,14 +67,6 @@ export default {
 	height: 25px;
 	border-radius: 50%;
 	background: #a00
-}
-
-.btn-cart {
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  font-size: 1.5rem;
-  z-index: 10;
 }
 
 .myBadge-danger {

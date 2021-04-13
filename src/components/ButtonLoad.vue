@@ -19,10 +19,6 @@
 </template>
 
 <script>
-import {TheMask} from 'vue-the-mask';
-import {Money} from '@/vmoney.js';
-import VueDropzone from 'vue2-dropzone';
-import {api, baseURL, firebaseConfig} from '@/constants/config';
 
 export default {
     data() {
@@ -34,8 +30,6 @@ export default {
     computed:{
     },
     components: {
-      TheMask,
-      Money,
     },
     computed: {
     },

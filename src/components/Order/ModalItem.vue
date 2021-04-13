@@ -34,7 +34,7 @@
               <div class="type-circle mb-4" v-if="p.type == 'circle'">
                 <p class="mb-1"><b>{{p.name}}: </b> {{p.selected.value}}</p>
                 <div class="d-flex align-items-start flex-direct-row">
-                  <div class="circle-item" :class="{active: item.value == p.selected.value}" v-for="item in p.items" :key="item" @click="p.selected = item">
+                  <div class="circle-item" :class="{active: item.value == p.selected.value}" v-for="(item, itemIndex) in p.items" :key="itemIndex" @click="p.selected = item">
                     {{item.value}}
                   </div>
                 </div>
@@ -47,7 +47,7 @@
                 <input readonly type="text" name="" id="" v-model="product.qty">
                 <button class="qty" @click="product.qty += 1">+</button>
               </div>
-              <button @click="addToCart" class="btn btn-success">Adicionar ao carrinho <span class="ml-3">{{product.qty * (product.price + getSelected()) | numeroPreco}}</span></button>
+              <button :disabled="product.qty == 0" @click="addToCart" class="btn btn-success">Adicionar ao carrinho <span class="ml-3">{{product.qty * (product.price + getSelected()) | numeroPreco}}</span></button>
             </div>
           </b-colxx>
         </div>
@@ -62,6 +62,7 @@
 import {
     mapGetters,
     mapActions,
+    mapState,
 } from "vuex";
 import { Carousel, Slide } from 'vue-carousel';
 export default {
@@ -70,13 +71,14 @@ export default {
       Slide
     },
     computed:{
-      ...mapGetters(["cart"])
+      ...mapGetters(["currentCart"]),
     },
     data(){
-      return{
+      return {
         id: 1, //Vem da prop
-        img: null,
+        img: '',
         product: {
+          id: 1,
           image: 'https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf4.jpeg',
           name: 'ARMAÇÃO EPI 101 R',
           description: 'Proteção total com ajuste de haste retrátil e fendas para ventilação. Armação e hastes injetadas em polímero de alta resistência.',
@@ -132,26 +134,82 @@ export default {
         let value = 0;
         this.product.attributes.forEach(r => {
           if(r.selected) {
-            console.log(Number(r.selected.price))
             value += Number(r.selected.price)
           }
         });
         return value
       },
       addToCart(){
-        this.$store.dispatch('setItemCart');
+
+        const valida = this.product.attributes.filter(r => r.obrigatorio && !r.selected);
+        if(valida.length > 0){
+          this.$notify("error", "Opsss", "Você precisa selecionar o(a) " + valida[0].name + " do produto", {
+            duration: 5000,
+            permanent: false
+          });
+          return false;
+        }
+
+        let {id, name, image, qty} = this.product;
+        let price = this.product.price + this.getSelected()
+        image = this.img.length > 0 ? this.img[0] : image;
+        let item = {id,name,image,qty,price}
+
+        item.attributes = this.product.attributes.map(r => {
+          return {
+            name: r.name,
+            value: r.selected.value
+          }
+        });
+        // console.log(this.product);
+        this.product.qty = 0;
+        this.product.attributes = this.product.attributes.map(r =>{
+          r.selected = '';
+          return r;
+        })
+
+
+        this.$store.dispatch('setItemCart', item);
+        this.$notify("success", "Sucesso", "Item adicionado ao carrinho", {
+          duration: 5000,
+          permanent: false
+        });
+      },
+      isEdit(){
+        let {id, name, image, qty} = this.product;
+        let price = this.product.price + this.getSelected()
+        image = this.img.length > 0 ? this.img[0] : image;
+        let item = {id,name,image,qty,price}
+
+        item.attributes = this.product.attributes.map(r => {
+          return {
+            name: r.name,
+            value: r.selected.value
+          }
+        });
+
+        let isEdit = false;
+        console.log('Size: ',this.currentCart.length)
+        if(this.currentCart.length > 0) { //Verifica se já exite item no carrinho
+          this.currentCart.forEach(r => { // passa por todos os itens do carrinho
+            if(JSON.stringify(r.attributes) === JSON.stringify(item.attributes) && r.id == item.id ) { // Verifica se algum item corresponde ao inserido
+              isEdit = true; // Confirma que é uma edição
+
+              // if(this.product.qty == 0) this.product.qty = r.qty;
+            }
+          });
+        }
+        return isEdit;
       },
       hideModal (refname) {
         this.$refs[refname].hide()
-        console.log('hide modal:: ' + refname)
-
         if (refname === 'modalnestedinline') {
           this.$refs['modalnested'].show()
         }
       },
       somethingModal (refname) {
         this.$refs[refname].hide()
-        console.log('something modal:: ' + refname)
+
 
         if (refname === 'modalnestedinline') {
           this.$refs['modalnested'].show()
@@ -159,6 +217,7 @@ export default {
       }
     },
     watch: {
+
     }
 }
 </script>
