@@ -4,82 +4,19 @@
      <b-row>
       <b-colxx xxs="12">
         <b-card class="mb-4" title="Selecione o item">
-			<b-row v-if="products">
-				<b-colxx md="4" lg="3" v-for="(pro, i) in products.data" :key="i">
-					<b-card class="mb-4" style="border:1px solid rgba(100,100,100,.5); border-radius:6px" no-body>
-						<div class="position-relative">
-              <img :src="baseURL + getProductImage(pro)" alt="" class="card-img-top">
-						</div>
-						<b-card-body>
-							<form @submit.prevent="setProduct(pro)">
-								<p class="mb-2 card-subtitle">{{pro.information.pro_name}} <sub v-if="pro.information.pro_ca">CA: {{pro.information.pro_ca}}</sub> </p>
-								<div class="separator mb-2"></div>
-                <b-form-group v-for="(attr, indexAttr) in pro.attrs" :key="`${indexAttr}_${i}`" :label="indexAttr" class="has-float-label mb-4">
-                  <b-form-select :options="option(attr)" plain v-model="pro['items_'+indexAttr]" />
-                </b-form-group>
-								<div v-if="distribuidor" class="separator mb-2"></div>
-                <b-form-group v-if="distribuidor" label="Quantidade" class="has-float-label mb-4">
-                  <b-form-input type="number" plain v-model="pro.qtd" />
-                </b-form-group>
-								<div class="separator my-2"></div>
-								<button class="btn btn-outline-success float-right w-100">Adicionar</button>
-							</form>
-						</b-card-body>
-					</b-card>
-				</b-colxx>
-			</b-row>
-			<b-row v-else class="align-items-center justify-content-center text-center">
-				<h2>Buscando produtos...</h2>
-			</b-row>
+          <b-row v-if="products">
+            <b-colxx md="4" lg="3" v-for="(pro, i) in products" :key="i" v-b-modal.modallg>
+              <CardProduct :product="pro" />
+            </b-colxx>
+          </b-row>
+          <b-row v-else class="align-items-center justify-content-center text-center">
+            <h2>Buscando produtos...</h2>
+          </b-row>
         </b-card>
       </b-colxx>
     </b-row>
 
-    <button v-b-modal.cart v-if="distribuidor" class="btn btn-success btn-cart">
-      <i class="iconsminds-shopping-cart"></i>
-      <div class="myBadge-danger" v-if="distribuidorCard.length">{{distribuidorCard.length}}</div>
-    </button>
-
-    <b-modal id="cart" ref="cart" title="Carrinho">
-      <table class="table table-striped">
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Quantidade</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(item, index) in distribuidorCard" :key="index">
-            <td>
-              {{item.filter((r, i) => {
-                if(r.attr == 'nome') return r
-              })[0].value}}
-
-              {{item.filter((r, i) => {
-                if(r.attr == 'Cor') return r
-              })[0].value}}
-
-              {{item.filter((r, i) => {
-                if(r.attr == 'Tamanho Comercial') return r
-              })[0].value}}
-            </td>
-            <td>{{item.filter((r, i) => {
-                if(r.attr == 'qtd') return r
-              })[0].value}}</td>
-            <td>
-              <button class="btn btn-outline-danger btn-xs" @click="distribuidorCard.splice(index,1)">
-                <i class="simple-icon-trash"></i>
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <template slot="modal-footer">
-        <b-button variant="secondary" @click="hideModal('cart')">Fechar</b-button>
-        <b-button variant="primary" @click="finalizarPedido()" class="mr-1">Finalizar pedido</b-button>
-      </template>
-    </b-modal>
+    <ModalItem typeItem="complete" />
 
 
   </div>
@@ -87,23 +24,41 @@
 
 <script>
 import myBreadCrumb from '@/components/breadcrumb';
+import CardProduct from '@/components/Order/CardProduct';
+import ModalItem from '@/components/Order/ModalItem';
+
 import {api, baseURL} from '@/constants/config';
 export default {
 	data() {
 		return {
-			products: null,
+			products: [
+        {
+          image: 'https://api.idsafety.com.br/public/upload/product/spray.png',
+          name: 'SPRAY ANTIEMBAÇANTE 15ML',
+          description: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quae adipisci laboriosam iure rem atque',
+          price: 15,
+          id: 1,
+        },
+        {
+          image: 'https://api.idsafety.com.br/public/upload/product/spray.png',
+          name: 'SPRAY ANTIEMBAÇANTE 15ML',
+          description: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quae adipisci laboriosam iure rem atque',
+          price: 15,
+          id: 2,
+        }
+      ],
       baseURL,
       distribuidor: false,
       distribuidorCard: []
 		}
 	},
-    components: {
-        'my-breadcrumb': myBreadCrumb
+  components: {
+    'my-breadcrumb': myBreadCrumb,
+    CardProduct,
+    ModalItem
 	},
 	methods: {
     addProductToCard(item){
-
-
       console.log(item)
 
       let attr = [];
@@ -272,7 +227,7 @@ export default {
     },
 	},
 	created() {
-		this.getProducts();
+		// this.getProducts();
 	}
 }
 </script>

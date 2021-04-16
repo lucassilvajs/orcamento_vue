@@ -64,6 +64,10 @@
 </template>
 
 <script>
+import {
+    mapGetters,
+    mapActions
+} from 'vuex';
 import { WebCam } from 'vue-web-cam';
 import Compressor from 'compressorjs';
 import {api, baseURL} from '@/constants/config';
@@ -79,7 +83,8 @@ export default {
       hasImage: false,
       fileObject: null,
       timeAwait: 5,
-      showMessage: false
+      showMessage: false,
+      totem: false
 		}
 	},
 	props: ["target", "sac"],
@@ -88,18 +93,16 @@ export default {
 	},
 	name: 'take-photo',
 	computed: {
-        device: function() {
-            return this.devices.find(n => n.deviceId === this.deviceId);
-        },
-        totem() {
-          if(JSON.parse(window.localStorage.getItem('user'))) {
-            return JSON.parse(window.localStorage.getItem('user')).user.totem;
-          }else{
-            return false;
-          }
-        }
+    ...mapGetters(["currentOrder", "currentUser"]),
+    device: function() {
+        return this.devices.find(n => n.deviceId === this.deviceId);
     },
+    // totem() {
+    //   return this.currentUser.user.totem ? true  : false
+    // }
+  },
 	methods: {
+    ...mapActions(['setItemOrder']),
 		showCam: function() {
       this.img = this.$refs.web.capture();
       this.fileObject = false;
@@ -195,16 +198,10 @@ export default {
 
         if(!this.sac){
           if(file.data.status == 'success') {
-            let order = window.localStorage.getItem('order');
-            if(order) {
-              order = JSON.parse(order)
-            }else{
-              order = {};
-            }
-
-            order[this.target] = file.data.data;
-
-            window.localStorage.setItem('order', JSON.stringify(order));
+            let order = {};
+            order.value = file.data.data;
+            order.type = this.target;
+            this.setItemOrder(order);
           }
         }
 
@@ -249,16 +246,10 @@ export default {
 
         if(!this.sac){
           if(file.data.status == 'success') {
-            let order = window.localStorage.getItem('order');
-            if(order) {
-              order = JSON.parse(order)
-            }else{
-              order = {};
-            }
-
-            order[this.target] = file.data.data;
-
-            window.localStorage.setItem('order', JSON.stringify(order));
+           let order = {};
+            order.value = file.data.data;
+            order.type = this.target;
+            this.setItemOrder(order);
           }
         }
 
@@ -282,15 +273,6 @@ export default {
         }
 
       }
-    },
-		checkImg() {
-			let order = window.localStorage.getItem('order');
-			if(order){
-				order = JSON.parse(order);
-				if(order[this.target]) {
-					this.img = baseURL+order[this.target]
-				}
-			}
     },
     changeCam(){
       setTimeout(() => {
@@ -327,10 +309,7 @@ export default {
     //Captura elemento de vídeo
 
       document.querySelector('.count').classList.add('flash');
-      let timer = false;
-      if(JSON.parse(window.localStorage.getItem('user'))) {
-        timer = JSON.parse(window.localStorage.getItem('user')).user.totem
-      }
+      let timer = this.totem;
       if(!timer) {
         this.timeAwait = 0;
         document.querySelector('.counter').classList.add('d-none');
@@ -409,6 +388,9 @@ export default {
             });
         }
       }, 500);
+    },
+    startImage(){
+      this.img = this.currentOrder[this.target] ? baseURL+this.currentOrder[this.target].value : false
     }
 	},
 	watch: {
@@ -424,14 +406,12 @@ export default {
         },
         img: function(ima) {
           this.hasImage = false;
-          console.log(ima.split(';')[0]);
           let existe = ['png', 'jpeg', 'jpg', 'gif', 'svg', 'heic'].map(r => { return ima.split(';')[0].indexOf(r) }).filter(r => r >= 0);
-          console.log(existe)
           this.hasImage = !existe.length
         }
 	},
 	created() {
-    this.checkImg();
+    this.startImage();
     this.changeCam();
     this.loadCamera();
 	}

@@ -47,12 +47,18 @@
 </template>
 
 <script>
+import {
+    mapGetters,
+    mapMutations,
+    mapActions
+} from 'vuex'
 
 import vSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
 import myBreadCrumb from '@/components/breadcrumb';
 import distribuidor from '@/views/order/Distribuidor';
 import {api} from '@/constants/config';
+
 export default {
     components: {
         'my-breadcrumb': myBreadCrumb,
@@ -77,26 +83,22 @@ export default {
         }
     },
     computed: {
-
+      ...mapGetters(["currentOrder"])
     },
     methods: {
+        ...mapActions(["setItemOrder"]),
         formStepOne: function(){
             let form = {};
             form['name'] = this.values[0];
+
             this.fields.forEach((el, index) => {
                 form[el.replace(':', '')] = this.values[index+1]
             });
 
-            let order = window.localStorage.getItem('order');
-            if(order){
-                order = JSON.parse(order);
-            }else{
-                order = {}
-            }
+            if(this.company) this.setItemOrder({company: this.company, type: 'company'});
 
-            order.info = form;
-            if(this.company) order.company = this.company;
-            window.localStorage.setItem('order', JSON.stringify(order));
+            form.type = 'info'
+            this.setItemOrder(form)
             this.$router.push("/app/order/products");
         },
         getItemsAdd: async function() {
@@ -119,9 +121,10 @@ export default {
               });
             }
 
-            let info = window.localStorage.getItem('order');
+
+
+            let info = this.currentOrder.info;
             if(info) {
-                info = JSON.parse(info).info;
                 let ind = 0;
                 for(let i in info) {
                     this.values[ind] = info[i]
@@ -130,14 +133,6 @@ export default {
             }
           }
         },
-        checkDistribuidor(){
-        let user = JSON.parse(window.localStorage.getItem('user'));
-        console.log(user)
-        if(user.user.distribuidor == '1') {
-          window.localStorage.setItem('order', JSON.stringify([]));
-          this.$router.push("/app/order/products");
-        }
-      }
     },
 
     watch: {
@@ -163,22 +158,11 @@ export default {
                   ind++;
               }
           }
-
-          let order = window.localStorage.getItem('order');
-          if(order){
-              order = JSON.parse(order);
-          }else{
-              order = {}
-          }
-
-          if(this.company) order.company = this.company;
-          window.localStorage.setItem('order', JSON.stringify(order));
       },
     },
 
     created() {
         this.getItemsAdd();
-        this.checkDistribuidor();
     }
 }
 </script>

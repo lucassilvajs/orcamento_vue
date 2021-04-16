@@ -15,6 +15,10 @@
 </template>
 
 <script>
+import {
+    mapGetters,
+    mapActions
+} from 'vuex'
 import myBreadCrumb from '@/components/breadcrumb';
 import takePhoto from '@/components/takePhoto';
 export default {
@@ -23,21 +27,16 @@ export default {
 		'take-photo': takePhoto,
 	},
 	computed: {
+    ...mapGetters(["currentUser"]),
 		totem() {
-          return JSON.parse(window.localStorage.getItem('user')).user.totem;
-        }
+      return this.currentUser.user.totem
+    }
 	},
 	methods: {
+    ...mapActions(['setItemOrder']),
 		setProduct: function (item) {
-			let order = window.localStorage.getItem('order');
-			if(order){
-				order = JSON.parse(order);
-			}else{
-				order = {};
-			}
-			order.product = item;
-			window.localStorage.setItem('order',JSON.stringify(order));
-			this.$router.push("/app/order/face");
+      this.setItemOrder({...item, type: 'recipe'})
+			this.$router.push("/app/order/confirmation");
 		}
 	}
 }

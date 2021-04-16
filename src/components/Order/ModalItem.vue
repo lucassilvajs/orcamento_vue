@@ -42,12 +42,13 @@
 
             </div>
             <div class="type-qty d-flex justify-content-between align-items-center">
-              <div class="control">
+              <div class="control" v-if="typeItem != 'complete'">
                 <button class="qty" :disabled="product.qty <= 0" @click="product.qty -= 1">-</button>
                 <input readonly type="text" name="" id="" v-model="product.qty">
                 <button class="qty" @click="product.qty += 1">+</button>
               </div>
-              <button :disabled="product.qty == 0" @click="addToCart" class="btn btn-success">Adicionar ao carrinho <span class="ml-3">{{product.qty * (product.price + getSelected()) | numeroPreco}}</span></button>
+              <button v-if="typeItem == 'complete'" @click="addItem" class="btn btn-success">Prosseguir solicitação</button>
+              <button v-else :disabled="product.qty == 0" @click="addToCart" class="btn btn-success">Adicionar ao carrinho <span class="ml-3">{{product.qty * (product.price + getSelected()) | numeroPreco}}</span></button>
             </div>
           </b-colxx>
         </div>
@@ -59,6 +60,7 @@
 </template>
 
 <script>
+
 import {
     mapGetters,
     mapActions,
@@ -66,6 +68,7 @@ import {
 } from "vuex";
 import { Carousel, Slide } from 'vue-carousel';
 export default {
+    props:["typeItem"],
     components: {
       Carousel,
       Slide
@@ -87,7 +90,7 @@ export default {
           attributes: [
             {
               obrigatorio: true,
-              name: 'Tamanho',
+              name: 'Tamanho Comercial',
               type: 'circle',
               items: [
                 {
@@ -129,7 +132,7 @@ export default {
       }
     },
     methods: {
-      ...mapActions(["setItemCart"]),
+      ...mapActions(["setItemOrder"]),
       getSelected(){
         let value = 0;
         this.product.attributes.forEach(r => {
@@ -214,6 +217,41 @@ export default {
         if (refname === 'modalnestedinline') {
           this.$refs['modalnested'].show()
         }
+      },
+      addItem(){
+        const valida = this.product.attributes.filter(r => r.obrigatorio && !r.selected);
+        if(valida.length > 0){
+          this.$notify("error", "Opsss", "Você precisa selecionar o(a) " + valida[0].name + " do produto", {
+            duration: 5000,
+            permanent: false
+          });
+          return false;
+        }
+
+        let {id, name, image, qty} = this.product;
+        let price = this.product.price + this.getSelected()
+        image = this.img.length > 0 ? this.img[0] : image;
+        let item = {id,name,image,qty,price}
+
+        item.attributes = this.product.attributes.map(r => {
+          return {
+            name: r.name,
+            value: r.selected.value
+          }
+        });
+        // console.log(this.product);
+        this.product.qty = 0;
+        this.product.attributes = this.product.attributes.map(r =>{
+          r.selected = '';
+          return r;
+        });
+
+        item.type = 'product';
+
+        this.setItemOrder(item)
+        this.$router.push(`/app/order/lens`);
+
+
       }
     },
     watch: {
@@ -221,7 +259,11 @@ export default {
     }
 }
 </script>
-<style scoped>
+<style>
+
+.no-header .modal-header{
+  display: none !important;
+}
 .btn-close{
   background: transparent;
   border: none;
@@ -231,4 +273,75 @@ export default {
   font-size: 2rem;
   color: #aaa;
 }
+
+.circle-color {
+	width:25px;
+	height: 25px;
+	border-radius: 50%;
+	background: #a00
+}
+
+.w-100px {
+  display: flex;
+  align-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  border: 1px solid #aaa;
+  border-radius: 7px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.w-100px:hover, .w-100px.active, .circle-item:hover, .circle-item.active {
+  border: solid rgb(0, 172, 149);
+  cursor: pointer;
+}
+
+.circle-item {
+  width: 55px;
+  height: 55px;
+  border: 2px solid #aaa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 15px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+}
+
+button.qty {
+  background: transparent;
+  border: 1px solid #aaa;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+}
+button.qty:hover, button.qty:active {
+  border: 1px solid rgb(0, 172, 149);
+}
+
+.control input[type="text"]{
+  width: 35px;
+  border: 0;
+  text-align: center;
+  font-weight: bold;
+}
+
+.myBadge-danger {
+  font-size: .7rem;
+  position: absolute;
+  top: 5px;
+  right: 20px;
+  background: red;
+  border-radius: 50%;
+  display: block;
+  width: 17px;
+  height: 17px;
+}
+
+h5.price {
+  font-size: 1rem;
+}
+
 </style>

@@ -52,6 +52,11 @@
 </template>
 
 <script>
+import {
+    mapGetters,
+    mapActions
+} from 'vuex';
+
 import { WebCam } from 'vue-web-cam';
 import Compressor from 'compressorjs';
 import {api, baseURL} from '@/constants/config';
@@ -77,6 +82,7 @@ export default {
 	},
 	name: 'take-photo-default',
 	computed: {
+        ...mapGetters(["currentOrder"]),
         device: function() {
             return this.devices.find(n => n.deviceId === this.deviceId);
         },
@@ -203,9 +209,8 @@ export default {
 
 		},
 		checkImg() {
-			let order = window.localStorage.getItem('order');
+			let order = this.currentOrder;
 			if(order){
-				order = JSON.parse(order);
 				if(order[this.target]) {
 					this.img = baseURL+order[this.target]
 				}

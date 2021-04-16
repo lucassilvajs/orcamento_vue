@@ -206,143 +206,54 @@
             </b-card>
 
             <!-- Cliente convencionais -->
-            <b-card class="mb-4" title="Tabela de preços dinamica" v-if="company.type_user == 0">
+            <b-card class="mb-4" title="Tabela de preços dinamica">
                 <div class="alert alert-info">Para manter o preço original você pode deixar o campo do valor zerado</div>
-                <b-row>
-                    <b-colxx md="3" lg="3" v-for="(pro, index) in allProduct.filter(r => !r.parent)" :key="index">
-                        <div>
-                          {{pro.name}}
-                          <b-input-group class="mb-3">
-                              <Money class="form-control" v-model="pro.value" :disabled="true" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
-                              <Money class="form-control" v-model="pro.valueD" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
-                          </b-input-group>
-                        </div>
-                    </b-colxx>
-                </b-row>
-            </b-card>
-            <!-- Tabela de preços para clientes distribuidores -->
-            <b-card class="mb-4" title="Tabela de preços dinamica" v-if="company.type_user == 1">
-              <b-row>
-                  <b-colxx md="12" lg="12">
-                    <table class="w-100 table-striped">
-                      <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>SKU</th>
-                          <th>Nome</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="(pro, proIndex) in allProduct.filter(r => !r.parent && r.sku)" :key="proIndex">
-                          <td>
-                            <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
-                              <div class="itemCheck mb-0 custom-control custom-checkbox">
-                                <input type="checkbox" autocomplete="off" class="custom-control-input" v-model="pro.checked" :id="`check_${pro.id}`">
-                                <label class="custom-control-label" :for="`check_${pro.id}`">
-                                </label>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            {{pro.sku}}
-                          </td>
-                          <td>
+                <fieldset v-for="(cat, index) in allProduct.products" :key="index">
+                  <legend>{{allProduct.attrs[index]}}</legend>
+                  <b-row>
+                      <b-colxx md="3" lg="3" v-for="(pro, iPro) in cat" :key="iPro">
+                          <div>
                             {{pro.name}}
-                          </td>
-                          <!-- <td>
-                            <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
-                              <div class="itemCheck mb-0 custom-control custom-checkbox">
-                                <input type="checkbox" autocomplete="off" class="custom-control-input" v-model="pro.checked" :id="`check_${pro.id}`">
-                                <label class="custom-control-label" :for="`check_${pro.id}`">
-                                </label>
-                              </div>
-                            </div>
-                          </td>
-                          <td>{{pro.id}}</td>
-                          <td>{{pro.name}}</td>
-                          <td>{{pro.sku ? pro.sku : '-'}}</td>
-                          <td>
-                            <button @click="getPrecificavel(pro.id)" class="btn btn-sm btn-outline-info">Precificar</button>
-                          </td> -->
-                        </tr>
-                        <tr>
-                          <td colspan="5" v-if="allProduct.filter(r => r.checked).length > 0">
-                            <button class="btn btn-outline-info" @click="addSelected">Precificar selecionados</button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </b-colxx>
-
-
-                  <b-colxx v-if="productDistribuidor" class="mt-5">
-                    <h5 class="title">{{productDistribuidor.name}}</h5>
-                    <table class="table w-100">
-                      <thead>
-                        <tr>
-                          <th v-for="(qtd, indexQtd) in productDistribuidor.price" :key="indexQtd">{{qtd.qty}} itens <a class="p-1 text-danger" @click="() => {
-                            if(productDistribuidor.price.length == 1) {
-                              $notify('error', 'Opsss...!', 'Você tem que deixar pelo menos um preço ativo', {
-                                duration: 3000,
-                                permanent: false
-                              });
-                            }else{
-                              productDistribuidor.price.splice(indexQtd, 1);
-                            }
-                          }"><i class="glyph-icon simple-icon-minus" /></a></th>
-                          <th class="d-flex">
-                            <the-mask class="form-control form-my" v-model="addPrices" :mask="['######']" />
-                            <button class="btn btn-xs btn-outline-success" @click="addItemProduct">
-                              <i class="glyph-icon simple-icon-plus" />
-                            </button>
-                          </th>
-                        </tr>
-                      </thead>
-
-                      <tbody>
-                        <tr>
-                          <td v-for="(value, indexValue) in productDistribuidor.price" :key="indexValue">
-                            <Money class="form-my" v-model="productDistribuidor.price[indexValue].value" v-bind="{ decimal: ',',thousands: '.',suffix: '%',precision: 2,masked: true,}"/>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td :colspan="productDistribuidor.price.length">
-                            <button class="btn btn-outline-success" @click="savePrecos">
-                              Salvar descontos
-                            </button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </b-colxx>
-              </b-row>
+                            <b-input-group class="mb-3">
+                                <Money class="form-control" v-model="pro.value" :disabled="true" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
+                                <Money class="form-control" v-model="pro.valueD" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
+                            </b-input-group>
+                          </div>
+                      </b-colxx>
+                  </b-row>
+                </fieldset>
             </b-card>
 
-            <b-card class="mb-4" title="Restrições" v-if="allProduct">
+            <!-- Tabela de preços para clientes distribuidores -->
+            <b-card class="mb-4" title="Restrições" v-if="allProduct.products">
+              <fieldset v-for="(productCat, iAll) in allProduct.products" :key="iAll">
+                <legend>{{allProduct.attrs[iAll]}}</legend>
                 <b-row>
-                  <b-colxx class="mb-4" md="4" lg="4" v-for="(pro, index) in allProduct.filter(r => !r.parent)" :key="index" >
+                  <b-colxx class="mb-4" md="3" lg="3" v-for="(pro, index) in productCat" :key="index" >
                     <b-card no-body class="p-3">
-                      <h6 class="text-muted">{{pro.name}}</h6>
-                        <div v-for="(a, ia) in pro.attrs" :key="ia">
-                          <b>{{a.label}}: </b>
-                          <div class="d-flex justify-content-between align-items-center px-2 mb-2" v-for="(val, indexVal) in a.values" :key="indexVal">
-                            <span>{{val}}</span>
-                            <div v-if="restricoes.filter(r => r == `${pro.id}_${a.label}_${val}`).length == 0" @click="addRestrition(`${pro.id}_${a.label}_${val}`)" class="badge badge-success">
-                              <i class="glyph-icon simple-icon-plus text-white"/> Permitindo
-                            </div>
-                            <div v-else @click="restricoes.splice(restricoes.indexOf(`${pro.id}_${a.label}_${val}`), 1);" class="badge badge-danger">
-                              <i class="glyph-icon simple-icon-trash text-white"/> Restringindo
-                            </div>
-                          </div>
-
-                        </div>
-
-                        <button v-if="restricoes.filter(r => r == `${pro.id}`).length == 0" @click="addRestrition(`${pro.id}`)" class="btn btn-success btn-sm btn-block mt-2">Produto permitido</button>
-                        <button v-else @click="restricoes.splice(restricoes.indexOf(`${pro.id}`), 1);" class="btn btn-danger btn-sm btn-block mt-2">Produto restingido</button>
+                      <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="text-muted">{{pro.name}}</span>
+                        <b-form-checkbox class="ml-3" v-model="pro.restrito" name="check-button" switch></b-form-checkbox>
+                      </div>
+                      <button type="button" @click="settings = pro" v-b-modal.modalsm class="btn btn-link text-center btn-xs">Clique aqui para parametrizar atributos</button>
                     </b-card>
                   </b-colxx>
                 </b-row>
+              </fieldset>
             </b-card>
+
+            <b-modal v-if="settings" id="modalsm" size="sm" :title="settings.name" hide-footer>
+                <div v-for="(a, ia) in settings.attrs" :key="ia" class="mt-0">
+                    <h6 class="d-flex align-items-center justify-content-between"><b>{{a.label}}: </b></h6>
+                    <div class="px-2 mb-4" v-for="(val, indexVal) in a.values" :key="indexVal">
+                        <span class="mb-1 font-weight-bold">{{val.label}} </span>
+                        <b-form-checkbox class="mb-1" v-model="val.completo" name="check-button" switch>Óculos Completo</b-form-checkbox>
+                        <b-form-checkbox class="mb-1" v-model="val.distribuidor" name="check-button" switch>Distribuição</b-form-checkbox>
+                    </div>
+                    <hr>
+                </div>
+                <button class="btn btn-success btn-block">Concluído</button>
+            </b-modal>
 
             <b-card class="mb-4" title="Produtos especifícos">
                 <b-alert variant="info" fade show dismissible>Os produtos cadastrados aqui vão aparecer apenas para essa empresa!</b-alert>
@@ -504,7 +415,7 @@ export default {
             file: null,
             check,
             checked,
-            allProduct: null,
+            allProduct: {},
             processing: false,
             requestError: false,
             productsProcessing:false,
@@ -518,7 +429,8 @@ export default {
             transporte: [],
             pdfanexo: []
           },
-          consultores: []
+          consultores: [],
+          settings: null
         }
     },
     computed: {
@@ -603,13 +515,17 @@ export default {
             }
           });
           let vv = this.company
-          this.allProduct = response.data.data.map(function(r) {
-            if(vv.dynamic[r.id]){
-              r.valueD = vv.dynamic[r.id].price
-            }else{
-              r.valueD = 0;
-            }
-            return r;
+          this.allProduct.attrs = response.data.data.attrs;
+          this.allProduct.products = response.data.data.products
+          .map(function(r) {
+            return r.map(j => {
+              if(vv.dynamic[j.id]){
+                j.valueD = vv.dynamic[j.id].price
+              }else{
+                j.valueD = 0;
+              }
+              return j;
+            })
           });
         },
         removeUser(index) {

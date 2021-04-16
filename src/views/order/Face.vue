@@ -15,25 +15,16 @@
 </template>
 
 <script>
+import {
+    mapGetters,
+    mapActions
+} from 'vuex'
 import takePhoto from '@/components/takePhoto';
 import myBreadCrumb from '@/components/breadcrumb';
 export default {
-    components: {
-        'my-breadcrumb': myBreadCrumb,
-        'take-photo': takePhoto,
+  components: {
+    'my-breadcrumb': myBreadCrumb,
+    'take-photo': takePhoto,
 	},
-	methods: {
-		setProduct: function (item) {
-			let order = window.localStorage.getItem('order');
-			if(order){
-				order = JSON.parse(order);
-			}else{
-				order = {};
-			}
-			order.product = item;
-			window.localStorage.setItem('order',JSON.stringify(order));
-			this.$router.push("/app/order/face");
-		}
-	}
 }
 </script>

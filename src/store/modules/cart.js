@@ -49,6 +49,15 @@ export default {
       current.splice(payload, 1);
       commit('DELETE_ITEM_CART', current);
       localStorage.setItem('cart', JSON.stringify(state.currentCart))
+    },
+    changeCartQty(context, payload){
+      let currentCart = context.state.currentCart;
+      currentCart[payload.index].qty = currentCart[payload.index].qty + payload.val;
+      context.commit('EDIT_ITEM_CART', currentCart);
+      localStorage.setItem('cart', JSON.stringify(context.state.currentCart))
+    },
+    async finalizarOrder({state}, payload){
+      const data = await api.post('/distribuidor', state.currentCart)
     }
   }
 }
