@@ -149,9 +149,8 @@ export default {
             this.fields = ["Chapa", "Setor", "Turno"];
           }
           this.company = this.companies[novo.code].idCompany
-          let info = window.localStorage.getItem('order');
+          let info = this.currentOrder;
           if(info) {
-              info = JSON.parse(info).info;
               let ind = 0;
               for(let i in info) {
                   this.values[ind] = info[i]

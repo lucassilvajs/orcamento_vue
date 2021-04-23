@@ -27,9 +27,6 @@ export default {
 	data() {
 		return {
       baseURL,
-      distribuidor: false,
-      distribuidorCard: [],
-      inCart: [],
       products: [
         {
           image: 'https://api.idsafety.com.br/public/upload/product/spray.png',

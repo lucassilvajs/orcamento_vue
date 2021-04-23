@@ -47,6 +47,10 @@ export default {
 
     setItemOrder({commit, state}, payload) {
       commit('SET_ITEM_ORDER', payload);
+      if(payload.type == 'company') {
+        payload.company = payload.company.company
+      }
+
       localStorage.setItem('order', JSON.stringify(state.currentOrder));
     },
 

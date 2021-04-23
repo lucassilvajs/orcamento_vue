@@ -52,6 +52,9 @@ export default {
     },
     clearError(state) {
       state.loginError = null
+    },
+    processing(state, payload) {
+      state.processing = payload
     }
   },
   actions: {

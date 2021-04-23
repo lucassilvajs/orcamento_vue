@@ -1,6 +1,5 @@
 <template>
-  <div class="no-header">
-    <b-modal id="modallg" size="lg" title="Large Modal" ref="modallg" hide-footer>
+    <b-modal id="modallg" size="lg" title="Large Modal" ref="modallg" hide-header hide-footer>
       <button @click="hideModal('modallg')" class="btn-close">
       <i class="glyph-icon simple-icon-close"/>
       </button>
@@ -56,7 +55,6 @@
           <h3>Buscando produto...</h3>
         </div>
     </b-modal>
-  </div>
 </template>
 
 <script>
@@ -260,10 +258,6 @@ export default {
 }
 </script>
 <style>
-
-.no-header .modal-header{
-  display: none !important;
-}
 .btn-close{
   background: transparent;
   border: none;

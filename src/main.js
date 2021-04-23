@@ -131,6 +131,11 @@ Vue.filter("datetime", valor => {
   return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR');
 });
 
+Vue.filter("limit", (valor, limit = 10) => {
+  if(valor) return valor.substring(0, limit) + (valor.length > limit ? '...' : '');
+  return '';
+})
+
 export default new Vue({
   i18n,
   router,
