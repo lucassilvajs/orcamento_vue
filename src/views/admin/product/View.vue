@@ -84,7 +84,7 @@ export default {
   },
   methods: {
     async getProducts() {
-      const response = await api.get('admin/product');
+      const response = await api.get('admin/product/list');
       this.product = response.data.data.map(p => {p.inDelete = false; return p});
     },
     deleteItem(item){

@@ -5,31 +5,28 @@
       </button>
         <div class="row" v-if="product">
           <b-colxx md="6" sm="12" class="d-flex align-items-center">
-            <div v-if="img && img.length > 1">
+            <div v-if="false && typeof product.img == 'object' && product.img.length > 1">
               <carousel :perPage="1">
-                <slide v-for="(imm, i) in img" :key="i">
-                  <img class="w-100" :src="imm" alt="">
+                <slide v-for="(imm, i) in product.img" :key="i">
+                  <img class="w-100" :src="baseURL+imm" alt="">
                 </slide>
               </carousel>
             </div>
-            <img v-else class="w-100" :src="img ? img : product.image" alt="">
+            <img v-else class="w-100" :src="baseURL+product.img" alt="">
           </b-colxx>
           <b-colxx md="6" sm="12">
             <h5>{{product.name}}</h5>
             <p>{{product.description}}</p>
             <h5 class="price text-success">{{product.price + getSelected() | numeroPreco}}</h5>
-
             <div class="attrs" v-for="(p, i) in product.attributes" :key="i">
-
               <div class="type-img mb-4" v-if="p.type == 'img'">
                 <p class="mb-1"><b>{{p.name}}: </b> {{p.selected.value}}</p>
                 <div class="d-flex align-items-start flex-direct-row">
-                  <div class="w-100px" :class="{active: p.selected.value == item.value}" v-for="item in p.items" :key="item.value" @click="() => {img = item.img; p.selected = item}">
-                    <img class="w-100" :src="item.img[0]" alt="">
+                  <div class="w-100px" :class="{active: p.selected.value == item.value}" v-for="item in p.items" :key="item.value" @click="() => {product.img = item.img; p.selected = item}">
+                    <img class="w-100" :src="baseURL+item.img" alt="">
                   </div>
                 </div>
               </div>
-
               <div class="type-circle mb-4" v-if="p.type == 'circle'">
                 <p class="mb-1"><b>{{p.name}}: </b> {{p.selected.value}}</p>
                 <div class="d-flex align-items-start flex-direct-row">
@@ -38,8 +35,8 @@
                   </div>
                 </div>
               </div>
-
             </div>
+
             <div class="type-qty d-flex justify-content-between align-items-center">
               <div class="control" v-if="typeItem != 'complete'">
                 <button class="qty" :disabled="product.qty <= 0" @click="product.qty -= 1">-</button>
@@ -64,9 +61,11 @@ import {
     mapActions,
     mapState,
 } from "vuex";
+
+import {api, baseURL} from '@/constants/config';
 import { Carousel, Slide } from 'vue-carousel';
 export default {
-    props:["typeItem"],
+    props:["typeItem", "idProduct", "idCompany"],
     components: {
       Carousel,
       Slide
@@ -76,57 +75,8 @@ export default {
     },
     data(){
       return {
-        id: 1, //Vem da prop
-        img: '',
-        product: {
-          id: 1,
-          image: 'https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf4.jpeg',
-          name: 'ARMAÇÃO EPI 101 R',
-          description: 'Proteção total com ajuste de haste retrátil e fendas para ventilação. Armação e hastes injetadas em polímero de alta resistência.',
-          price: 69,
-          qty: 0,
-          attributes: [
-            {
-              obrigatorio: true,
-              name: 'Tamanho Comercial',
-              type: 'circle',
-              items: [
-                {
-                  value: '52',
-                  price: 0
-                },
-                {
-                  value: '56',
-                  price: 5
-                },
-              ],
-              selected: ''
-            },
-            {
-              obrigatorio: true,
-              name: 'Cor',
-              type: 'img',
-              selected: '',
-              items: [
-                {
-                  img: ['https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf4.jpeg', 'https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf41.jpeg'],
-                  value: 'Cristal',
-                  price: 0
-                },
-                {
-                  img: ['https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf41.jpeg'],
-                  value: 'Fume',
-                  price: 0
-                },
-                {
-                  img: ['https://api.idsafety.com.br/public/upload/product/a94292edae5c2939ae6460e10ffbeaf42.jpeg'],
-                  value: 'Branco',
-                  price: 5
-                },
-              ]
-            }
-          ]
-        },
+        baseURL,
+        product: null,
       }
     },
     methods: {
@@ -140,8 +90,8 @@ export default {
         });
         return value
       },
-      addToCart(){
 
+      addToCart(){
         const valida = this.product.attributes.filter(r => r.obrigatorio && !r.selected);
         if(valida.length > 0){
           this.$notify("error", "Opsss", "Você precisa selecionar o(a) " + valida[0].name + " do produto", {
@@ -151,10 +101,9 @@ export default {
           return false;
         }
 
-        let {id, name, image, qty} = this.product;
+        let {id, name, img, qty} = this.product;
         let price = this.product.price + this.getSelected()
-        image = this.img.length > 0 ? this.img[0] : image;
-        let item = {id,name,image,qty,price}
+        let item = {id,name,img,qty,price}
 
         item.attributes = this.product.attributes.map(r => {
           return {
@@ -162,13 +111,12 @@ export default {
             value: r.selected.value
           }
         });
-        // console.log(this.product);
+
         this.product.qty = 0;
         this.product.attributes = this.product.attributes.map(r =>{
           r.selected = '';
           return r;
-        })
-
+        });
 
         this.$store.dispatch('setItemCart', item);
         this.$notify("success", "Sucesso", "Item adicionado ao carrinho", {
@@ -176,11 +124,11 @@ export default {
           permanent: false
         });
       },
+
       isEdit(){
-        let {id, name, image, qty} = this.product;
+        let {id, name, img, qty} = this.product;
         let price = this.product.price + this.getSelected()
-        image = this.img.length > 0 ? this.img[0] : image;
-        let item = {id,name,image,qty,price}
+        let item = {id,name,img,qty,price}
 
         item.attributes = this.product.attributes.map(r => {
           return {
@@ -202,12 +150,14 @@ export default {
         }
         return isEdit;
       },
+
       hideModal (refname) {
         this.$refs[refname].hide()
         if (refname === 'modalnestedinline') {
           this.$refs['modalnested'].show()
         }
       },
+
       somethingModal (refname) {
         this.$refs[refname].hide()
 
@@ -216,6 +166,7 @@ export default {
           this.$refs['modalnested'].show()
         }
       },
+
       addItem(){
         const valida = this.product.attributes.filter(r => r.obrigatorio && !r.selected);
         if(valida.length > 0){
@@ -226,10 +177,9 @@ export default {
           return false;
         }
 
-        let {id, name, image, qty} = this.product;
+        let {id, name, img, qty} = this.product;
         let price = this.product.price + this.getSelected()
-        image = this.img.length > 0 ? this.img[0] : image;
-        let item = {id,name,image,qty,price}
+        let item = {id,name,img,qty,price}
 
         item.attributes = this.product.attributes.map(r => {
           return {
@@ -248,11 +198,20 @@ export default {
 
         this.setItemOrder(item)
         this.$router.push(`/app/order/lens`);
+      },
 
-
+      async getProduct() {
+        const data = await api.get(`product/${this.idProduct}/${this.idCompany}`);
+        this.product = data.data.data;
       }
     },
+    created(){
+
+    },
     watch: {
+      async idProduct(){
+        await this.getProduct();
+      }
 
     }
 }

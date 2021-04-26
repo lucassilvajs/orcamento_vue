@@ -149,7 +149,7 @@ export default {
             this.fields = ["Chapa", "Setor", "Turno"];
           }
           this.company = this.companies[novo.code].idCompany
-          let info = this.currentOrder;
+          let info = this.currentOrder.info;
           if(info) {
               let ind = 0;
               for(let i in info) {

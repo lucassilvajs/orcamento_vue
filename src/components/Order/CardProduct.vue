@@ -10,8 +10,7 @@
             <h5 class="price text-success">{{product.price | numeroPreco}}</h5>
           </div>
           <h4 class="name-product">{{product.name}}</h4>
-          <span class="text-muted"><b>C.A:</b> 123456789</span>
-          <p class="text-muted">{{product.description}}</p>
+          <p v-if="product.description" class="text-muted">{{product.description}}</p>
         </form>
       </b-card-body>
     </b-card>

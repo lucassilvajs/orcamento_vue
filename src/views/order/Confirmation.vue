@@ -33,7 +33,7 @@
         <b-colxx xxs="12" md="6">
           <b-card no-body>
             <div class="d-flex product">
-              <single-lightbox :thumb="currentOrder.product.image" :large="currentOrder.product.image" class-name="img-thumbnail img-product mx-auto d-block p-2" />
+              <single-lightbox :thumb="baseURL+currentOrder.product.img" :large="baseURL+currentOrder.product.img" class-name="img-thumbnail img-product mx-auto d-block p-2" />
               <div class="p-3">
                 <h4 class="title">{{currentOrder.product.name.toUpperCase() + ' ' + currentOrder.product.attributes.map(r => r.value).join(' ').toUpperCase()}}</h4>
                 <p v-for="(attr, iAttr) in currentOrder.product.attributes" :key="iAttr"><b>{{attr.name}}: </b>{{attr.value}}</p>

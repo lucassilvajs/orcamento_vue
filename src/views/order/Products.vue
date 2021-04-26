@@ -5,8 +5,8 @@
       <b-colxx xxs="12">
         <b-card class="mb-4" title="Selecione o item">
           <b-row v-if="products">
-            <b-colxx md="4" lg="3" v-for="(pro, i) in products" :key="i" v-b-modal.modallg>
-              <CardProduct :product="pro" />
+            <b-colxx md="4" lg="3" v-for="(pro, i) in products" :key="i">
+              <CardProduct :product="pro" @click.native="setItem(pro.id)" v-b-modal.modallg />
             </b-colxx>
           </b-row>
           <b-row v-else class="align-items-center justify-content-center text-center">
@@ -16,7 +16,7 @@
       </b-colxx>
     </b-row>
 
-    <ModalItem typeItem="complete" />
+    <ModalItem typeItem="complete" :idProduct="idProduct" :idCompany="idCompany" />
 
 
   </div>
@@ -37,6 +37,7 @@ export default {
 	data() {
 		return {
       products: null,
+      idProduct: 0,
 			// products: [
       //   {
       //     image: 'https://api.idsafety.com.br/public/upload/product/spray.png',
@@ -64,7 +65,10 @@ export default {
     ModalItem
 	},
   computed: {
-    ...mapGetters(["currentOrder"])
+    ...mapGetters(["currentOrder"]),
+    idCompany(){
+      return this.currentOrder.company.company
+    }
   },
 	methods: {
 
@@ -91,6 +95,10 @@ export default {
         this.$refs['modalnested'].show()
       }
     },
+
+    setItem(item) {
+      this.idProduct = item;
+    }
 	},
 	created() {
 		this.getProducts();
