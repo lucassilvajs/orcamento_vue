@@ -2,7 +2,7 @@
   <div>
     <b-card class="mb-4" style="border:1px solid rgba(100,100,100,.5); border-radius:6px" no-body>
       <div class="position-relative">
-        <img :src="product.image" alt="" class="card-img-top">
+        <img :src="baseURL + product.image" alt="" class="card-img-top">
       </div>
       <b-card-body>
         <form @submit.prevent="setProduct(pro)">
@@ -18,7 +18,9 @@
 </template>
 
 <script>
+import {api, baseURL} from '@/constants/config';
 export default {
+
     props: ["product"],
     components: {
 
@@ -27,7 +29,7 @@ export default {
     },
     data(){
       return{
-
+        baseURL
       }
     },
     methods: {

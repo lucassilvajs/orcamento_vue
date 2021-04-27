@@ -6,7 +6,7 @@
         <b-card class="mb-4" title="Imagem da face">
 			<b-alert variant="info" class="text-center mx-auto" fade show dismissible>Estamos tentando acessar a sua <b>câmera</b> de seu navegador.<br />Caso apareça algum alerta, permita que tenhamos acesso à sua câmera.</b-alert>
 			<b-row>
-				<take-photo target="face" />
+				<take-photo link="/app/order/" target="face" />
 			</b-row>
         </b-card>
       </b-colxx>

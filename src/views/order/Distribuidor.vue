@@ -3,7 +3,7 @@
     <b-card class="mb-4" title="Adquira seus óculos sem grau e acessórios">
 			<b-row v-if="products">
 				<b-colxx md="4" lg="3" v-for="(pro, i) in products" :key="i" v-b-modal.modallg>
-					<card-product :product="pro" />
+					<card-product :product="pro" @click.native="setItem(pro.id)" />
 				</b-colxx>
 			</b-row>
 			<b-row v-else class="align-items-center justify-content-center text-center">
@@ -11,8 +11,8 @@
 			</b-row>
     </b-card>
 
-    <ModalCart />
-    <ModalItem />
+    <ModalCart :idCompany="idCompany" />
+    <ModalItem typeItem="distribuicao" :idProduct="idProduct" :idCompany="idCompany" />
 
   </div>
 </template>
@@ -23,38 +23,49 @@ import ModalItem from '@/components/Order/ModalItem';
 import ModalCart from '@/components/Order/ModalCart';
 import CardProduct from '@/components/Order/CardProduct';
 import {api, baseURL} from '@/constants/config';
+
+import {
+    mapGetters,
+    mapActions,
+    mapState,
+} from "vuex";
+
 export default {
+  props: ["idCompany"],
 	data() {
 		return {
       baseURL,
-      products: [
-        {
-          image: 'https://api.idsafety.com.br/public/upload/product/spray.png',
-          name: 'SPRAY ANTIEMBAÇANTE 15ML',
-          description: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quae adipisci laboriosam iure rem atque',
-          price: 15,
-          id: 1,
-        },
-        {
-          image: 'https://api.idsafety.com.br/public/upload/product/spray.png',
-          name: 'SPRAY ANTIEMBAÇANTE 15ML',
-          description: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quae adipisci laboriosam iure rem atque',
-          price: 15,
-          id: 2,
-        }
-      ]
+      products: null,
+      idProduct: null,
 		}
 	},
-    components: {
-        'my-breadcrumb': myBreadCrumb,
-        ModalItem,
-        ModalCart,
-        'card-product': CardProduct
+  components: {
+    'my-breadcrumb': myBreadCrumb,
+    ModalItem,
+    ModalCart,
+    'card-product': CardProduct
 	},
+  computed: {
+    ...mapGetters(["currentCart"]),
+  },
 	methods: {
+    getProducts: async function()
+		{
+			const products = await api.get(`/distribuicao/${this.idCompany}`);
+			this.products = products.data.data
+    },
+    setItem(item) {
+      this.idProduct = item;
+    }
 	},
 	created() {
-	}
+    this.getProducts();
+	},
+  watch: {
+    idCompany(){
+      this.getProducts();
+    }
+  }
 }
 </script>
 

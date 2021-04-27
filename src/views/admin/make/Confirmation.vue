@@ -1,117 +1,61 @@
 <template>
-<div>
-    <my-breadcrumb v-if="order" :distribuidor="order.type_user == 'distribuidor'" />
+<div style="margin-top:80px;">
+    <my-breadcrumb />
     <b-row>
-        <b-colxx xxs="12">
-            <b-card class="mb-4" title="Confirmação da solicitação">
-                <b-row v-if="order.type_user != 'distribuidor'">
-                    <b-colxx md="3" lg="3" class="">
-                        <h5 class="mb-2 mt-4 card-title">Dados do colaborador</h5>
-                        <div v-if="order && order.info">
-                            <p v-for="(field, index) in order.info" :key="index"><b>{{index == 'name' ? 'Nome': index}}: </b>{{field}}</p>
-                        </div>
-                        <div v-else>
-                            <p class="text-center">Você não inseriu dados do coladorador <router-link to="/admin/make/information">Clique aqui</router-link> para adicionar</p>
-                        </div>
-                    </b-colxx>
-                    <b-colxx md="3" lg="3" class="">
-                        <h5 class="mb-2 mt-4 card-title">Produto Selecionado</h5>
-                        <div v-if="order && order.product">
-                            <p v-for="(pro, indexProduct) in order.product.filter(r => {if(r.attr != 'model') return r})" :key="indexProduct"><b>{{pro.attr}}: </b>{{pro.value}}</p>
-                            <hr />
-                            <div v-if="order.lens">
-                                <div v-for="(lens, index) in order.lens" :key="index">
-                                    <p v-for="(l, i) in lens" :key="i"><b>{{ index == 0 ? 'Lentes' : (index == 1 ? 'Dioptria' : 'Tratamento') }}: </b>{{l.name}}</p>
-                                </div>
-
-                            </div>
-                            <img class="w-100" :src="`${baseURL}${order.product.image}`" alt="">
-                        </div>
-                        <div v-else>
-                            <p class="text-center">Você ainda não selecionou o óculos <router-link to="/admin/make/products">Clique aqui</router-link> para adicionar</p>
-                        </div>
-                    </b-colxx>
-                    <b-colxx md="3" lg="3" class="">
-                        <h5 class="mb-2 mt-4 card-title">Captura da face</h5>
-                        <div v-if="order && order.face">
-                            <img v-if="isImage(order.face)" class="w-100" :src="`${baseURL}${order.face}`" alt="">
-                            <iframe style="height:300px;" :src="`${baseURL}${order.face}`" v-else frameborder="0"></iframe>
-                        </div>
-                        <div v-else>
-                            <p class="text-center">Você ainda não anexou a face <router-link to="/admin/make/face">Clique aqui</router-link> para anexar</p>
-                        </div>
-                    </b-colxx>
-                    <b-colxx md="3" lg="3" class="">
-                        <h5 class="mb-2 mt-4 card-title">Captura da receita</h5>
-                        <div v-if="order && order.recipe">
-                            <img v-if="isImage(order.recipe)" class="w-100" :src="`${baseURL}${order.recipe}`" alt="">
-                            <iframe style="height:300px;" :src="`${baseURL}${order.recipe}`" v-else frameborder="0"></iframe>
-                        </div>
-                        <div v-else>
-                            <p class="text-center">Você ainda não anexou a receita <router-link to="/admin/make/recipe">Clique aqui</router-link> para anexar</p>
-                        </div>
-                    </b-colxx>
-                </b-row>
-                <b-row v-else>
-                  <table class="table table-striped">
-                    <thead>
-                      <tr>
-                        <th>Nome</th>
-                        <th>Quantidade</th>
-                        <th>Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(item, index) in order.distribuidorCard" :key="index">
-                        <td>
-                          {{item.filter((r, i) => {
-                            if(r.attr == 'nome') return r
-                          })[0].value}}
-
-                          {{item.filter((r, i) => {
-                            if(r.attr == 'Cor') return r
-                          })[0].value}}
-
-                          {{item.filter((r, i) => {
-                            if(r.attr == 'Tamanho Comercial') return r
-                          })[0].value}}
-                        </td>
-                        <td>{{item.filter((r, i) => {
-                            if(r.attr == 'qtd') return r
-                          })[0].value}}</td>
-                        <td>
-                          <button class="btn btn-outline-danger btn-xs" @click="order.distribuidorCard.splice(index,1)">
-                            <i class="simple-icon-trash"></i>
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </b-row>
-            </b-card>
+        <b-colxx xxs="12" md="3">
+          <b-card class="mb-4" no-body>
+            <single-lightbox v-if="isImage(baseURL+currentOrder.face.value)" :thumb="baseURL+currentOrder.face.value" :large="baseURL+currentOrder.face.value" class-name="img-thumbnail card-img mx-auto d-block p-2" />
+            <b-card-body class="pt-0">
+              <router-link v-if="!currentOrder.recipe" to="/app/order/recipe" class="btn btn-xs btn-danger">Adicionar receita</router-link>
+              <div v-if="isImage(baseURL+currentOrder.recipe.value)">
+                <LightGallery
+                  :images="[baseURL+currentOrder.recipe.value]"
+                  :index="photoIndex"
+                  :disable-scroll="true"
+                  @close="handleHide()"
+                />
+                <router-link class="btn btn-xs btn-outline-info mt-1" to="#" @click.native.prevent="onThumbClick(0)">Ver receita</router-link>
+              </div>
+              <div v-else>
+                <a class="btn btn-xs btn-outline-info mt-1" target="_blank" :href="baseURL+currentOrder.recipe.value">Ver receita</a>
+              </div>
+              <div v-if="!isImage(baseURL+currentOrder.face.value)">
+                <a class="btn btn-xs btn-outline-info mt-1" target="_blank" :href="baseURL+currentOrder.face.value">Ver face</a>
+              </div>
+              <div class="info mt-3" v-for="(info, iInfo) in currentOrder.info" :key="iInfo">
+                <p class="text-muted text-small">{{iInfo == 'name' ? 'Nome' : iInfo}}</p>
+                <p v-if="info.length == 0" class="mb-3" style="letter-spacing:.13rem; text-decoration:underline;">Não preenchido</p>
+                <p v-else class="mb-3">{{info}}</p>
+              </div>
+            </b-card-body>
+          </b-card>
         </b-colxx>
-    </b-row>
-    <b-row v-if="order.type_user != 'distribuidor'">
-        <b-colxx class="d-flex justify-content-end">
-          <button class="show-success btn btn-info mb-3 btn-multiple-state btn-shadow ml-3" @click="() => {
-              if(order) {
-               order.new  = true;
-              }
-              sendInfo();
-            }">
-            <span class="label">Finalizar e iniciar nova solicitação</span>
-            <span class="spinner d-inline-block">
-              <span class="bounce1"></span>
-              <span class="bounce2"></span>
-              <span class="bounce3"></span>
-            </span>
-            <span class="icon success">
-              Finalizar e iniciar nova solicitação
-            </span>
-          </button>
-
-
-            <b-button v-if="awaitingOrders.length == 0" variant="success" :disabled="processing" :class="{'mb-3 btn-multiple-state btn-shadow ml-3': true,
+        <b-colxx xxs="12" md="6">
+          <b-card no-body>
+            <div class="d-flex product">
+              <single-lightbox :thumb="baseURL+currentOrder.product.img" :large="baseURL+currentOrder.product.img" class-name="img-thumbnail img-product mx-auto d-block p-2" />
+              <div class="p-3">
+                <h4 class="title">{{currentOrder.product.name.toUpperCase() + ' ' + currentOrder.product.attributes.map(r => r.value).join(' ').toUpperCase()}}</h4>
+                <p v-for="(attr, iAttr) in currentOrder.product.attributes" :key="iAttr"><b>{{attr.name}}: </b>{{attr.value}}</p>
+                <p class="mb-3">
+                  <b-badge variant="outline-secondary" class="mb-1 mr-1" pill v-for="(attr, iAttr) in lens" :key="iAttr">{{attr[0].name}}</b-badge>
+                </p>
+              </div>
+            </div>
+          </b-card>
+        </b-colxx>
+        <b-colxx>
+          <b-card title="Resumo da compra">
+            <div class="d-flex justify-content-between">
+              <h6 class="text-dark">Valor total:</h6>
+              <h6 v-if="price"><b>{{price | numeroPreco}}</b></h6>
+              <h6 v-else><b>Indisponível</b></h6>
+            </div>
+            <hr>
+            <b-form-checkbox v-if="awaitingOrders.length == 0" v-model="isMulti" name="check-button">
+              Após finalizar, iniciar nova solicitação
+            </b-form-checkbox>
+            <b-button variant="success" :disabled="processing" :class="{'m-3 btn-multiple-state btn-shadow btn-block': true,
                 'show-spinner': processing,
                 'show-success': !processing && uploadError===false,
                 'show-fail': !processing && uploadError }" @click="sendInfo">
@@ -128,27 +72,7 @@
                 </span>
                 <span class="label">Enviar Solicitação</span>
             </b-button>
-        </b-colxx>
-    </b-row>
-    <b-row v-else>
-        <b-colxx class="d-flex justify-content-end">
-            <b-button v-if="awaitingOrders.length == 0" variant="success" :disabled="processing" :class="{'mb-3 btn-multiple-state btn-shadow ml-3': true,
-                'show-spinner': processing,
-                'show-success': !processing && uploadError===false,
-                'show-fail': !processing && uploadError }" @click="sendInfoDistribuidor">
-                <span class="spinner d-inline-block">
-                    <span class="bounce1"></span>
-                    <span class="bounce2"></span>
-                    <span class="bounce3"></span>
-                </span>
-                <span class="icon success">
-                    Enviar Solicitação
-                </span>
-                <span class="icon fail">
-                    <i class="simple-icon-exclamation"></i>
-                </span>
-                <span class="label">Enviar Solicitação</span>
-            </b-button>
+          </b-card>
         </b-colxx>
     </b-row>
 </div>
@@ -160,168 +84,117 @@ import {
     mapMutations,
     mapActions
 } from 'vuex'
+
+import {LightGallery} from "vue-light-gallery";
 import {api, baseURL} from '@/constants/config';
 import myBreadCrumb from '@/components/adminBreadcrumb';
+import SingleLightbox from "@/components/Pages/SingleLightbox";
 export default {
     components: {
-        'my-breadcrumb': myBreadCrumb
+        'my-breadcrumb': myBreadCrumb,
+        "single-lightbox": SingleLightbox,
+        LightGallery
     },
     data() {
-        return {
-            order: null,
-            baseURL,
-            processing: false,
-            uploadError: false,
-            orderAwaiting: 0
-        }
+      return {
+        order: null,
+        baseURL,
+        uploadError: false,
+        price: 0,
+        isNew: 0,
+        photoIndex: null,
+        processing: false,
+        isMulti: false
+      }
     },
 
     computed: {
-        ...mapGetters(["processing", "loginError", "awaitingOrders"]),
-        valido: function(){
-            let message = '';
-            let status = true;
-
-            let order = window.localStorage.getItem('order');
-            order = JSON.parse(order)
-
-            try {
-              order.info.name
-            } catch (error) {
-                 status = false;
-                message += '- Nome do solicitante<br />';
+        ...mapGetters(["loginError", "awaitingOrders", "currentOrder"]),
+        lens(){
+          let lens = [];
+          for(let i in this.currentOrder.lens) {
+            if(this.currentOrder.lens[i].length > 0) {
+              lens.push(this.currentOrder.lens[i])
             }
+          }
 
-            //Product
-            try {
-              order.product
-            } catch (error) {
-              status = false;
-              message += '- Óculos<br />';
-            }
-
-            try {
-              order.face
-            } catch (error) {
-                status = false;
-                message += '- Imagem da face<br />';
-            }
-
-            try {
-              order.recipe
-            } catch (error) {
-                status = false;
-                message += '- Imagem da receita<br />';
-            }
-
-            try {
-              order.lens[0][0].name
-              console.log(order.lens[0][0].name)
-            } catch (error) {
-                status = false;
-                message +=  '- Tipo de lente<br />';
-            }
-
-            return {
-                status,
-                message
-            }
+          return lens;
         },
     },
     methods: {
-      ...mapActions(['getAwaitingOrders']),
+      ...mapActions(['getAwaitingOrders', 'clearCart']),
+      onThumbClick(index) {
+        this.photoIndex = index;
+      },
+      handleHide() {
+        this.photoIndex = null;
+      },
       isImage(ima){
         let existe = ['png', 'jpeg', 'jpg', 'gif', 'svg', 'heic'].map(r => { return ima.split(';')[0].indexOf(r) }).filter(r => r >= 0);
         return existe.length
       },
       sendInfo: async function(){
-          if(!this.valido.status) {
-              this.$notify("error", "Faltam algumas coisas", this.valido.message, {
+          let order = this.currentOrder;
+          order.consulta = false;
+          order.new = this.awaitingOrders.length == 0 ? (this.isMulti ? 1 : 0) : 1;
+          this.processing = true
+          const response = await api.post('/order', order);
+          let data = response.data;
+          if(data.status == 'success') {
+              this.$notify("success", order.new ? 'Sucesso' : `Pedido #${data.data.order.id}`, data.message, {
                   duration: 3000,
                   permanent: false
               });
+              this.clearCart();
+              this.$router.push(data.data.order.target);
           }else{
-            this.processing = true;
-            let order = JSON.parse(window.localStorage.getItem('order'));
-            if(this.order.new) { // Verifica se o usuário necessita cadastrar multiplos pedidos antes de efetuar a proposta
-              order.new = true;
-            }
-            const response = await api.post('/orderadmin', order);
-            let data = response.data;
-            if(data.status == 'success') {
-                this.$notify("success", order.new ? 'Sucesso' : `Pedido #${data.data.order.id}`, data.message, {
-                    duration: 3000,
-                    permanent: false
-                });
-
-                window.localStorage.removeItem('order');
-                this.$router.push(data.data.order.target);
-            }else{
-                this.uploadError = false;
-                this.$notify("error", 'Opsss...!', data.message, {
-                    duration: 3000,
-                    permanent: false
-                });
-                this.processing = false
-            }
-
-            this.getAwaitingOrders();
-          }
-      },
-      sendInfoDistribuidor: async function(){
-          if(false) {
-              this.$notify("error", "Faltam algumas coisas", this.valido.message, {
+              this.uploadError = false;
+              this.$notify("error", 'Opsss...!', data.message, {
                   duration: 3000,
                   permanent: false
               });
-          }else{
-            this.processing = true;
-            let order = JSON.parse(window.localStorage.getItem('order'));
-            if(this.order.new) { // Verifica se o usuário necessita cadastrar multiplos pedidos antes de efetuar a proposta
-              order.new = true;
-            }
-
-            order.distribuidor = this.type_user == 'distribuidor';
-            const response = await api.post('/orderadmin', order);
-            let data = response.data;
-            if(data.status == 'success') {
-                this.$notify("success", `Pedido #${data.data.order.id}`, data.message, {
-                    duration: 3000,
-                    permanent: false
-                });
-
-                window.localStorage.removeItem('order');
-                this.$router.push(data.data.order.target);
-            }else{
-                this.uploadError = false;
-                this.$notify("error", 'Opsss...!', data.message, {
-                    duration: 3000,
-                    permanent: false
-                });
-                this.processing = false
-            }
-
-            this.getAwaitingOrders();
           }
+
+          this.getAwaitingOrders();
+          this.processing = false
       },
-      infoOrder: function() {
-          this.order = JSON.parse(window.localStorage.getItem('order'));
-      },
+      async getValue(){
+        let order = this.currentOrder;
+        order.consulta = true;
+        const response = await api.post('/order', order);
+        if(response.data.status == 'success') {
+          this.price = response.data.data;
+        }
+      }
     },
     created() {
-        this.infoOrder();
+      this.getValue();
     },
     watch: {
     }
 }
 </script>
 
-<style scoped>
-    p{
-        margin-bottom: 5px!important;
-    }
+<style>
+p{
+    margin-bottom: 5px!important;
+}
 
-    .text-center a{
-        color: #00b3b7
-    }
+.text-center a{
+   color: #00b3b7
+}
+
+.mh-150{
+  max-height: 150px!important;
+}
+
+h4.title {
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.img-product {
+  width: 250px!important;
+  display: none;
+}
 </style>

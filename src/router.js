@@ -139,6 +139,11 @@ const routes = [
         component: () =>
           import(/* webpackChunkName: "user" */ "./views/order/ResponseOrder")
       },
+      {
+        path: "distribuidor/:hash/:response",
+        component: () =>
+          import(/* webpackChunkName: "user" */ "./views/order/ResponseDistribuidor")
+      },
     ]
   },
   {

@@ -21,7 +21,7 @@
           <tr v-for="(item, index) in currentCart" :key="index">
             <td>
               <div class="w-100px bg-white">
-                <single-lightbox :thumb="item.image" :large="item.image" class-name="w-100" />
+                <single-lightbox :thumb="baseURL+item.img" :large="baseURL+item.img" class-name="w-100" />
               </div>
             </td>
             <td>{{item.name.toUpperCase() + ' ' + item.attributes.map(r => r.value).join(' ').toUpperCase() }}</td>
@@ -82,9 +82,10 @@ import {
     mapActions,
     mapState
 } from "vuex";
-
+import {api, baseURL} from '@/constants/config';
 import SingleLightbox from "@/components/Pages/SingleLightbox";
 export default {
+    props: ["idCompany"],
     components:{
       "single-lightbox": SingleLightbox,
     },
@@ -94,7 +95,8 @@ export default {
     data(){
       return {
         processing: false,
-        uploadError: false
+        uploadError: false,
+        baseURL
       }
     },
     methods: {
@@ -138,8 +140,8 @@ export default {
           confirmButtonColor: '#7f7',
           cancelButtonText: "Cancelar",
           showLoaderOnConfirm: true,
-          preConfirm: (login) => {
-            this.finalizarOrder()
+          preConfirm: async (login) => {
+            await this.finalizarOrder(this.idCompany);
           },
           allowOutsideClick: () => !this.$swal.isLoading()
         });

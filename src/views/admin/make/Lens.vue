@@ -37,6 +37,7 @@
 </template>
 
 <script>
+import {mapGetters, mapActions} from 'vuex';
 import myBreadCrumb from '@/components/adminBreadcrumb';
 import check from '@/assets/img/check.svg'
 import checked from '@/assets/img/checked.svg'
@@ -44,51 +45,46 @@ import {api} from '@/constants/config';
 export default {
 	data() {
 		return {
-            tratament: null,
-            check,
-            checked,
-
+      tratament: null,
+      check,
+      checked,
 		}
 	},
-    components: {
-        'my-breadcrumb': myBreadCrumb,
+  components: {
+      'my-breadcrumb': myBreadCrumb,
 	},
+  computed: {
+    ...mapGetters(["currentOrder"])
+  },
 	methods: {
-        addTratament: function(){
-            let save = [];
-            for(let i in this.tratament) {
-              save.push(this.tratament[i][0].map(r => {
-                if(r.checked) {
-                  return r
-                }
-              }).filter(r => r));
-            }
+    ...mapActions(["setItemOrder"]),
+    addTratament: function(){
+      let save = [];
+      console.log(this.tratament);
+      for(let i in this.tratament) {
+        save.push(this.tratament[i][0].map(r => {
+          if(r.checked) {
+            return r
+          }
+        }).filter(r => r));
+      }
 
-              let order = window.localStorage.getItem('order');
-              if(order){
-                  order = JSON.parse(order);
-              }else{
-                  order = {}
-              }
-
-              order.lens = save;
-              window.localStorage.setItem('order', JSON.stringify(order));
-              this.$router.push("/admin/make/face");
-            // }
-        },
-        getLens: async function()
-        {
-          let {company} = JSON.parse(window.localStorage.getItem('order'));
-          const lens = await api.get("/lens", {
-            params: {
-              company
-            }
-          });
-          this.tratament = lens.data.data
+      this.setItemOrder({...save, type: 'lens'})
+      this.$router.push('/admin/make/face')
+    },
+    getLens: async function()
+    {
+      let {company} = JSON.parse(window.localStorage.getItem('order'));
+      const lens = await api.get("/lens", {
+        params: {
+          company
         }
+      });
+      this.tratament = lens.data.data
+    }
 	},
 	created() {
-        this.getLens();
+    this.getLens();
 	}
 }
 </script>

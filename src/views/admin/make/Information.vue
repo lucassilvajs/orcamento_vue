@@ -6,7 +6,7 @@
             <b-card class="mb-3" v-if="companies">
                 <b-row v-if="companiesValue">
                     <b-colxx>
-                        <b-form-group label="Selecione a empresa" class="has-float-label mb-4">
+                        <b-form-group label="Selecione a empresa">
                             <v-select v-model="setCompany"
                                 :options="companiesValue" dir="ltr"></v-select>
                         </b-form-group>
@@ -14,7 +14,7 @@
                 </b-row>
             </b-card>
 
-            <b-card class="mb-4" title="Dados do colaborador">
+            <b-card v-if="company" class="mb-4" title="Dados do colaborador">
                 <b-row>
                     <b-colxx v-if="fields">
                         <form @submit.prevent="formStepOne" class="form" v-if="false && setCompany || !this.fields.colaborador ">
@@ -39,21 +39,31 @@
                     </b-colxx>
                 </b-row>
             </b-card>
+
+            <distribuidor v-if="company" :idCompany="company" />
         </b-colxx>
     </b-row>
 </div>
 </template>
 
 <script>
+import {
+    mapGetters,
+    mapMutations,
+    mapActions
+} from 'vuex'
 
 import vSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
 import myBreadCrumb from '@/components/adminBreadcrumb';
+import distribuidor from '@/views/order/Distribuidor';
 import {api} from '@/constants/config';
+
 export default {
     components: {
         'my-breadcrumb': myBreadCrumb,
         'v-select': vSelect,
+        distribuidor
     },
     data() {
         return {
@@ -64,9 +74,6 @@ export default {
                 optical: '',
                 observation: '',
             },
-            order: {
-              type: '0'
-            },
             companies: false,
             company: false,
             setCompany: false,
@@ -76,32 +83,26 @@ export default {
         }
     },
     computed: {
-
+      ...mapGetters(["currentOrder"])
     },
     methods: {
-        formStepOne: function(type = 'products'){
-            let form = {};
-            form['name'] = this.values[0];
-            this.fields.forEach((el, index) => {
-                form[el.replace(':', '')] = this.values[index+1]
-            });
+        ...mapActions(["setItemOrder"]),
+        formStepOne: function(){
+          let form = {};
+          form['name'] = this.values[0];
 
-            let order = window.localStorage.getItem('order');
-            if(order){
-                order = JSON.parse(order);
-            }else{
-                order = {}
-            }
+          this.fields.forEach((el, index) => {
+              form[el.replace(':', '')] = this.values[index+1]
+          });
 
-            order.info = form;
-            order.type_user = type;
+          if(this.company) this.setItemOrder({company: this.company, type: 'company'});
 
-            if(this.company) order.company = this.company;
-            window.localStorage.setItem('order', JSON.stringify(order));
-            this.$router.push(`/admin/make/products`);
+          form.type = 'info'
+          this.setItemOrder(form)
+          this.$router.push("/admin/make/products");
         },
         getItemsAdd: async function() {
-          const itemsFields = await api.get('admin/company/fields');
+          const itemsFields = await api.get('company/fields');
           this.fields = itemsFields.data.data
           if(this.fields.colaborador){
             this.companies = this.fields.companies
@@ -120,14 +121,13 @@ export default {
               });
             }
 
-            let info = window.localStorage.getItem('order');
+            let info = this.currentOrder.info;
             if(info) {
-                info = JSON.parse(info).info;
-                let ind = 0;
-                for(let i in info) {
-                    this.values[ind] = info[i]
-                    ind++;
-                }
+              let ind = 0;
+              for(let i in info) {
+                this.values[ind] = info[i]
+                ind++;
+              }
             }
           }
         },
@@ -147,29 +147,15 @@ export default {
             this.fields = ["Chapa", "Setor", "Turno"];
           }
           this.company = this.companies[novo.code].idCompany
-          if(this.companies[novo.code].type_user == 1) {
-            this.formStepOne('distribuidor');
-          }
-          let info = window.localStorage.getItem('order');
+          let info = this.currentOrder.info;
           if(info) {
-              info = JSON.parse(info).info;
               let ind = 0;
               for(let i in info) {
                   this.values[ind] = info[i]
                   ind++;
               }
           }
-
-          let order = window.localStorage.getItem('order');
-          if(order){
-              order = JSON.parse(order);
-          }else{
-              order = {}
-          }
-
-          if(this.company) order.company = this.company;
-          window.localStorage.setItem('order', JSON.stringify(order));
-      }
+      },
     },
 
     created() {

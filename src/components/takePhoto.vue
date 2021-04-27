@@ -87,7 +87,7 @@ export default {
       totem: false
 		}
 	},
-	props: ["target", "sac"],
+	props: ["target", "sac", "link"],
 	components: {
     	'vue-web-cam': WebCam
 	},
@@ -212,7 +212,7 @@ export default {
               duration: 3000,
               permanent: false
             });
-            this.$router.push(`/app/order/${redirect}`);
+            this.$router.push(`${this.link}${redirect}`);
           }
         }
 
@@ -261,7 +261,7 @@ export default {
                 duration: 3000,
                 permanent: false
               });
-              this.$router.push(`/app/order/${redirect}`);
+              this.$router.push(`${this.link}${redirect}`);
             }
 
           }
@@ -269,7 +269,7 @@ export default {
       }else{
         if(!erroUpload) {
           const redirect = this.target == 'face' ? 'recipe' : 'confirmation';
-          this.$router.push(`/app/order/${redirect}`);
+          this.$router.push(`${this.link}${redirect}`);
         }
 
       }

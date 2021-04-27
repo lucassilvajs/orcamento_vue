@@ -56,8 +56,16 @@ export default {
       context.commit('EDIT_ITEM_CART', currentCart);
       localStorage.setItem('cart', JSON.stringify(context.state.currentCart))
     },
-    async finalizarOrder({state}, payload){
-      const data = await api.post('/distribuidor', state.currentCart)
+    async finalizarOrder({state, commit}, payload){
+      const data = await api.post('/distribuicao', {cart: state.currentCart, idCompany: payload});
+      this._vm.$notify(data.data.status, data.data.status == 'success' ? 'Sucesso' : 'Opsss...', data.data.message, {
+        duration: 3000,
+        permanent: false
+      });
+
+      commit('EDIT_ITEM_CART', []);
+      localStorage.setItem('cart', JSON.stringify(state.currentCart))
+
     }
   }
 }

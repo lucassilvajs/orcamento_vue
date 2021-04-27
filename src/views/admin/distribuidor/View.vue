@@ -13,8 +13,8 @@
                   <label class="custom-control custom-checkbox pl-4 mb-0 d-inline-block" slot="button-content">
                       <input class="custom-control-input" type="checkbox" v-model="selectAll">
                       <span :class="{
-      'custom-control-label' :true
-    }">&nbsp;</span>
+                        'custom-control-label' :true
+                      }">&nbsp;</span>
                   </label>
                   <b-dropdown-item @click="alertActionDelete()">Deletar pedidos</b-dropdown-item>
               </b-dropdown>
@@ -47,6 +47,8 @@
                   <td>{{statusLabel[item.order_status]}}</td>
                   <td>
                     <b-dropdown id="ddown1" text="Ações" variant="outline-primary">
+                        <b-dropdown-item v-b-modal.modalCart @click="modalCart(index)">Ver pedido</b-dropdown-item>
+                        <b-dropdown-item @click="changeOrder(item.order_id, 'reenviar')">Reenviar proposta</b-dropdown-item>
                         <b-dropdown-item @click="changeOrder(item.order_id, 'nf')" v-if="$route.params.status == 'order' && !item.order_bling">Gerar Nota Fiscal</b-dropdown-item>
                         <b-dropdown-item @click="changeOrder(item.order_id, 'approve')" v-if="$route.params.status != 'order'">Aprovar</b-dropdown-item>
                         <b-dropdown-item @click="changeOrder(item.order_id, 'delete')">Excluir Pedido</b-dropdown-item>
@@ -74,6 +76,47 @@
       </b-colxx>
     </b-row>
 
+    <b-modal id="modalCart" size="lg" title="Large Modal" hide-footer hide-header v-if="item">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Nome</th>
+            <th>Quantidade</th>
+            <th>Preço </th>
+            <th>Preço praticado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(it, index) in item" :key="index">
+            <td>
+              <div class="w-100px bg-white">
+                <single-lightbox :thumb="baseURL+it.img" :large="baseURL+it.img" class-name="w-100" />
+              </div>
+            </td>
+             <td>{{it.name.toUpperCase() + ' ' + it.attributes.map(r => r.value).join(' ').toUpperCase() }}</td>
+            <td>
+
+              <div class="control text-center">
+                <b>{{it.qty}}</b>
+              </div>
+
+            </td>
+            <td> {{it.qty * it.price | numeroPreco}} </td>
+            <td> {{it.price | numeroPreco}} </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="text-right" colspan="5">
+              <p>Valor total: <b>{{ getTotalCart() | numeroPreco }} </b> </p>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </b-modal>
+
+
   </div>
 </div>
 </template>
@@ -82,9 +125,11 @@ import check from '@/assets/img/check.svg'
 import checked from '@/assets/img/checked.svg'
 import { api, baseURL } from '@/constants/config'
 import Stars from '@/components/Common/Stars';
+import SingleLightbox from "@/components/Pages/SingleLightbox";
 export default {
   components: {
-    'stars': Stars
+    'stars': Stars,
+    "single-lightbox": SingleLightbox,
   },
   data () {
     return {
@@ -104,7 +149,8 @@ export default {
         pending: 'Pendente',
         awaiting: 'Aguardando envio',
         approved: 'Aprovado'
-      }
+      },
+      item: null
     }
   },
   computed: {
@@ -147,6 +193,7 @@ export default {
       if(action == 'nf') message = 'Você realmente deseja emitir a nota fiscal desse pedido?';
       if(action == 'approve') message = 'Você realmente deseja aprovar esse pedido?';
       if(action == 'delete') message = 'Você realmente deseja deletar esse pedido?';
+      if(action == 'reenviar') message = 'Você realmente deseja reenviar a proposta?';
 
       this.$swal.fire({
         title: "Você está certo disso?",
@@ -170,6 +217,16 @@ export default {
         this.getOrder();
       })
     },
+    modalCart(index){
+      this.item = JSON.parse(this.items[index].order_attributes)
+    },
+    getTotalCart(){
+      let total = 0;
+      this.item.forEach(element => {
+        total += element.qty * element.price
+      });
+      return total;
+    },
   },
   created(){
     this.getOrder();
@@ -187,6 +244,22 @@ export default {
     width: 20px
 }
 
+.w-100px {
+  display: flex;
+  align-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  border: 1px solid #aaa;
+  border-radius: 7px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.w-100px:hover, .w-100px.active, .circle-item:hover, .circle-item.active {
+  border: solid rgb(0, 172, 149);
+  cursor: pointer;
+}
 /* .son {
   background: #fff;
 }

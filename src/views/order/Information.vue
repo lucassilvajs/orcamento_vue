@@ -14,7 +14,7 @@
                 </b-row>
             </b-card>
 
-            <b-card class="mb-4" title="Dados do colaborador">
+            <b-card v-if="company" class="mb-4" title="Dados do colaborador">
                 <b-row>
                     <b-colxx v-if="fields">
                         <form @submit.prevent="formStepOne" class="form" v-if="false && setCompany || !this.fields.colaborador ">
@@ -40,7 +40,7 @@
                 </b-row>
             </b-card>
 
-            <distribuidor />
+            <distribuidor v-if="company" :idCompany="company" />
         </b-colxx>
     </b-row>
 </div>
@@ -55,7 +55,7 @@ import {
 
 import vSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
-import myBreadCrumb from '@/components/breadcrumb';
+import myBreadCrumb from '@/components/adminBreadcrumb';
 import distribuidor from '@/views/order/Distribuidor';
 import {api} from '@/constants/config';
 
@@ -88,18 +88,18 @@ export default {
     methods: {
         ...mapActions(["setItemOrder"]),
         formStepOne: function(){
-            let form = {};
-            form['name'] = this.values[0];
+          let form = {};
+          form['name'] = this.values[0];
 
-            this.fields.forEach((el, index) => {
-                form[el.replace(':', '')] = this.values[index+1]
-            });
+          this.fields.forEach((el, index) => {
+              form[el.replace(':', '')] = this.values[index+1]
+          });
 
-            if(this.company) this.setItemOrder({company: this.company, type: 'company'});
+          if(this.company) this.setItemOrder({company: this.company, type: 'company'});
 
-            form.type = 'info'
-            this.setItemOrder(form)
-            this.$router.push("/app/order/products");
+          form.type = 'info'
+          this.setItemOrder(form)
+          this.$router.push("/app/order/products");
         },
         getItemsAdd: async function() {
           const itemsFields = await api.get('company/fields');
@@ -121,15 +121,13 @@ export default {
               });
             }
 
-
-
             let info = this.currentOrder.info;
             if(info) {
-                let ind = 0;
-                for(let i in info) {
-                    this.values[ind] = info[i]
-                    ind++;
-                }
+              let ind = 0;
+              for(let i in info) {
+                this.values[ind] = info[i]
+                ind++;
+              }
             }
           }
         },

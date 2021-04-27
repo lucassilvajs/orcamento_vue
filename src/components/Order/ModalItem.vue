@@ -65,7 +65,7 @@ import {
 import {api, baseURL} from '@/constants/config';
 import { Carousel, Slide } from 'vue-carousel';
 export default {
-    props:["typeItem", "idProduct", "idCompany"],
+    props:["typeItem", "idProduct", "idCompany", "link"],
     components: {
       Carousel,
       Slide
@@ -197,11 +197,11 @@ export default {
         item.type = 'product';
 
         this.setItemOrder(item)
-        this.$router.push(`/app/order/lens`);
+        this.$router.push(`${this.link}/lens`);
       },
 
       async getProduct() {
-        const data = await api.get(`product/${this.idProduct}/${this.idCompany}`);
+        const data = await api.get(`${this.typeItem == 'complete' ? 'product' : 'distribuicao'}/${this.idProduct}/${this.idCompany}`);
         this.product = data.data.data;
       }
     },
@@ -210,6 +210,7 @@ export default {
     },
     watch: {
       async idProduct(){
+        this.product = null;
         await this.getProduct();
       }
 

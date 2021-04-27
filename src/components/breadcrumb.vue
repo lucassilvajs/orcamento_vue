@@ -4,8 +4,7 @@
         <b-colxx xxs="12">
             <div class="d-flex text-center mb-3" style="padding:5px 0;border-bottom:1px solid #ccc; border-top:1px solid #ccc; overflow:auto">
                 <div v-for="(item, index) in itemsOrder" :key="index" class="col">
-                    <router-link v-if="!item.isLink" :to="item.link">{{item.text}}</router-link>
-                    <a v-else>{{item.text}}</a>
+                    <router-link :to="item.link">{{item.text}}</router-link>
                 </div>
             </div>
         </b-colxx>

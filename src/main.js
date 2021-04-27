@@ -59,16 +59,14 @@ Vue.use(VueLineClamp, {
 })
 Vue.use(VCalendar, {
   firstDayOfWeek: 2, // ...other defaults,
+  "is-expanded": false,
   formats: {
     title: 'MMM YY',
     weekdays: 'WW',
     navMonths: 'MMMM',
     input: ['L', 'YYYY-MM-DD', 'YYYY/MM/DD'],
-    dayPopover: 'L'
-  },
-  datePickerShowDayPopover: false,
-  popoverExpanded: true,
-  popoverDirection: 'bottom'
+    dayPopover: 'L',
+  }
 });
 Vue.use(VueScrollTo);
 Vue.config.productionTip = false

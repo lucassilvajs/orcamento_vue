@@ -1,6 +1,6 @@
 <template>
   <div>
-    <my-breadcrumb :distribuidor="distribuidor" />
+    <my-breadcrumb />
      <b-row>
       <b-colxx xxs="12">
         <b-card class="mb-4" title="Selecione o item">
@@ -16,7 +16,7 @@
       </b-colxx>
     </b-row>
 
-    <ModalItem typeItem="complete" :idProduct="idProduct" :idCompany="idCompany" />
+    <ModalItem typeItem="complete" link="/app/order" :idProduct="idProduct" :idCompany="idCompany" />
 
 
   </div>
@@ -38,25 +38,7 @@ export default {
 		return {
       products: null,
       idProduct: 0,
-			// products: [
-      //   {
-      //     image: 'https://api.idsafety.com.br/public/upload/product/spray.png',
-      //     name: 'SPRAY ANTIEMBAÇANTE 15ML',
-      //     description: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quae adipisci laboriosam iure rem atque',
-      //     price: 15,
-      //     id: 1,
-      //   },
-      //   {
-      //     image: 'https://api.idsafety.com.br/public/upload/product/spray.png',
-      //     name: 'SPRAY ANTIEMBAÇANTE 15ML',
-      //     description: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quae adipisci laboriosam iure rem atque',
-      //     price: 15,
-      //     id: 2,
-      //   }
-      // ],
       baseURL,
-      distribuidor: false,
-      distribuidorCard: []
 		}
 	},
   components: {
@@ -67,7 +49,7 @@ export default {
   computed: {
     ...mapGetters(["currentOrder"]),
     idCompany(){
-      return this.currentOrder.company.company
+      return this.currentOrder.company ? this.currentOrder.company.company : 0;
     }
   },
 	methods: {
@@ -82,7 +64,7 @@ export default {
         });
       }
 
-      let company = this.currentOrder.company.company;
+      let company = this.currentOrder.company ? this.currentOrder.company.company : 0;
 			const products = await api.get(`/products/${company}`);
 			this.products = products.data.data
     },
