@@ -41,12 +41,6 @@
                           text: r.name}
                           })" />
                       </b-form-group>
-                      <b-form-group v-if="productInfo.type.filter(r => {if(r.id == product.type) return r;})[0].parent" label="Sub categoria" class="has-float-label">
-                        <b-form-select v-model="product.subtype" :options="productInfo.type.filter(r => {if(r.id == product.type) return r;})[0].parent.map(r => {
-                          return {value: r.id,
-                          text: r.name}
-                          })" />
-                      </b-form-group>
                     </b-colxx>
                   </b-row>
                   <b-row>
@@ -76,7 +70,7 @@
         </b-colxx>
 
         <b-colxx xxs="12">
-          <b-card class="mb-4" title="Imagens" v-if="product.type == 1">
+          <b-card class="mb-4" title="Imagens" v-if="product.type == 1 || product.type == 5">
             <b-alert dismissible show variant="info">Adicione aqui <strong>Todas</strong> as imagens referentes a esse produto</b-alert>
             <vue-dropzone @vdropzone-complete="completeUpload" ref="myVueDropzone" id="dropzone" :options="dropzoneOptions" />
             <draggable v-if="listImages.length > 0" class="row min-height" :list="listImages" :group="{name: 'people', pull: 'clone'}" >
@@ -87,7 +81,7 @@
           </b-card>
         </b-colxx>
 
-        <b-colxx lg="8" xxs="12" v-if="product.type == 1">
+        <b-colxx lg="8" xxs="12" v-if="product.type == 1 || product.type == 5">
           <b-card class="mb-4" title="Criar seu produto">
             <div class="area-drop">
               <draggable class="row min-height" :list="createdProduct" :group="{ name: 'people'}" @change="refreshElements">
@@ -127,7 +121,7 @@
           </b-card>
         </b-colxx>
 
-        <b-colxx lg="4" xxs="12" v-if="productInfo.attributes && product.type == 1">
+        <b-colxx lg="4" xxs="12" v-if="productInfo.attributes && product.type == 1 || product.type == 5">
           <b-card class="mb-4" title="Atributos">
             <draggable class="list-group min-height" :list="productInfo.attributes" :group="{ name: 'people', pull: 'clone'}" @change="refreshElements">
               <div class="list-group-item" v-for="(element, index) in productInfo.attributes" :key="index">

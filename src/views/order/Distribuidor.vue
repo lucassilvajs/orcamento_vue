@@ -51,7 +51,7 @@ export default {
 	methods: {
     getProducts: async function()
 		{
-			const products = await api.get(`/distribuicao/${this.idCompany}`);
+			const products = await api.get(`/distribuicao/${ isNaN(this.idCompany) ? 0 : this.idCompany}`);
 			this.products = products.data.data
     },
     setItem(item) {

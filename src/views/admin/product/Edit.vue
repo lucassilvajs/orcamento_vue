@@ -41,12 +41,6 @@
                           text: r.name}
                           })" />
                       </b-form-group>
-                      <b-form-group v-if="productInfo.type.filter(r => {if(r.id == product.type) return r;})[0].parent" label="Sub categoria" class="has-float-label">
-                        <b-form-select v-model="product.subtype" :options="productInfo.type.filter(r => {if(r.id == product.type) return r;})[0].parent.map(r => {
-                          return {value: r.id,
-                          text: r.name}
-                          })" />
-                      </b-form-group>
                     </b-colxx>
                   </b-row>
                   <b-row>
@@ -75,48 +69,7 @@
           </b-card>
         </b-colxx>
 
-        <b-colxx xxs="12" v-if="product.type == 1">
-          <b-card class="mb-4" title="Preço dinâmico (Distribuidor)">
-            <table class="table">
-              <thead>
-                <th v-for="(qtd, indexQtd) in productDistribuidor.price" :key="indexQtd">{{qtd.qty}} Itens  <a class="p-1 text-danger" @click="() => {
-                    if(productDistribuidor.price.length == 1) {
-                      $notify('error', 'Opsss...!', 'Você tem que deixar pelo menos um preço ativo', {
-                        duration: 3000,
-                        permanent: false
-                      });
-                    }else{
-                      productDistribuidor.price.splice(indexQtd, 1);
-                    }
-                  }"><i class="glyph-icon simple-icon-minus" /></a>
-                </th>
-                <th class="d-flex">
-                  <the-mask class="form-control form-my" v-model="addPrices" :mask="['######']" />
-                  <button class="btn btn-xs btn-outline-success" @click="addItemProduct">
-                    <i class="glyph-icon simple-icon-plus" />
-                  </button>
-                </th>
-              </thead>
-              <tbody>
-                <tr>
-                  <td v-for="(value, indexValue) in productDistribuidor.price" :key="indexValue">
-                    <Money :masked="false" class="form-my" v-model="productDistribuidor.price[indexValue].value" v-bind="{ decimal: ',',thousands: '.',suffix: '%',precision: 2,masked: true,}"/>
-                  </td>
-                  <td></td>
-                </tr>
-                <tr>
-                  <td :colspan="productDistribuidor.price.length">
-                    <button class="btn btn-outline-success" @click="savePrecos">
-                      Salvar descontos
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </b-card>
-        </b-colxx>
-
-        <b-colxx xxs="12" v-if="product.type == 1">
+        <b-colxx xxs="12" v-if="product.type == 1 || product.type == 5">
           <b-card class="mb-4" title="Imagens">
             <b-alert dismissible show variant="info">Adicione aqui <strong>Todas</strong> as imagens referentes a esse produto</b-alert>
             <vue-dropzone @vdropzone-complete="completeUpload" ref="myVueDropzone" id="dropzone" :options="dropzoneOptions" />
@@ -128,7 +81,7 @@
           </b-card>
         </b-colxx>
 
-        <b-colxx lg="8" xxs="12" v-if="product.type == 1">
+        <b-colxx lg="8" xxs="12" v-if="product.type == 1 || product.type == 5">
           <b-card class="mb-4" title="Criar seu produto">
             <div class="area-drop">
               <draggable class="row min-height" :list="createdProduct" :group="{ name: 'people'}" @change="refreshElements">
@@ -168,7 +121,7 @@
           </b-card>
         </b-colxx>
 
-        <b-colxx lg="4" xxs="12" v-if="productInfo.attributes && product.type == 1">
+        <b-colxx lg="4" xxs="12" v-if="productInfo.attributes && product.type == 1 || product.type == 5">
           <b-card class="mb-4" title="Atributos">
             <draggable class="list-group min-height" :list="productInfo.attributes" :group="{ name: 'people', pull: 'clone'}" @change="refreshElements">
               <div class="list-group-item" v-for="(element, index) in productInfo.attributes" :key="index">
@@ -178,7 +131,7 @@
           </b-card>
         </b-colxx>
 
-        <b-colxx xxs="12" v-if="product.attributes.length > 0 && product.type == 1">
+        <b-colxx xxs="12" v-if="product.attributes.length > 0 && product.type == 1 || product.type == 5">
           <b-card title="Variações criadas">
             <b-row>
               <b-colxx md="3" v-for="(attr, attrIndex) in product.attributes" :key="attrIndex">

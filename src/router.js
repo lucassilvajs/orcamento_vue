@@ -120,7 +120,8 @@ const routes = [
       {
         path: "/app/company/card/:id",
         component: () =>
-          import(/* webpackChunkName: "dashboards" */ "./views/app/company/CardNew")
+          import(/* webpackChunkName: "dashboards"  */ "./views/app/company/CardNew")
+          // import(/* webpackChunkName: "dashboards"  */ "./views/Manutencao")
       },
       {
         path: "/logout",
@@ -296,6 +297,7 @@ const routes = [
         path: "/admin/product/new",
         component: () =>
           import(/* webpackChunkName: "dashboards" */ "./views/admin/product/New")
+          // import(/* webpackChunkName: "dashboards"  */ "./views/Manutencao")
       },
       {
         path: "/admin/product/edit/:id",

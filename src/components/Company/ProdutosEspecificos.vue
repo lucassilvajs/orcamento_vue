@@ -13,7 +13,7 @@
               <fieldset class="form-group has-float-label mb-4">
                 <legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0">Preço</legend>
                 <div tabindex="-1" role="group" class="bv-no-focus-ring">
-                    <Money class="form-control" v-model="product.price" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
+                    <Money class="form-control" v-model="product.price" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: false,}"/>
                 </div>
               </fieldset>
             </b-form-group>

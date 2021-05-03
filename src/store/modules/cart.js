@@ -33,7 +33,6 @@ export default {
           if(JSON.stringify(r.attributes) === JSON.stringify(payload.attributes) && r.id == payload.id ) { // Verifica se algum item corresponde ao inserido
             isEdit = true; // Confirma que é uma edição
             r = payload; // Atualiza o item
-            console.log(payload)
           }
           currentCart.push(r)
         });

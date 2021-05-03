@@ -149,11 +149,11 @@
                       <b-dropdown id="ddown1" text="Ações" variant="outline-primary">
                         <b-dropdown-item @click="getInfoOrder(index)" v-b-modal.modalright>Informações do pedido</b-dropdown-item>
 
-                        <b-dropdown-item v-if="it.status == 'Pendente'">
+                        <!-- <b-dropdown-item v-if="it.status == 'Pendente'">
                           <router-link :to="`/admin/company/edit`">
                             Cadastrar e-mail XML
                           </router-link>
-                        </b-dropdown-item>
+                        </b-dropdown-item> -->
                       </b-dropdown>
                       <!-- <span @click="pc.order = it.id">
                         <button v-if="it.status == 'Aprovado' && !it.attr.pc && it.pedidoCompra != 222 && !consultor" class="btn btn-outline-warning" v-b-modal.modalright1>

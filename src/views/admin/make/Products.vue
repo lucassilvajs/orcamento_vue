@@ -6,7 +6,7 @@
         <b-card class="mb-4" title="Selecione o item">
           <b-row v-if="products">
             <b-colxx md="4" lg="3" v-for="(pro, i) in products" :key="i">
-              <CardProduct :product="pro" @click.native="setItem(pro.id)" v-b-modal.modallg />
+              <CardProduct typeItem="complete" :product="pro" @click.native="setItem(pro.id)" v-b-modal.modallg />
             </b-colxx>
           </b-row>
           <b-row v-else class="align-items-center justify-content-center text-center">

@@ -36,6 +36,7 @@
                   <th>CNPJ</th>
                   <th>Colaborador</th>
                   <th>Nº Pedido</th>
+                  <th>Inclusão</th>
                   <th>Preço</th>
                   <th>NCM</th>
                   <th>Status</th>
@@ -56,6 +57,7 @@
                   <td>{{item.cnpj}}</td>
                   <td>{{item.name}}</td>
                   <td>{{item.object.sap.orderId}}</td>
+                  <td>{{item.date}}</td>
                   <td><b>ERP: </b>{{item.value}} <br /> <b>Cotado:</b> {{item.object.sap.price | numeroPreco}}</td>
                   <td>
                     {{item.object.sap.ncm}}

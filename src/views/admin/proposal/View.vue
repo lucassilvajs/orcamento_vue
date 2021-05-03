@@ -172,11 +172,13 @@
           <b>{{item.type}}</b> {{item.name}}
         </div>
         <b>Face: </b><br />
-        <img class="w-100" :src="baseURL + or.attr.face" v-if="isImage(or.attr.face)" alt="">
-        <iframe height="350" v-else class="w-100" :src="baseURL + or.attr.face" frameborder="0"></iframe>
+        <div v-if="isImage(or.attr.face)">
+            <single-lightbox  :thumb="baseURL + (typeof or.attr.face == 'object' ? or.attr.face.value : or.attr.face)" :large="baseURL + (typeof or.attr.face == 'object' ? or.attr.face.value : or.attr.face)" class-name="img-thumbnail card-img mx-auto d-block p-2" />
+        </div>
+        <iframe height="350" v-else class="w-100" :src="baseURL + (typeof or.attr.face == 'object' ? or.attr.face.value : or.attr.face)" frameborder="0"></iframe>
         <b>Receita: </b><br />
-        <img class="w-100" :src="baseURL + or.attr.recipe" v-if="isImage(or.attr.recipe)" alt="">
-        <iframe height="350" v-else class="w-100" :src="baseURL + or.attr.recipe" frameborder="0"></iframe>
+        <img class="w-100" :src="baseURL + (typeof or.attr.recipe == 'object' ? or.attr.recipe.value : or.attr.recipe)" v-if="isImage(or.attr.recipe)" alt="">
+        <iframe height="350" v-else class="w-100" :src="baseURL + (typeof or.attr.recipe == 'object' ? or.attr.recipe.value : or.attr.recipe)" frameborder="0"></iframe>
         <hr class="my-3">
       </div>
       <template slot="modal-footer">
@@ -196,10 +198,12 @@ import vSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
 import { api, baseURL } from '@/constants/config'
 import Stars from '@/components/Common/Stars';
+import SingleLightbox from "@/components/Pages/SingleLightbox";
 export default {
   components: {
     'stars': Stars,
     'v-select': vSelect,
+    "single-lightbox": SingleLightbox,
   },
   data () {
     return {
@@ -219,7 +223,9 @@ export default {
   },
   methods: {
     isImage(ima){
-      let existe = ['png', 'jpeg', 'jpg', 'gif', 'svg', 'heic'].map(r => { return ima.split(';')[0].indexOf(r) }).filter(r => r >= 0);
+      if (typeof ima == 'object') ima = ima.value;
+      let total = ima.split('.').length;
+      let existe = ['png', 'jpeg', 'jpg', 'gif', 'svg', 'heic'].map(r => { return ima.split('.')[total - 1].indexOf(r) }).filter(r => r >= 0);
       return existe.length
     },
     async getOrder() {

@@ -2,7 +2,7 @@
   <div>
     <b-card class="mb-4" title="Usuários">
         <b-colxx md="12" lg="12">
-            <b-row>
+            <b-row v-if="currentCompany">
               <b-colxx md="4" lg="4" v-for="(user, index) in currentCompany.users.filter(r => r.concluido !== 0)" :key="index">
                 <b-card class="p-2" no-body>
                   <p class="mb-1"><b>Nome: </b>{{user.name}}</p>

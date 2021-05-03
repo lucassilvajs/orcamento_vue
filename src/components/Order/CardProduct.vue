@@ -7,7 +7,7 @@
       <b-card-body>
         <form @submit.prevent="setProduct(pro)">
           <div class="d-flex justify-content-end">
-            <h5 class="price text-success">{{product.price | numeroPreco}}</h5>
+            <h5 v-if="typeItem != 'complete'" class="price text-success">{{product.price | numeroPreco}}</h5>
           </div>
           <h4 class="name-product">{{product.name}}</h4>
           <p v-if="product.description" class="text-muted">{{product.description}}</p>
@@ -21,7 +21,7 @@
 import {api, baseURL} from '@/constants/config';
 export default {
 
-    props: ["product"],
+    props: ["product", "typeItem"],
     components: {
 
     },

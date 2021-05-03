@@ -171,7 +171,7 @@
     </b-colxx>
   </b-row>
 
-  <b-modal v-if="order" id="modalright" ref="modalright" :title="`Pedido #${order.id}`" modal-class="modal-right">
+  <b-modal size="lg" v-if="order" id="modalright" ref="modalright" :title="`Pedido #${order.id}`">
       <b>Data: </b>{{order.date}}<br />
       <b>Empresa: </b>{{order.empresa.split('-')[0]}}<br />
       <b>Colaborador: </b>{{order.object.info.name}}<br />
@@ -193,12 +193,25 @@
         <b>{{item.type}}</b> {{item.name}}
       </div>
       <div>
-        <b>Face: </b><br />
-        <img class="w-100 mb-3" :src="baseURL + order.object.face" v-if="isImage(order.object.face)" alt="">
-        <iframe height="350" v-else class="w-100 mb-3" :src="baseURL + order.object.face" frameborder="0"></iframe>
-        <b>Receita: </b><br />
-        <img class="w-100 mb-3" :src="baseURL + order.object.recipe" v-if="isImage(order.object.recipe)" alt="">
-        <iframe height="350" v-else class="w-100 mb-3" :src="baseURL + order.object.recipe" frameborder="0"></iframe>
+        <div class="d-flex">
+          <div class="face w-50">
+            <b>Face: </b><br />
+            <div v-if="isImage(order.object.face)">
+                <single-lightbox  :thumb="baseURL + (typeof order.object.face == 'object' ? order.object.face.value : order.object.face)" :large="baseURL + (typeof order.object.face == 'object' ? order.object.face.value : order.object.face)" class-name="img-thumbnail card-img mx-auto d-block p-2" />
+            </div>
+            <iframe height="350" v-else class="w-100" :src="baseURL + (typeof order.object.face == 'object' ? order.object.face.value : order.object.face)" frameborder="0"></iframe>
+          </div>
+          <div class="recipe w-50">
+            <b>Receita: </b><br />
+            <div v-if="isImage(order.object.recipe)">
+              <single-lightbox  :thumb="baseURL + (typeof order.object.recipe == 'object' ? order.object.recipe.value : order.object.recipe)" :large="baseURL + (typeof order.object.recipe == 'object' ? order.object.recipe.value : order.object.recipe)" class-name="img-thumbnail card-img mx-auto d-block p-2" />
+            </div>
+            <iframe height="350" v-else class="w-100" :src="baseURL + (typeof order.object.recipe == 'object' ? order.object.recipe.value : order.object.recipe)" frameborder="0"></iframe>
+
+          </div>
+        </div>
+
+
 
           <div v-if="items[index].len != 1" @click="changeLen(1)"><img :src="check" alt="" class="img-input"> Lente solicitada</div>
           <div v-else><img :src="checked" alt="" class="img-input"> Lente solicitada</div>
@@ -221,9 +234,11 @@ import check from '@/assets/img/check.svg'
 import checked from '@/assets/img/checked.svg'
 import { api, baseURL } from '@/constants/config'
 import Stars from '@/components/Common/Stars';
+import SingleLightbox from "@/components/Pages/SingleLightbox";
 export default {
   components: {
-    'stars': Stars
+    'stars': Stars,
+    "single-lightbox": SingleLightbox,
   },
   data () {
     return {
@@ -248,7 +263,9 @@ export default {
       return this.$route.path.split('/')[2] == page
     },
      isImage(ima){
-      let existe = ['png', 'jpeg', 'jpg', 'gif', 'svg', 'heic'].map(r => { return ima.split(';')[0].indexOf(r) }).filter(r => r >= 0);
+      if (typeof ima == 'object') ima = ima.value;
+      let total = ima.split('.').length;
+      let existe = ['png', 'jpeg', 'jpg', 'gif', 'svg', 'heic'].map(r => { return ima.split('.')[total - 1].indexOf(r) }).filter(r => r >= 0);
       return existe.length
     },
     async getOrder() {

@@ -2,7 +2,7 @@ import {api ,getCep} from '@/constants/config';
 import axios from "axios";
 export default {
   state: {
-    currentCompany: null,
+    currentCompany: {},
   },
   getters: {
     currentCompany: state => state.currentCompany,
@@ -17,7 +17,6 @@ export default {
     async getCompany({commit}, payload){
       const response = await api.get(`admin/company/${payload.id}`);
       let currentCompany = response.data.data;
-
       commit('SET_COMPANY', currentCompany);
     },
 
@@ -36,6 +35,16 @@ export default {
         context.commit('SET_COMPANY', address);
         context.commit('loading', false)
       }
+    },
+
+    async addCompany(context){
+      context.commit('processing', true)
+      const data = await api.post(`admin/company/`, context.state.currentCompany);
+      this._vm.$notify(data.data.status, data.data.status == 'success' ? 'Sucesso' : 'Opsss...', data.data.message, {
+        duration: 3000,
+        permanent: false
+      });
+      context.commit('processing', false)
     },
 
     async editCompany(context) {

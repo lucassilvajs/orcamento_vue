@@ -14,7 +14,7 @@
                 </b-row>
             </b-card>
 
-            <b-card v-if="company" class="mb-4" title="Dados do colaborador">
+            <b-card v-if="company || fields" class="mb-4" title="Adquira seu óculos de grau">
                 <b-row>
                     <b-colxx v-if="fields">
                         <form @submit.prevent="formStepOne" class="form" v-if="false && setCompany || !this.fields.colaborador ">
@@ -39,8 +39,7 @@
                     </b-colxx>
                 </b-row>
             </b-card>
-
-            <distribuidor v-if="company" :idCompany="company" />
+            <distribuidor v-if="company || fields" :idCompany="company" />
         </b-colxx>
     </b-row>
 </div>
@@ -55,7 +54,7 @@ import {
 
 import vSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
-import myBreadCrumb from '@/components/adminBreadcrumb';
+import myBreadCrumb from '@/components/breadcrumb';
 import distribuidor from '@/views/order/Distribuidor';
 import {api} from '@/constants/config';
 
