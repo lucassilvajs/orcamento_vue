@@ -180,17 +180,13 @@
         <b>DP:</b> {{order.object.measure.pupillary_distance}}<br />
         <b>ALT:</b> {{order.object.measure.pupillary_height}}<br />
       </div>
-      <div v-if="order.feedback.feedback">
-        <b>Feedback: </b>{{order.feedback.feedback}}<br />
-        <b>Nota: </b><stars :disabled="true" v-model="order.feedback.rate"></stars><br />
-      </div>
       <div v-if="order.object.pc">
         <b>PC: </b>{{order.object.pc.number}}<br />
         <a :href="baseURL + order.object.pc.file" target="_blank" class="btn btn-outline-info">Ver</a><br />
       </div>
       <hr>
-      <div v-for="item in order.object.lens" :key="item.code">
-        <b>{{item.type}}</b> {{item.name}}
+      <div v-for="(item, iItem) in order.object.lens" :key="item.code">
+        <b>{{item.type}}</b> {{item.name}} <span v-if="iItem === 0"> {{order.object.product.filter(r => r.name).map(r => r.value).reverse().join(' ')}} </span>
       </div>
       <div>
         <div class="d-flex">

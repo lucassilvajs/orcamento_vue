@@ -9,10 +9,6 @@
                         <h4>{{cat.type}}</h4>
                         <table class="table w-100 table-hover" v-for="(item, itemIndex) in cat[0]" :key="itemIndex">
                           <tr class="w-100 d-flex justify-content-between" @click="() => {
-                            tratament[catIndex][0] = tratament[catIndex][0].map(r => {
-                              r.checked = false;
-                              return r;
-                            });
                             tratament[catIndex][0][itemIndex].checked = !tratament[catIndex][0][itemIndex].checked;
                             }">
                             <td>{{item.name}}</td>

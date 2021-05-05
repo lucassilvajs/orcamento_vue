@@ -124,43 +124,14 @@
     </b-colxx>
   </b-row>
 
-  <b-modal v-if="order" id="modalright" ref="modalright" :title="`Pedido #${order.id}`" modal-class="modal-right">
-      <b>{{order.product.name}} {{order.product.color}} {{order.product.size}}</b>
-      <b>Data: </b>{{order.date}}<br />
-      <b>Empresa: </b>{{order.empresa.split('-')[0]}}<br />
-      <b>Colaborador: </b>{{order.object.info.name}}<br />
-      <b>Valor: </b>{{order.value}}<br />
-      <b>Feedback: </b>{{order.feedback.feedback}}<br />
-      <b>Nota: </b><stars :disabled="true" v-model="order.feedback.rate"></stars><br />
-      <hr>
-      <div v-if="order.type == 4">
-        <h5>Pedido está ok?</h5>
-        <p>Você pode confirmar o pedido ou reprovar ele!</p>
-        <div class="alert alert-warning">Preencher somente em caso de <b>rejeição</b>!</div>
-        <b-form-group label="Razão da rejeição" class="has-float-label mb-2">
-            <select class="form-control" v-model="sap.reason">
-              <option value="incorrectDeliveryDate">Data de entrega inválida</option>
-              <option value="incorrectDescription">Descrição incorreta</option>
-              <option value="incorrectPrice">Preço incorreto</option>
-              <option value="incorrectQuantity">Qauntidade incorreta</option>
-              <option value="incorrectStockPartNumber">Estoque / número da peça incorreto</option>
-              <option value="incorrectUOM">UOM inválido</option>
-              <option value="unabletoSupplyItem">Item indisponível</option>
-              <option value="other">Outro</option>
-            </select>
-        </b-form-group>
-        <b-form-group label="Comente sua decisão">
-            <b-form-input v-model="sap.comment" type="text" placeholder="Comente sua decisão" />
-        </b-form-group>
-        <div class="d-flex mb-4">
-          <button class="btn btn-xs btn-success mr-3" @click="responseSap('approved')">Aprovar</button>
-          <button class="btn btn-xs btn-danger" @click="responseSap('reproved')">Reprovar</button>
-        </div>
-        <hr>
+  <b-modal size="lg" v-if="order" id="modalright" ref="modalright" :title="`Pedido #${order.id}`">
+      <div>
+        <b>{{order.product.name}} {{order.product.color}} {{order.product.size}}</b>
+        <b>Data: </b>{{order.date}}<br />
+        <b>Empresa: </b>{{order.empresa.split('-')[0]}}<br />
+        <b>Colaborador: </b>{{order.object.info.name}}<br />
+        <b>Valor: </b>{{order.value}}<br />
       </div>
-      <!-- <div v-for="item in order.object.lens" :key="item.code">
-        <b>{{item.type}}</b> {{item.name}}
-      </div> -->
       <div v-for="(or, ind) in order.parents.map(r => {
           return {
             order_id: r.order_id,
@@ -168,18 +139,23 @@
             attr: JSON.parse(r.attr)
           }
         })" :key="ind">
-        <div v-for="item in or.attr.lens" :key="item.code">
-          <b>{{item.type}}</b> {{item.name}}
+        <div v-for="(item, iItem) in or.attr.lens" :key="iItem">
+          <b>{{item.type}}</b> {{item.name}} <span v-if="iItem === 0"> {{or.attr.product.filter(r => r.name).map(r => r.value).reverse().join(' ')}} </span>
         </div>
-        <b>Face: </b><br />
-        <div v-if="isImage(or.attr.face)">
-            <single-lightbox  :thumb="baseURL + (typeof or.attr.face == 'object' ? or.attr.face.value : or.attr.face)" :large="baseURL + (typeof or.attr.face == 'object' ? or.attr.face.value : or.attr.face)" class-name="img-thumbnail card-img mx-auto d-block p-2" />
+        <div class="d-flex mt-3">
+          <div>
+            <b>Face: </b><br />
+            <div v-if="isImage(or.attr.face)">
+                <single-lightbox  :thumb="baseURL + (typeof or.attr.face == 'object' ? or.attr.face.value : or.attr.face)" :large="baseURL + (typeof or.attr.face == 'object' ? or.attr.face.value : or.attr.face)" class-name="img-thumbnail card-img mx-auto d-block p-2" />
+            </div>
+            <iframe height="350" v-else class="w-100" :src="baseURL + (typeof or.attr.face == 'object' ? or.attr.face.value : or.attr.face)" frameborder="0"></iframe>
+          </div>
+          <div>
+            <b>Receita: </b><br />
+            <single-lightbox v-if="isImage(or.attr.recipe)" :thumb="baseURL + (typeof or.attr.face == 'object' ? or.attr.face.value : or.attr.face)" :large="baseURL + (typeof or.attr.face == 'object' ? or.attr.face.value : or.attr.face)" class-name="img-thumbnail card-img mx-auto d-block p-2" />
+            <iframe height="350" v-else class="w-100" :src="baseURL + (typeof or.attr.recipe == 'object' ? or.attr.recipe.value : or.attr.recipe)" frameborder="0"></iframe>
+          </div>
         </div>
-        <iframe height="350" v-else class="w-100" :src="baseURL + (typeof or.attr.face == 'object' ? or.attr.face.value : or.attr.face)" frameborder="0"></iframe>
-        <b>Receita: </b><br />
-        <img class="w-100" :src="baseURL + (typeof or.attr.recipe == 'object' ? or.attr.recipe.value : or.attr.recipe)" v-if="isImage(or.attr.recipe)" alt="">
-        <iframe height="350" v-else class="w-100" :src="baseURL + (typeof or.attr.recipe == 'object' ? or.attr.recipe.value : or.attr.recipe)" frameborder="0"></iframe>
-        <hr class="my-3">
       </div>
       <template slot="modal-footer">
           <b-button v-if="false && order.status == 'Pendente'" variant="success" @click="changeStatus('approved', order.id)">Aprovar</b-button>

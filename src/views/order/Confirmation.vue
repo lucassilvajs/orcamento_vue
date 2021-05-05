@@ -24,7 +24,7 @@
               </div>
               <div class="info mt-3" v-for="(info, iInfo) in currentOrder.info" :key="iInfo">
                 <p class="text-muted text-small">{{iInfo == 'name' ? 'Nome' : iInfo}}</p>
-                <p v-if="info.length == 0" class="mb-3" style="letter-spacing:.13rem; text-decoration:underline;">Não preenchido</p>
+                <p v-if="!info" class="mb-3" style="letter-spacing:.13rem;">Não preenchido</p>
                 <p v-else class="mb-3">{{info}}</p>
               </div>
             </b-card-body>
@@ -38,7 +38,9 @@
                 <h4 class="title">{{currentOrder.product.name.toUpperCase() + ' ' + currentOrder.product.attributes.map(r => r.value).join(' ').toUpperCase()}}</h4>
                 <p v-for="(attr, iAttr) in currentOrder.product.attributes" :key="iAttr"><b>{{attr.name}}: </b>{{attr.value}}</p>
                 <p class="mb-3">
-                  <b-badge variant="outline-secondary" class="mb-1 mr-1" pill v-for="(attr, iAttr) in lens" :key="iAttr">{{attr[0].name}}</b-badge>
+                  <div v-for="(len, iLen) in lens" :key="iLen">
+                    <b-badge variant="outline-secondary" class="mb-1 mr-1" pill v-for="(attr, iAttr) in len" :key="iAttr">{{attr.name}}</b-badge>
+                  </div>
                 </p>
               </div>
             </div>

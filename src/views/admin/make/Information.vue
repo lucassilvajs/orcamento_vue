@@ -14,7 +14,7 @@
                 </b-row>
             </b-card>
 
-            <b-card v-if="company" class="mb-4" title="Dados do colaborador">
+            <b-card v-if="company" class="mb-4" title="Adquira seu óculos graduado">
                 <b-row>
                     <b-colxx v-if="fields">
                         <form @submit.prevent="formStepOne" class="form" v-if="false && setCompany || !this.fields.colaborador ">
