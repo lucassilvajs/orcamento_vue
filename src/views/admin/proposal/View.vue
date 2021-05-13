@@ -32,16 +32,6 @@
               </b-form-group>
           </b-colxx>
           <b-colxx lg="3">
-              <b-form-group label="Propostas partir de:" class="has-float-label mb-4">
-                <v-date-picker mode="single" v-model="filter.start" :input-props="{ class:'form-control', placeholder: $t('form-components.date') }"></v-date-picker>
-              </b-form-group>
-          </b-colxx>
-          <b-colxx lg="3">
-              <b-form-group label="Propostas até:" class="has-float-label mb-4">
-                <v-date-picker mode="single" v-model="filter.end" :input-props="{ class:'form-control', placeholder: $t('form-components.date') }"></v-date-picker>
-              </b-form-group>
-          </b-colxx>
-          <b-colxx lg="3">
               <b-form-group label="Consultor" class="has-float-label mb-4">
                 <v-select v-model="filter.consult" :options="suggestions" dir="ltr"></v-select>
               </b-form-group>
@@ -129,9 +119,8 @@
         <b>{{order.product.name}} {{order.product.color}} {{order.product.size}}</b>
         <b>Data: </b>{{order.date}}<br />
         <b>Empresa: </b>{{order.empresa.split('-')[0]}}<br />
-        <b>Colaborador: </b>{{order.object.info.name}}<br />
-        <b>Valor: </b>{{order.value}}<br />
       </div>
+      <hr class="my-3">
       <div v-for="(or, ind) in order.parents.map(r => {
           return {
             order_id: r.order_id,
@@ -141,6 +130,9 @@
         })" :key="ind">
         <div v-for="(item, iItem) in or.attr.lens" :key="iItem">
           <b>{{item.type}}</b> {{item.name}} <span v-if="iItem === 0"> {{or.attr.product.filter(r => r.name).map(r => r.value).reverse().join(' ')}} </span>
+        </div>
+        <div v-for="(item, iItem) in or.attr.info" :key="iItem">
+          <b>{{iItem == 'name' ? 'Nome' : iItem}}:</b> {{item}}
         </div>
         <div class="d-flex mt-3">
           <div>
@@ -152,10 +144,11 @@
           </div>
           <div>
             <b>Receita: </b><br />
-            <single-lightbox v-if="isImage(or.attr.recipe)" :thumb="baseURL + (typeof or.attr.face == 'object' ? or.attr.face.value : or.attr.face)" :large="baseURL + (typeof or.attr.face == 'object' ? or.attr.face.value : or.attr.face)" class-name="img-thumbnail card-img mx-auto d-block p-2" />
+            <single-lightbox v-if="isImage(or.attr.recipe)" :thumb="baseURL + (typeof or.attr.recipe == 'object' ? or.attr.recipe.value : or.attr.recipe)" :large="baseURL + (typeof or.attr.recipe == 'object' ? or.attr.recipe.value : or.attr.recipe)" class-name="img-thumbnail card-img mx-auto d-block p-2" />
             <iframe height="350" v-else class="w-100" :src="baseURL + (typeof or.attr.recipe == 'object' ? or.attr.recipe.value : or.attr.recipe)" frameborder="0"></iframe>
           </div>
         </div>
+        <hr class="my-2">
       </div>
       <template slot="modal-footer">
           <b-button v-if="false && order.status == 'Pendente'" variant="success" @click="changeStatus('approved', order.id)">Aprovar</b-button>

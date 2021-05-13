@@ -65,7 +65,8 @@ export default {
       }
 
       this.setItemOrder({...save, type: 'lens'})
-      this.$router.push('/app/order/face')
+      let base = this.$route.path.indexOf('admin') >= 0 ? '/admin/make/' : '/app/order/';
+      this.$router.push(`${base}face`)
     },
     getLens: async function()
     {

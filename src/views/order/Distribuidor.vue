@@ -2,7 +2,7 @@
   <div>
     <b-card class="mb-4" title="Adquira seus óculos sem grau e acessórios">
 			<b-row v-if="products">
-				<b-colxx md="4" lg="3" v-for="(pro, i) in products" :key="i" v-b-modal.modallg>
+				<b-colxx :lg="lg" v-for="(pro, i) in products" :key="i" v-b-modal.modallg>
 					<card-product :product="pro" @click.native="setItem(pro.id)" />
 				</b-colxx>
 			</b-row>
@@ -47,6 +47,10 @@ export default {
 	},
   computed: {
     ...mapGetters(["currentCart"]),
+    lg(){
+      return this.$route.path.indexOf('confirmation') >= 0 ? 6 : 3;
+    }
+
   },
 	methods: {
     getProducts: async function()

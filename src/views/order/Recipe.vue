@@ -6,7 +6,7 @@
         <b-card class="mb-4" title="Imagem da receita">
 			<b-alert variant="info" class="text-center mx-auto" fade show dismissible>Estamos tentando acessar a sua <b>câmera</b> de seu navegador.<br />Caso apareça algum alerta, permita que tenhamos acesso à sua câmera.</b-alert>
 			<b-row :style="{'marginTop': (totem ? 'calc( 100vh - 1000px )' : '0px') }">
-				<take-photo link="/app/order/" target="recipe"/>
+				<take-photo :link="$route.path.indexOf('admin') >= 0 ? '/admin/make/' : '/app/order/'" target="recipe"/>
 			</b-row>
         </b-card>
       </b-colxx>

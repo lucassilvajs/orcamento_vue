@@ -22,10 +22,9 @@ export default {
     props: ["distribuidor"],
     computed: {
       itemsOrder(){
-        let linkAtual = false;
+        let base = this.$route.path.indexOf('admin') >= 0 ? '/admin/make/' : '/app/order/';
         return this.itemsOrderObj.map(r => {
-          if(this.$route.path == r.link) linkAtual = true;
-          r.isLink = linkAtual;
+          r.link = base+r.link;
           return r;
         });
       }
@@ -34,28 +33,28 @@ export default {
         return {
             itemsOrderObj: [
                 {
-                    text: 'Selecionar empresa',
-                    link: '/app/order/information'
+                    text: 'Dados do Colaborador',
+                    link: 'information'
                 },
                 {
                     text: 'Selecionar produto',
-                    link: '/app/order/products'
+                    link: 'products'
                 },
                 {
                     text: 'Selecionar lentes',
-                    link: '/app/order/lens'
+                    link: 'lens'
                 },
                 {
                     text: 'Capturar face',
-                    link: '/app/order/face'
+                    link: 'face'
                 },
                 {
                     text: 'Capturar receita',
-                    link: '/app/order/recipe'
+                    link: 'recipe'
                 },
                 {
                     text: 'Confirmação dos dados',
-                    link: '/app/order/confirmation'
+                    link: 'confirmation'
                 },
             ],
         }

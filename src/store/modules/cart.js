@@ -5,9 +5,11 @@ import {api} from '@/constants/config';
 export default {
   state: {
     currentCart: localStorage.getItem('cart') != null ? JSON.parse(localStorage.getItem('cart')) : [],
+    haveParent: false //Responsavel por saber se o mesmo é um acessório. Se for atribuir id ao pai
   },
   getters: {
     currentCart: state => state.currentCart,
+    haveParent: state => state.haveParent,
   },
   mutations: {
     SET_ITEM_CART(state, payload) {
@@ -21,6 +23,9 @@ export default {
     },
     CLEAR_CART(state, payload){
       state.currentCart = null
+    },
+    HAVE_PARENT(state, payload){
+      state.haveParent = payload
     },
   },
   actions: {
@@ -57,6 +62,9 @@ export default {
     },
     async finalizarOrder({state, commit}, payload){
       const data = await api.post('/distribuicao', {cart: state.currentCart, idCompany: payload});
+      if(state.acessorio) {
+        console.log(data)
+      }
       this._vm.$notify(data.data.status, data.data.status == 'success' ? 'Sucesso' : 'Opsss...', data.data.message, {
         duration: 3000,
         permanent: false

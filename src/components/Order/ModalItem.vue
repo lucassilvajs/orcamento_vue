@@ -197,7 +197,8 @@ export default {
         item.type = 'product';
 
         this.setItemOrder(item)
-        this.$router.push(`${this.link}/lens`);
+        let base = this.$route.path.indexOf('admin') >= 0 ? '/admin/make/' : '/app/order/';
+        this.$router.push(`${base}lens`);
       },
 
       async getProduct() {

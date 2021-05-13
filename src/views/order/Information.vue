@@ -3,7 +3,7 @@
     <my-breadcrumb />
     <b-row>
         <b-colxx xxs="12">
-            <b-card class="mb-3" v-if="companies">
+            <b-card class="mb-3">
                 <b-row v-if="companiesValue">
                     <b-colxx>
                         <b-form-group label="Selecione a empresa">
@@ -14,9 +14,9 @@
                 </b-row>
             </b-card>
 
-            <b-card v-if="company || fields" class="mb-4" title="Adquira seu óculos de grau">
+            <b-card v-if="fields" class="mb-4" title="Adquira seus óculos de grau completo">
                 <b-row>
-                    <b-colxx v-if="fields">
+                    <b-colxx>
                         <form @submit.prevent="formStepOne" class="form" v-if="false && setCompany || !this.fields.colaborador ">
                             <b-row>
                                 <b-colxx lg="4">
@@ -39,7 +39,7 @@
                     </b-colxx>
                 </b-row>
             </b-card>
-            <distribuidor v-if="company || fields" :idCompany="company" />
+            <distribuidor v-if="fields" :idCompany="company" />
         </b-colxx>
     </b-row>
 </div>
@@ -98,36 +98,23 @@ export default {
 
           form.type = 'info'
           this.setItemOrder(form)
-          this.$router.push("/app/order/products");
+          let base = this.$route.path.indexOf('admin') >= 0 ? '/admin/make/' : '/app/order/';
+          this.$router.push(`${base}products`);
         },
         getItemsAdd: async function() {
           const itemsFields = await api.get('company/fields');
-          this.fields = itemsFields.data.data
-          if(this.fields.colaborador){
-            this.companies = this.fields.companies
+          if(itemsFields.data.data.colaborador) {
+            // Significa que será necessário selecionar uma empresa antes de apresentar os campos
+            this.companies = itemsFields.data.data.companies;
+
+            // Salva globalmente para se buscar os campos no evento de Watch
             this.companiesValue = [];
-            this.fields.companies.forEach((el, index) => {
+            this.companies.forEach((el, index) => {
               this.companiesValue.push({code: index, label: el.company});
             });
           }else{
-            if(this.fields.length == 0){
-              this.values = ['','',''].map(r=>r);
-              this.fields = ["Chapa", "Setor", "Turno"];
-            }else{
-              this.values.push('');
-              this.fields.forEach((el) => {
-                  this.values.push('');
-              });
-            }
-
-            let info = this.currentOrder.info;
-            if(info) {
-              let ind = 0;
-              for(let i in info) {
-                this.values[ind] = info[i]
-                ind++;
-              }
-            }
+            // Cliente normal, não precisa selecionar a empresa
+            this.fields = itemsFields.data.data
           }
         },
     },

@@ -2,8 +2,8 @@
 <div class="sidebar" @mouseenter="isMenuOver=true" @mouseleave="isMenuOver=false" @touchstart="isMenuOver=true">
     <div class="main-menu">
         <vue-perfect-scrollbar class="scroll" :settings="{ suppressScrollX: true, wheelPropagation: false }">
-            <ul class="list-unstyled" v-if="menuItems">
-                <li v-for="(item,index) in menuItems" :class="{ 'active' : (selectedParentMenu === item.id && viewingParentMenu === '') || viewingParentMenu === item.id }" :key="`parent_${item.id}`" :data-flag="item.id">
+            <ul class="list-unstyled">
+                <li v-for="(item) in menuItems" :class="{ 'active' : (selectedParentMenu === item.id && viewingParentMenu === '') || viewingParentMenu === item.id }" :key="`parent_${item.id}`" :data-flag="item.id">
                     <a v-if="item.newWindow" :href="item.to" rel="noopener noreferrer" target="_blank">
                         <i :class="item.icon" />
                         {{ $t(item.label) }}
@@ -68,17 +68,17 @@ import {
 import {
     menuHiddenBreakpoint,
     subHiddenBreakpoint
-} from '@/constants/config'
-// import menuItems from '@/constants/admin/menu';
-import { api, baseURL } from '@/constants/config';
+} from '../../constants/config'
+import menuItems from '../../constants/admin/menu'
 
 export default {
     data() {
         return {
             selectedParentMenu: '',
             isMenuOver: false,
-            menuItems: null,
-            viewingParentMenu: ''
+            menuItems,
+            viewingParentMenu: '',
+            onlyEmployee: false
         }
     },
     mounted() {
@@ -119,6 +119,7 @@ export default {
 
             return isCurrentMenuHasSubItem;
         },
+
         changeSelectedParentHasNoSubmenu(parentMenu) {
             this.selectedParentMenu = parentMenu
             this.viewingParentMenu = parentMenu
@@ -129,6 +130,7 @@ export default {
                 selectedMenuHasSubItems: false
             })
         },
+
         openSubMenu(e, menuItem) {
             const selectedParent = menuItem.id;
             const hasSubMenu = menuItem.subs && menuItem.subs.length > 0;
@@ -255,11 +257,10 @@ export default {
             }
             return nextClasses
         },
-        async getMenu(){
-          // const data = await api.get('admin/menu');
-          const data = {"status":"success","message":"Login efetuado com sucesso.","data":{"menu":[{"id":"home","icon":"iconsminds-monitor-analytics","label":"BI","to":"https:\/\/idsafety.com.br\/bi\/bi\/bi.html","newWindow":true},{"id":"crm","icon":"simple-icon-graph","label":"CRM","to":"\/admin\/crm"},{"id":"make","icon":"simple-icon-note","label":"Fazer proposta","to":"\/admin\/make\/information"},{"id":"orders","icon":"iconsminds-shopping-cart","label":"Vendas","to":"\/app\/app\/dashboards","subs":[{"subs":[{"icon":"iconsminds-paper","label":"Pedidos","to":"\/admin\/order"},{"icon":"simple-icon-note","label":"Propostas","to":"\/admin\/proposal"}],"label":"Cliente convencional"},{"subs":[{"icon":"iconsminds-paper","label":"Pedidos","to":"\/admin\/distribuidor\/order"},{"icon":"simple-icon-note","label":"Propostas","to":"\/admin\/distribuidor\/proposal"}],"icon":"simple-icon-pie-chart","label":"Distribuidor","to":"#"},{"subs":[{"icon":"iconsminds-paper","label":"Ariba","to":"\/admin\/ariba","notification":6}],"icon":"simple-icon-pie-chart","label":"Integrações","to":"#"}]},{"id":"sac","icon":"iconsminds-headset","label":"- S.A.C.","subs":[{"icon":"iconsminds-tag","label":"Ver sac","to":"\/admin\/sac\/view"},{"icon":"iconsminds-add","label":"Adicionar","to":"\/admin\/sac\/new"}]},{"id":"product","icon":"simple-icon-eyeglass","label":"Produtos","to":"\/admin\/dashboards","subs":[{"icon":"iconsminds-tag","label":"Ver produtos","to":"\/admin\/product\/view"},{"icon":"iconsminds-add","label":"Adicionar produto","to":"\/admin\/product\/new"}]},{"id":"consults","icon":"simple-icon-people","label":"Consultores","to":"\/admin\/dashboards","subs":[{"icon":"simple-icon-user","label":"Ver","to":"\/admin\/consult\/view"},{"icon":"simple-icon-user","label":"Adicionar","to":"\/admin\/consult\/new"}]},{"id":"company","icon":"iconsminds-empire-state-building","label":"Empresas","to":"\/admin\/dashboards","subs":[{"icon":"iconsminds-building","label":"Ver","to":"\/admin\/company\/view"},{"icon":"iconsminds-add","label":"Adicionar","to":"\/admin\/company\/new"}]},{"id":"user","icon":"iconsminds-administrator","label":"Usuários","to":"\/admin\/dashboards","subs":[{"icon":"simple-icon-user","label":"Ver","to":"\/admin\/user\/view"},{"icon":"simple-icon-plus","label":"Adicionar","to":"\/admin\/user\/new"}]},{"id":"logout","icon":"simple-icon-logout","label":"Sair","to":"\/login"}]}}
-          console.log(data)
-          this.menuItems = data.data.menu;
+
+        run() {
+            const colaborador = JSON.parse(window.localStorage.getItem('user'))['user']['colaborador'];
+            this.menuItems = this.menuItems.filter( r => r);
         }
     },
     computed: {
@@ -269,9 +270,11 @@ export default {
             selectedMenuHasSubItems: 'getSelectedMenuHasSubItems'
         })
     },
+    created() {
+        this.run();
+    },
     watch: {
         '$route'(to, from) {
-          this.getMenu()
             if (to.path !== from.path) {
 
                 const toParentUrl = to.path.split('/').filter(x => x !== '')[1];
@@ -291,23 +294,6 @@ export default {
                 window.scrollTo(0, top)
             }
         }
-    },
-    created(){
-      this.getMenu()
     }
 }
 </script>
-<style scoped>
-.my-badge {
-    position: absolute;
-    top: -5px;
-    color: #fff;
-    background: #c00;
-    font-size: .7rem;
-    width: 17px;
-    height: 17px;
-    padding: 0;
-    text-align: center;
-    border-radius: 50%;
-}
-</style>

@@ -53,6 +53,11 @@ const routes = [
           import("./views/order/Confirmation")
       },
       {
+        path: "/app/order/success",
+        component: () =>
+          import("./views/order/Success")
+      },
+      {
         path: "/app/order/approved", // Aprovadas do consultor
         component: () =>
           import("./views/order/Orders")
@@ -362,37 +367,42 @@ const routes = [
       {
         path: "/admin/make/information",
         component: () =>
-          import("./views/admin/make/Information")
+          import("./views/order/Information")
       },
       {
         path: "/admin/make/products",
         component: () =>
-          import("./views/admin/make/Products")
+          import("./views/order/Products")
       },
       {
         path: "/admin/make/distribuidor",
         component: () =>
-          import("./views/admin/make/Distribuidor")
+          import("./views/order/Distribuidor")
       },
       {
         path: "/admin/make/lens",
         component: () =>
-          import("./views/admin/make/Lens")
+          import("./views/order/Lens")
       },
       {
         path: "/admin/make/face",
         component: () =>
-          import("./views/admin/make/Face")
+          import("./views/order/Face")
       },
       {
         path: "/admin/make/recipe",
         component: () =>
-          import("./views/admin/make/Recipe")
+          import("./views/order/Recipe")
       },
       {
         path: "/admin/make/confirmation",
         component: () =>
-          import("./views/admin/make/Confirmation")
+          import("./views/order/Confirmation")
+      },
+      {
+        path: "/admin/make/success",
+        component: () =>
+          import("./views/order/Success")
       },
       {
         path: "/admin/ariba",

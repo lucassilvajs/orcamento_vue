@@ -54,7 +54,7 @@
       <b-alert show variant="info" v-else>Seu carrinho está vazio</b-alert>
       <template slot="modal-footer">
         <b-button variant="light" @click="hideModal('cart')">Fechar</b-button>
-        <b-button v-if="currentCart.length" variant="success" :disabled="processing" :class="{'mr-1 btn-multiple-state btn-shadow': true,
+        <b-button v-if="showCart && currentCart.length" variant="success" :disabled="processing" :class="{'mr-1 btn-multiple-state btn-shadow': true,
             'show-spinner': processing,
             'show-success': !processing && uploadError===false,
             'show-fail': !processing && uploadError }" @click="finalizarPedido">
@@ -91,6 +91,10 @@ export default {
     },
     computed:{
       ...mapGetters(["currentCart"]),
+      showCart() {
+        if(this.$route.path.indexOf('confirmation') >= 0) return false
+        return true
+      }
     },
     data(){
       return {
