@@ -266,12 +266,12 @@ const routes = [
       {
         path: "/admin/order",
         component: () =>
-          import(/* webpackChunkName: "dashboards" */ "./views/admin/order/View")
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/order/ProposalOrder")
       },
       {
         path: "/admin/proposal",
         component: () =>
-          import(/* webpackChunkName: "dashboards" */ "./views/admin/proposal/View")
+          import(/* webpackChunkName: "dashboards" */ "./views/admin/order/ProposalOrder")
       },
       {
         path: "/admin/distribuidor/:status",

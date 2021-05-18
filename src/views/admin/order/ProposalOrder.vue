@@ -2,19 +2,27 @@
 <div>
   <b-row>
     <b-colxx xxs="12">
-      <h1>Propostas</h1>
+      <h1>{{typeOrder}}</h1>
       <div class="top-right-button-container">
-        <b-button-group>
+        <b-button-group v-if="typeOrder == 'Propostas'">
             <b-dropdown @click="targetSelectAll()" split right class="check-button" variant="primary">
                 <label class="custom-control custom-checkbox pl-4 mb-0 d-inline-block" slot="button-content">
                     <input class="custom-control-input" type="checkbox" v-model="selectAll">
-                    <span :class="{
-    'custom-control-label' :true
-  }">&nbsp;</span>
+                    <span :class="{'custom-control-label' :true}">&nbsp;</span>
                 </label>
                 <b-dropdown-item @click="alertAction('Deseja mesmo aprovar e emitir o PV das propostas selecionadas?', 'approved','pv')">Aprovar e emitir PV</b-dropdown-item>
                 <b-dropdown-item @click="alertAction('Deseja mesmo reprovar as propostas selecionadas?','reproved','pv_nf')">Reprovar</b-dropdown-item>
                 <b-dropdown-item @click="alertAction('Deseja mesmo reenviar as propostas selecionadas?','reproved','resend')">Reenviar</b-dropdown-item>
+                <b-dropdown-item @click="alertActionDelete()">Deletar pedidos</b-dropdown-item>
+            </b-dropdown>
+        </b-button-group>
+        <b-button-group v-else>
+            <b-dropdown @click="targetSelectAll()" split right class="check-button" variant="primary">
+                <label class="custom-control custom-checkbox pl-4 mb-0 d-inline-block" slot="button-content">
+                    <input class="custom-control-input" type="checkbox" v-model="selectAll">
+                    <span :class="{'custom-control-label' :true}">&nbsp;</span>
+                </label>
+                <b-dropdown-item @click="alertAction('Deseja mesmo emitir as NFs?', '','nf')">Emitir NF</b-dropdown-item>
                 <b-dropdown-item @click="alertActionDelete()">Deletar pedidos</b-dropdown-item>
             </b-dropdown>
         </b-button-group>
@@ -36,6 +44,24 @@
                 <v-select v-model="filter.consult" :options="suggestions" dir="ltr"></v-select>
               </b-form-group>
           </b-colxx>
+          <b-colxx lg="3">
+            <b-form-group label="Lentes:" class="has-float-label mb-4">
+                <select v-model="filter.len" id="" class="form-control">
+                  <option value="">Todas</option>
+                  <option value="1">Solicitada</option>
+                  <option value="0">Não solicitadas</option>
+                </select>
+            </b-form-group>
+          </b-colxx>
+          <b-colxx lg="3">
+            <b-form-group label="Notas fiscais:" class="has-float-label mb-4">
+                <select v-model="filter.nf" id="" class="form-control">
+                  <option value="">Todas</option>
+                  <option value="1">Emitidas</option>
+                  <option value="0">Não Emitidas</option>
+                </select>
+            </b-form-group>
+          </b-colxx>
           <b-colxx lg="12">
               <button class="btn btn-outline-success float-right" @click="() => {filter.page = 1; getOrder()}">Buscar</button>
           </b-colxx>
@@ -43,7 +69,7 @@
       </b-card>
     </b-colxx>
     <b-colxx xxs="12">
-      <b-card class="mb-4" title="Propostas">
+      <b-card class="mb-4" :title="typeOrder">
         <p><b>Selecionados</b>: {{
           items.filter(r => r.checked).length
         }} <br /><b>Total</b>: {{
@@ -62,13 +88,14 @@
                 <th>Solicitante</th>
                 <th>Solicitação</th>
                 <th>Valor</th>
+                <th v-if="typeOrder == 'Pedidos'">NF</th>
                 <th>Status</th>
                 <th>Ações</th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="(item, index) in items" :key="index">
-                <td>
+                <td v-if="!item.bling">
                   <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
                     <div class="itemCheck mb-0 custom-control custom-checkbox">
                       <input type="checkbox" autocomplete="off" class="custom-control-input" v-model="item.checked" :id="`check_${item.id}`">
@@ -76,14 +103,16 @@
                     </div>
                   </div>
                 </td>
+                <td v-else></td>
                 <td>{{item.id}}</td>
                 <td>{{item.empresa}} <span v-if="item.type == 4" class="badge badge-success">ARIBA: Aguardando aprovação interna!</span></td>
                 <td>{{item.cnpj}}</td>
-                <td v-if="item.parents.length">{{item.parents.map(r => JSON.parse(r.attr).info.name).join(', ')}}</td>
+                <td v-if="item.type = '1' && item.parents.length">{{item.parents.map(r => JSON.parse(r.attr).info.name).join(', ')}}</td>
                 <td v-else> {{item.acessorio}} Itens <span class="badge badge-danger">Distribuição</span> </td>
                 <td>{{item.solicitante}}</td>
                 <td>{{item.date}}</td>
                 <td>{{item.value | numeroPreco}}</td>
+                <td v-if="typeOrder == 'Pedidos'">{{item.bling}}</td>
                 <td>{{item.multiple == 'pending' ? 'Proposta agendada' : item.status}}</td>
                 <td>
                   <button @click="orderId = item.id" v-b-modal.viewOrder class="btn btn-outline-success">
@@ -111,51 +140,6 @@
   </b-row>
 
   <ViewOrder v-if="orderId" :orderId="orderId" />
-<!-- <b-modal size="lg" v-if="order" id="modalright" ref="modalright" :title="`Pedido #${order.id}`">
-      <div>
-        <b>{{order.product.name}} {{order.product.color}} {{order.product.size}}</b>
-        <b>Data: </b>{{order.date}}<br />
-        <b>Empresa: </b>{{order.empresa.split('-')[0]}}<br />
-      </div>
-      <hr class="my-3">
-      <div v-for="(or, ind) in order.parents.map(r => {
-          return {
-            order_id: r.order_id,
-            total: r.total,
-            attr: JSON.parse(r.attr)
-          }
-        })" :key="ind">
-        <div v-for="(item, iItem) in or.attr.lens" :key="iItem">
-          <b>{{item.type}}</b> {{item.name}} <span v-if="iItem === 0"> {{or.attr.product.filter(r => r.name).map(r => r.value).reverse().join(' ')}} </span>
-        </div>
-        <div v-for="(item, iItem) in or.attr.info" :key="iItem">
-          <b>{{iItem == 'name' ? 'Nome' : iItem}}:</b> {{item}}
-        </div>
-        <div class="d-flex mt-3">
-          <div>
-            <b>Face: </b><br />
-            <div v-if="isImage(or.attr.face)">
-                <single-lightbox  :thumb="baseURL + (typeof or.attr.face == 'object' ? or.attr.face.value : or.attr.face)" :large="baseURL + (typeof or.attr.face == 'object' ? or.attr.face.value : or.attr.face)" class-name="img-thumbnail card-img mx-auto d-block p-2" />
-            </div>
-            <iframe height="350" v-else class="w-100" :src="baseURL + (typeof or.attr.face == 'object' ? or.attr.face.value : or.attr.face)" frameborder="0"></iframe>
-          </div>
-          <div>
-            <b>Receita: </b><br />
-            <single-lightbox v-if="isImage(or.attr.recipe)" :thumb="baseURL + (typeof or.attr.recipe == 'object' ? or.attr.recipe.value : or.attr.recipe)" :large="baseURL + (typeof or.attr.recipe == 'object' ? or.attr.recipe.value : or.attr.recipe)" class-name="img-thumbnail card-img mx-auto d-block p-2" />
-            <iframe height="350" v-else class="w-100" :src="baseURL + (typeof or.attr.recipe == 'object' ? or.attr.recipe.value : or.attr.recipe)" frameborder="0"></iframe>
-          </div>
-        </div>
-        <hr class="my-2">
-      </div>
-      <template slot="modal-footer">
-          <b-button v-if="false && order.status == 'Pendente'" variant="success" @click="changeStatus('approved', order.id)">Aprovar</b-button>
-          <b-button v-if="false && order.status == 'Pendente'" variant="danger" @click="changeStatus('reproved', order.id)">Reprovar</b-button><br>
-          <b-button v-if="false && order.status == 'Pendente'" variant="primary" @click="reenviar(order.id)">Reenviar</b-button>
-          <button class="btn btn-outline-danger" @click="hideModal('modalright')">Fechar</button>
-          <router-link class="btn btn-info" :to="`/admin/proposal/edit/${order.id}`">Editar</router-link>
-
-      </template>
-  </b-modal> -->
 
 </div>
 </template>
@@ -190,6 +174,11 @@ export default {
       orderId: 1
     }
   },
+  computed:{
+    typeOrder(){
+      return this.$route.path.indexOf('proposal') >= 0 ? 'Propostas' : 'Pedidos';
+    }
+  },
   methods: {
     isImage(ima){
       if (typeof ima == 'object') ima = ima.value;
@@ -198,9 +187,9 @@ export default {
       return existe.length
     },
     async getOrder() {
-      // document.querySelector('.load-generic').classList.toggle('d-flex');
       this.items = null;
-      const items = await api.get('/admin/proposal', {
+      let typeOrder = this.$route.path.indexOf('proposal') >= 0 ? 'proposal' : 'order';
+      const items = await api.get(`/admin/proposal_order/${typeOrder}`, {
         params: this.filter
       });
 
@@ -305,10 +294,8 @@ export default {
           icon: result.value.status == 'success' ? 'success' : 'warning'
         });
         this.getOrder();
-      })
-
+      });
     },
-
     async alertAction(message, status, action){
       await this.$swal.fire({
         title: `O que você acha?`,
@@ -327,6 +314,8 @@ export default {
             if(r.checked) {
               if(action == 'resend') {
                 this.reenviar(r.id)
+              }else if(action == 'nf') {
+                this.generateNf(r.id)
               }else{
                 this.changeStatus(status, r.id);
               }
@@ -420,11 +409,27 @@ export default {
         text: data.data.message,
         icon: data.data.status,
       });
+    },
+    async generateNf(idOrder) {
+      const response = await api.post(`/admin/order/generateNF`, {
+        order: idOrder
+      });
+
+      let data = response.data;
+      this.$swal.fire({
+        title: `${data.status == 'success' ? 'Sucesso' : 'Ops..!'}`,
+        text: `${data.message}`,
+        icon: `${data.status}`,
+      });
+      this.getOrders();
+    },
+  },
+  watch: {
+    '$route'(){
+      this.getOrder();
     }
-
-
-},
-   created(){
+  },
+  created(){
     this.getOrder();
   }
 }

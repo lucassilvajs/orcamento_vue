@@ -77,95 +77,36 @@
         <b-card class="mb-4" :title="`Confira ${$route.path.split('/')[2] == 'proposal' ? 'sua propostas' : 'Seus pedidos'}`">
           <!-- <b-table v-if="items && items.length" striped :items="items" /> -->
             <div v-if="items && items.length">
-              <table class="table b-table table-striped">
-                <thead>
-                  <tr>
-                    <th>
-                      <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
-                        <div class="itemCheck mb-0 custom-control custom-checkbox">
-                          <input type="checkbox" autocomplete="off" class="custom-control-input" :id="`check_all`">
-                          <label class="custom-control-label" :for="`check_all`"  @click="() => {
-                              statusCheck = !statusCheck;
-                              items = items.map(r => {r.checked = statusCheck; return r;}
-                            )}">
-                          </label>
-                        </div>
-                      </div>
-                    </th>
-                    <th>#</th>
-                    <th>Colaborador</th>
-                    <th v-if="consultor">Empresa</th>
-                    <th v-if="consultor">CNPJ</th>
-                    <th v-if="$route.path.split('/')[2] != 'proposal'">Nota</th>
-                    <th v-if="!totem">Valor</th>
-                    <th v-if="$route.path.split('/')[2] != 'proposal'">Produto</th>
-                    <th>Data</th>
-                    <th>Status</th>
-                    <th>Informações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(it, index) in items" :key="index">
-                    <td>
-                      <div class="custom-control custom-checkbox pl-1 align-self-center pr-4">
-                        <div class="itemCheck mb-0 custom-control custom-checkbox">
-                          <input type="checkbox" autocomplete="off" class="custom-control-input"  :checked="it.checked" @change="() => {
-                              items = items.map((e,i) => {
-                                if(i == index) {
-                                  e.checked = !e.checked
-                                }
-                                return e
-                              })
-                            }" :id="`check_${index}`">
-                          <label class="custom-control-label" :for="`check_${index}`"></label>
-                        </div>
-                      </div>
-                    </td>
-                    <td>{{it.id}}</td>
-                    <td>{{it.name}}</td>
-                    <td v-if="consultor">{{it.company}}</td>
-                    <td v-if="consultor">{{it.cnpj}}</td>
-                    <td v-if="$route.path.split('/')[2] != 'proposal'">{{it.nota}}</td>
-                    <td>{{it.value}}</td>
-                    <td v-if="$route.path.split('/')[2] != 'proposal'">{{it.product}}</td>
-                    <td>{{it.date}}</td>
-                    <td>{{it.multiple == 'pending' ? 'Proposta agendada' : it.status}}</td>
-                    <td>
-
-                      <!-- <button v-if="it.status != 'Aprovado' && it.status != 'Aguardando'" @click="swalsendOrder(it.id)" v-b-modal.modalright class="d-none btn btn-outline-success">
-                        <div class="simple-icon-doc"/>
-                      </button>
-                      <button v-if="it.status == 'Aguardando'" @click="swalsendOrderMulti(it.id)" v-b-modal.modalright class="d-none btn btn-outline-success">
-                        <div class="simple-icon-docs"/>
-                      </button> -->
-                      <span @click="getInfoOrder(index)">
-                        <button v-if="it.status == 'Reprovado' && !it.feedback && !consultor" v-b-modal.modalright2 class="btn btn-outline-danger">
-                          <div class="simple-icon-pencil"/>
-                        </button>
-                      </span>
-                      <a v-if="it.rastreio" target="_blank" :href="`https://www.linkcorreios.com.br/${it.rastreio}`" class="btn btn-success">
-                          <div class="simple-icon-envelope"/>
-                      </a>
-                      <b-dropdown id="ddown1" text="Ações" variant="outline-primary">
-                        <b-dropdown-item @click="getInfoOrder(index)" v-b-modal.modalright>Informações do pedido</b-dropdown-item>
-
-                        <!-- <b-dropdown-item v-if="it.status == 'Pendente'">
-                          <router-link :to="`/admin/company/edit`">
-                            Cadastrar e-mail XML
-                          </router-link>
-                        </b-dropdown-item> -->
-                      </b-dropdown>
-                      <!-- <span @click="pc.order = it.id">
-                        <button v-if="it.status == 'Aprovado' && !it.attr.pc && it.pedidoCompra != 222 && !consultor" class="btn btn-outline-warning" v-b-modal.modalright1>
-                          <div class="simple-icon-doc"/>
-                        </button>
-
-                      </span> -->
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <b-pagination v-if="false && total > 20"
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Empresa</th>
+                  <th>CNPJ</th>
+                  <th>Colaborador</th>
+                  <th>Solicitante</th>
+                  <th>Solicitação</th>
+                  <th>Valor</th>
+                  <th v-if="typeOrder == 'Pedidos'">NF</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in items" :key="index">
+                  <td>{{item.id}}</td>
+                  <td>{{item.empresa}} <span v-if="item.type == 4" class="badge badge-success">ARIBA: Aguardando aprovação interna!</span></td>
+                  <td>{{item.cnpj}}</td>
+                  <td v-if="item.type = '1' && item.parents.length">{{item.parents.map(r => JSON.parse(r.attr).info.name).join(', ')}}</td>
+                  <td v-else> {{item.acessorio}} Itens <span class="badge badge-danger">Distribuição</span> </td>
+                  <td>{{item.solicitante}}</td>
+                  <td>{{item.date}}</td>
+                  <td>{{item.value | numeroPreco}}</td>
+                  <td v-if="typeOrder == 'Pedidos'">{{item.bling}}</td>
+                  <td>{{item.multiple == 'pending' ? 'Proposta agendada' : item.status}}</td>
+                </tr>
+              </tbody>
+            </table>
+              <b-pagination v-if="total > 20"
                 size="sm"
                 align="center"
                 :total-rows="total"
