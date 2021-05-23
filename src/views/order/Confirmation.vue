@@ -24,7 +24,7 @@
               </div>
               <div class="info mt-3" v-for="(info, iInfo) in currentOrder.info" :key="iInfo">
                 <p class="text-muted text-small">{{iInfo == 'name' ? 'Nome' : iInfo}}</p>
-                <p v-if="info.length == 0" class="mb-3" style="letter-spacing:.13rem; text-decoration:underline;">Não preenchido</p>
+                <p v-if="!info" class="mb-3" style="letter-spacing:.13rem; text-decoration:underline;">Não preenchido</p>
                 <p v-else class="mb-3">{{info}}</p>
               </div>
             </b-card-body>
@@ -55,7 +55,7 @@
           </b-card>
           <distribuidor v-if="acessorio" class="mt-4" col="6"
             title="Adicione acessórios ao seu pedido"
-            :not="[1]" :idCompany="currentOrder.company.company"
+            :not="[1]" :idCompany="currentOrder.company ? currentOrder.company.company : false"
           />
         </b-colxx>
 

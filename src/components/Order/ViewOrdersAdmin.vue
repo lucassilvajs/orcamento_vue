@@ -28,10 +28,22 @@
 
                   <div v-if="order.order[0].type == '1'" style="max-height:65vh; overflow: auto;">
                     <div v-for="(item, iItem) in order.order.filter(r => r.type == 1)" :key="iItem">
+
                       <h5>#{{item.id}}</h5>
                       <p class="mb-0" v-for="(info, iInfo) in JSON.parse(item.attributes).info" :key="iInfo"><b>{{iInfo == 'name' ? 'Nome' : iInfo}}: </b> {{info}}</p>
-
-                      <p class="mb-0" v-for="(len, iInfo) in JSON.parse(item.attributes).lens" :key="iInfo"><b>{{len.type}}: </b> {{len.name}} <span v-if="len.type == 'Óculos'">{{JSON.parse(item.attributes).product.filter(r => r.name).map(r => r.value).join(' ')}}</span></p>
+                      <div v-if="JSON.parse(item.attributes).measure">
+                        <span class="badge badge-success">DP: {{JSON.parse(item.attributes).measure.pupillary_distance}} /
+                        ALT: {{JSON.parse(item.attributes).measure.pupillary_height}} </span>
+                      </div>
+                      <p class="mb-0" v-for="len in JSON.parse(item.attributes).lens" :key="len.code">
+                        <b>{{len.type}}</b> {{len.name}} <span v-if="len.type == 'Óculos'">{{JSON.parse(item.attributes).product.filter(r => r.name).map(r => r.value).join(' ')}}</span>
+                      </p>
+                      <div class="mt-4" v-if="JSON.parse(item.attributes).pc">
+                        <b>Pedido de compra: </b>
+                        <hr class="my-1">
+                        <a target="_blank" v-if="JSON.parse(item.attributes).pc.file" :href="baseURL+JSON.parse(item.attributes).pc.file" class="btn btn-outline-success btn-xs">Ver pedido <i class="simple-icon-book-open" /></a>
+                        <p v-if="JSON.parse(item.attributes).pc.number"><b>Numero: </b> {{JSON.parse(item.attributes).pc.number}} </p>
+                      </div>
 
                       <p class="mb-0 mt-2" v-if="item.acessorio"><b>Acessórios:</b></p>
                       <table class="table table-striped" v-if="item.acessorio">
@@ -54,11 +66,32 @@
                       </table>
                       <div class="mt-2">
                         <button @click="orderSelected = item" class="btn btn-xs btn-outline-info">Visualizar <i class="simple-icon-eye" /></button>
+
+                        <router-link :to="`/admin/proposal/edit/${item.id}`" class="btn btn-xs btn-info">Editar <i class="simple-icon-pencil" /></router-link>
+
+                        <button v-if="['approved'].indexOf(order.order[0].status) >= 0 && item.len == '0'"  @click="alertActionOnly(item.id, 'len', 'Deseja realmente confirmar a solicitação de lente? ')" class="btn btn-xs btn-outline-success">Solicitar lente <i class="simple-icon-magic-wand" /></button>
+
+                        <button v-if="['approved'].indexOf(order.order[0].status) >= 0 && item.len == '1'" class="btn btn-xs btn-success">Lente já solicitada <i class="simple-icon-magic-wand" /></button>
+
+                        <router-link v-if="['approved'].indexOf(order.order[0].status) >= 0" :to="`/admin/order/measure/${item.id}`" class="btn btn-warning btn-xs mr-2">Medição <i class="simple-icon-eye" /></router-link>
+
+                        <button @click="alertActionOnly(item.id, 'deleted', 'Deseja realmente deletar essa proposta? ')" class="btn btn-outline-danger btn-xs mr-2">Deletar <i class="simple-icon-trash" /></button>
+
                       </div>
                       <hr>
                     </div>
                   </div>
 
+                  <!-- <div v-if="['pending', 'reproved', 'awaiting'].indexOf(order.order[0].status) >= 0" class="controllers d-flex justify-content-start">
+                    <button @click="alertActionOnly(order.order[0].id, 'approved', 'Deseja realmente aprovar essa proposta? ')" class="btn btn-success btn-sm mr-2">Aprovar/PV <i class="simple-icon-check" /></button>
+                    <button @click="alertActionOnly(order.order[0].id, 'reproved', 'Deseja realmente reprovar essa proposta? ')" class="btn btn-danger btn-sm mr-2">Reprovar <i class="simple-icon-close" /></button>
+                    <button  @click="alertActionOnly(order.order[0].id, 'resend', 'Deseja realmente reenviar essa proposta? ')" class="btn btn-info btn-sm mr-2">Reenviar proposta <i class="simple-icon-envelope" /></button>
+                  </div>
+
+                  <div v-if="['approved'].indexOf(order.order[0].status) >= 0" class="controllers d-flex justify-content-start">
+                    <button @click="alertActionOnly(order.order[0].id, 'approved', 'Deseja realmente emitir a NF? ')" class="btn btn-success btn-sm mr-2">Emitir NF <i class="simple-icon-check" /></button>
+                    <button  @click="alertActionOnly(order.order[0].id, 'pending', 'Deseja realmente voltar para proposta? ')" class="btn btn-warning btn-sm mr-2">Tornar proposta <i class="simple-icon-control-start" /></button>
+                  </div> -->
 
                 </b-colxx>
                 <b-colxx md="4">
@@ -77,8 +110,10 @@
                       <h6 class="m-0">Receita</h6>
                       <single-lightbox v-if="orderSelected.recipe.indexOf('.pdf') < 0" :thumb="baseURL + orderSelected.recipe" :large="baseURL + orderSelected.recipe" class-name="w-100 mx-auto d-block p-2" />
                       <a v-else target="_blank" :href="baseURL + orderSelected.recipe" class="btn btn-info">Ver pedido</a>
+
                     </div>
                   </div>
+
                 </b-colxx>
               </b-row>
 
@@ -115,8 +150,20 @@
                       </tr>
                     </tfoot>
                   </table>
+
+                  <!-- <div v-if="['pending', 'reproved', 'awaiting'].indexOf(order.order[0].status) >= 0" class="controllers d-flex justify-content-start">
+                    <button @click="alertActionOnly(order.order[0].id, 'approved', 'Deseja realmente aprovar essa proposta? ')" class="btn btn-success btn-sm mr-2">Aprovar/PV <i class="simple-icon-check" /></button>
+                    <button @click="alertActionOnly(order.order[0].id, 'reproved', 'Deseja realmente reprovar essa proposta? ')" class="btn btn-danger btn-sm mr-2">Reprovar <i class="simple-icon-close" /></button>
+                    <button  @click="alertActionOnly(order.order[0].id, 'resend', 'Deseja realmente reenviar essa proposta? ')" class="btn btn-info btn-sm mr-2">Reenviar proposta <i class="simple-icon-envelope" /></button>
+                  </div>
+
+                  <div v-if="['approved'].indexOf(order.order[0].status) >= 0" class="controllers d-flex justify-content-start">
+                    <button @click="alertActionOnly(order.order[0].id, 'approved', 'Deseja realmente emitir a NF? ')" class="btn btn-success btn-sm mr-2">Emitir NF <i class="simple-icon-check" /></button>
+                    <button  @click="alertActionOnly(order.order[0].id, 'pending', 'Deseja realmente voltar para proposta? ')" class="btn btn-warning btn-sm mr-2">Tornar proposta <i class="simple-icon-control-start" /></button>
+                  </div> -->
                 </b-colxx>
               </b-row>
+
             </div>
           </b-colxx>
         </b-row>
@@ -160,15 +207,12 @@ export default {
         }
       },
       async getOrder(){
-        if(this.orderId) {
-          this.orderSelected = null
-          this.order = null;
-
-          const data = await api.get(`/order/view/${this.orderId}`);
-          if(data.data.status == 'success') {
-            console.log(data.data.data)
-            this.order = data.data.data
-          }
+        this.orderSelected = null
+        this.order = null;
+        const data = await api.get(`/order/view/${this.orderId}`);
+        if(data.data.status == 'success') {
+          console.log(data.data.data)
+          this.order = data.data.data
         }
       },
       getTotalCart(cart){

@@ -15,8 +15,8 @@ const data = [
   },
   {
     id: "history",
-    icon: "simple-icon-clock",
-    label: "Histórico",
+    icon: "simple-icon-notebook",
+    label: "Meus pedidos",
     to: "/app/order/orders"
   },
   {

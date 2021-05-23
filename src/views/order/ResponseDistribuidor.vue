@@ -31,7 +31,7 @@
                 <single-lightbox :thumb="baseURL+it.img" :large="baseURL+it.img" class-name="w-100" />
               </div>
             </td>
-             <td>{{it.name.toUpperCase() + ' ' + it.attributes.map(r => r.value).join(' ').toUpperCase() }}</td>
+             <td>{{it.name + ' ' + it.attributes.map(r => r.value).join(' ') }}</td>
             <td>
 
               <div class="control text-center">

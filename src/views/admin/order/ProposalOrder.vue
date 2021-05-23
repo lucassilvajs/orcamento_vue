@@ -12,6 +12,7 @@
                 </label>
                 <b-dropdown-item @click="alertAction('Deseja mesmo aprovar e emitir o PV das propostas selecionadas?', 'approved','pv')">Aprovar e emitir PV</b-dropdown-item>
                 <b-dropdown-item @click="alertAction('Deseja mesmo reprovar as propostas selecionadas?','reproved','pv_nf')">Reprovar</b-dropdown-item>
+                <b-dropdown-item @click="alertAction('Deseja mesmo reprovar as propostas selecionadas?','pending','pv_nf')">Tornar proposta</b-dropdown-item>
                 <b-dropdown-item @click="alertAction('Deseja mesmo reenviar as propostas selecionadas?','reproved','resend')">Reenviar</b-dropdown-item>
                 <b-dropdown-item @click="alertActionDelete()">Deletar pedidos</b-dropdown-item>
             </b-dropdown>
@@ -70,12 +71,12 @@
     </b-colxx>
     <b-colxx xxs="12">
       <b-card class="mb-4" :title="typeOrder">
-        <p><b>Selecionados</b>: {{
+        <!-- <p><b>Selecionados</b>: {{
           items.filter(r => r.checked).length
         }} <br /><b>Total</b>: {{
           sum_array(items.filter(r => r.checked).map(sr => sr.parents.map(r => r.total).reduce(function(total, num){
                     return (parseFloat(total) + parseFloat(num))
-                  }))) | numeroPreco }}</p>
+                  }))) | numeroPreco }}</p> -->
         <div v-if="items && items.length > 0">
           <table class="table table-striped">
             <thead>
@@ -118,7 +119,13 @@
                   <button @click="orderId = item.id" v-b-modal.viewOrder class="btn btn-outline-success">
                     <div class="simple-icon-doc"/>
                   </button>
+
                   <button class="btn btn-outline-danger" @click="deleteOrder(item.id)"><div class="simple-icon-trash"/></button>
+
+                  <div v-if="$route.path.indexOf('app') >= 0">
+
+
+                  </div>
                 </td>
               </tr>
             </tbody>
@@ -149,7 +156,7 @@ import 'vue-select/dist/vue-select.css';
 import { api, baseURL } from '@/constants/config'
 import Stars from '@/components/Common/Stars';
 import SingleLightbox from "@/components/Pages/SingleLightbox";
-import ViewOrder from "@/components/Order/ViewOrders"
+import ViewOrder from "@/components/Order/ViewOrdersAdmin"
 export default {
   components: {
     'stars': Stars,
@@ -310,18 +317,36 @@ export default {
       }).then((result) => {
         if (result.value) {
 
-          this.items.map(r => {
-            if(r.checked) {
-              if(action == 'resend') {
-                this.reenviar(r.id)
-              }else if(action == 'nf') {
-                this.generateNf(r.id)
-              }else{
-                this.changeStatus(status, r.id);
-              }
+          if(action == 'nf') {
+            const cnpj = new Set();
+            this.items.filter(r => r.checked).map(r => {
+              cnpj.add(r.cnpj);
+            });
+
+            if(cnpj.size > 1) {
+              this.$swal.fire({
+                title: `Ops...!!!`,
+                text: `Você não pode vincular notas de empresas diferentes`,
+                icon: 'error',
+              });
+            }else{
+              //Retorna IDs Selecionados
+              const id = this.items.filter(r => r.checked).map(r => r.id)
+              this.generateNf(id)
             }
-          })
-          this.getOrder();
+
+          }else{
+            this.items.map(r => {
+              if(r.checked) {
+                if(action == 'resend') {
+                  this.reenviar(r.id)
+                }else if(action != 'nf'){ // Melhorar esse IF se acrescentar outra condição ele vai entrar !!!!!
+                  this.changeStatus(status, r.id);
+                  this.getOrder();
+                }
+              }
+            })
+          }
 
         }
       });

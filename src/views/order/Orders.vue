@@ -81,39 +81,49 @@
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Empresa</th>
-                  <th>CNPJ</th>
+                  <th v-if="consultor">Empresa</th>
+                  <th v-if="consultor">CNPJ</th>
                   <th>Colaborador</th>
                   <th>Solicitante</th>
                   <th>Solicitação</th>
                   <th>Valor</th>
-                  <th v-if="typeOrder == 'Pedidos'">NF</th>
+                  <th>NF</th>
                   <th>Status</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(item, index) in items" :key="index">
                   <td>{{item.id}}</td>
-                  <td>{{item.empresa}} <span v-if="item.type == 4" class="badge badge-success">ARIBA: Aguardando aprovação interna!</span></td>
-                  <td>{{item.cnpj}}</td>
+                  <td v-if="consultor">{{item.empresa}} <span v-if="item.type == 4" class="badge badge-success">ARIBA: Aguardando aprovação interna!</span></td>
+                  <td v-if="consultor">{{item.cnpj}}</td>
                   <td v-if="item.type = '1' && item.parents.length">{{item.parents.map(r => JSON.parse(r.attr).info.name).join(', ')}}</td>
                   <td v-else> {{item.acessorio}} Itens <span class="badge badge-danger">Distribuição</span> </td>
                   <td>{{item.solicitante}}</td>
                   <td>{{item.date}}</td>
                   <td>{{item.value | numeroPreco}}</td>
-                  <td v-if="typeOrder == 'Pedidos'">{{item.bling}}</td>
+                  <td>{{item.bling}}</td>
                   <td>{{item.multiple == 'pending' ? 'Proposta agendada' : item.status}}</td>
+                  <td>
+
+                    <button @click="orderId = item.id" v-b-modal.viewOrder class="btn btn-outline-success">
+                      <div class="simple-icon-doc"/>
+                    </button>
+                    <a v-if="item.rastreio" target="_blank" :href="`https://www.linkcorreios.com.br/${item.rastreio}`" class="btn btn-success">
+                        <div class="simple-icon-envelope"/>
+                    </a>
+                  </td>
                 </tr>
               </tbody>
             </table>
-              <b-pagination v-if="total > 20"
+              <b-pagination v-if="total > perPage"
                 size="sm"
                 align="center"
                 :total-rows="total"
-                :per-page="20"
+                :per-page="perPage"
                 @change="(numbe) => {
                   filter.page = numbe;
-                  getOrder();
+                  getOrderFilter();
                 }"
               />
             </div>
@@ -122,128 +132,31 @@
       </b-colxx>
     </b-row>
 
-    <b-modal v-if="order" id="modalright" ref="modalright" :title="`Pedido #${order.id}`" modal-class="modal-right">
-      <b>Data: </b>{{order.date}}<br />
-      <b>Empresa: </b>{{order.company}}<br />
-      <b>Colaborador: </b>{{order.attr.info.name}}<br />
-      <span v-if="!totem"><b>Valor: </b>{{order.value}}<br /></span>
-      <div v-if="order.attr.pc">
-        <b>Pedido de compra: </b>{{order.attr.pc.number}}<br />
-        <a v-if="order.attr.pc && order.attr.pc.file" :href="baseURL+order.attr.pc.file" class="btn btn-success btn-sm ">
-          Download <i class="simple-icon-cloud-download"/>
-        </a>
-      </div>
-      <div v-if="order.feedback">
-        <b>Feedback: </b>{{order.feedback.feedback}}<br />
-        <b>Nota: </b><stars :disabled="true" v-model="order.feedback.rate"></stars><br />
-      </div>
-      <hr>
-      <div v-for="item in order.attr.lens" :key="item.code">
-        <b>{{item.type}}</b> {{item.name}} <span v-if="item.attributes"> - {{item.attributes}} </span>
-      </div>
-      <!-- <div v-for="attr in order.attr.product.attributes" :key="attr.label">
-        <b>{{attr.label}}: </b>{{attr.select}}
-      </div> -->
-      <div v-if="order.attr.measure">
-        <b>DP:</b> {{order.attr.measure.pupillary_distance}}<br />
-        <b>ALT:</b> {{order.attr.measure.pupillary_height}}<br />
-      </div>
-      <hr>
-      <b>Face: </b><br />
-      <img class="w-100" :src="baseURL + order.attr.face" v-if="isImage(order.attr.face)" alt="">
-      <iframe height="350" v-else class="w-100" :src="baseURL + order.attr.face" frameborder="0"></iframe>
-      <b>Receita: </b><br />
-      <img class="w-100" :src="baseURL + order.attr.recipe" v-if="isImage(order.attr.recipe)" alt="">
-      <iframe height="350" v-else class="w-100" :src="baseURL + order.attr.recipe" frameborder="0"></iframe>
-      <template slot="modal-footer">
-          <button class="btn btn-outline-warning" @click="hideModal('modalright')">Fechar</button>
-          <router-link v-if="consultor" :to="`/app/order/edit/${order.id}`" class="btn btn-info">Editar</router-link>
-      </template>
-    </b-modal>
 
-    <b-modal id="modalright1" ref="modalright1" title="Adicionar pedido de compra" modal-class="modal-right">
-      <b-row>
-        <b-colxx>
-          <b-form-group label="Número do pedido" class="has-float-label mb-4">
-              <b-form-input type="text" v-model="pc.number" />
-          </b-form-group>
-          <b-input-group class="mb-3">
-            <b-form-file v-model="pc.file"  placeholder="Anexar"></b-form-file>
-          </b-input-group>
-          <div class="text-right">
-            <b-button variant="success" :disabled="processingPc" :class="{'float-right mb-3 btn-multiple-state btn-shadow': true,
-                'show-spinner': processingPc,
-                'show-success': !processingPc && uploadError===false,
-                'show-fail': !processingPc && uploadError }" @click="sendPedidoCompra">
-                <span class="spinner d-inline-block">
-                    <span class="bounce1"></span>
-                    <span class="bounce2"></span>
-                    <span class="bounce3"></span>
-                </span>
-                <span class="icon success">
-                    Enviar pedido
-                </span>
-                <span class="icon fail">
-                    <i class="simple-icon-exclamation"></i>
-                </span>
-                <span class="label">Enviar pedido</span>
-            </b-button>
-          </div>
-        </b-colxx>
-      </b-row>
-      <template slot="modal-footer">
-          <b-button variant="info" @click="hideModal('modalright1')">Fechar</b-button>
-      </template>
-    </b-modal>
+    <ViewOrder :orderId="orderId" />
 
-    <b-modal id="modalright2" ref="modalright2" title="Feedback" modal-class="modal-right">
-      <b-row>
-        <b-colxx>
-          <b-form @submit.prevent="formSubmit" class="av-tooltip tooltip-label-bottom">
-              <b-form-group label="Conte para nós o motivo da sua decisão">
-                  <b-textarea v-model="feedback"></b-textarea>
-              </b-form-group>
-              <b-form-group label="Que nota você da para nós?">
-                  <stars v-model="rate"></stars>
-              </b-form-group>
-              <b-button variant="success" :disabled="processing" :class="{'float-right mb-3 btn-multiple-state btn-shadow': true,
-                  'show-spinner': processing,
-                  'show-success': !processing && uploadError===false,
-                  'show-fail': !processing && uploadError }" @click="sendFeedback">
-                  <span class="spinner d-inline-block">
-                      <span class="bounce1"></span>
-                      <span class="bounce2"></span>
-                      <span class="bounce3"></span>
-                  </span>
-                  <span class="icon success">
-                      Enviar feedback
-                  </span>
-                  <span class="icon fail">
-                      <i class="simple-icon-exclamation"></i>
-                  </span>
-                  <span class="label">Enviar feedback</span>
-              </b-button>
-          </b-form>
-        </b-colxx>
-      </b-row>
-      <template slot="modal-footer">
-          <b-button variant="info" @click="hideModal('modalright2')">Fechar</b-button>
-      </template>
-    </b-modal>
   </div>
   <div v-else style="height:90vh; display:flex; justify-content:center; align-items:center">
     <h1>Buscando informações...</h1>
   </div>
 </template>
 <script>
+import {
+    mapGetters,
+    mapMutations,
+    mapActions
+} from 'vuex'
+
 import Stars from '@/components/Common/Stars';
 import vSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
 import {api, baseURL} from '@/constants/config';
+import ViewOrder from "@/components/Order/ViewOrders"
 export default {
   components: {
     'v-select': vSelect,
-    'stars': Stars
+    'stars': Stars,
+    ViewOrder
   },
   data () {
     return {
@@ -254,12 +167,14 @@ export default {
       order: null,
       items: null,
       filter: {},
-      total: 300,
+      total: null,
+      perPage: null,
       baseURL,
       processingPc: false,
       processing: false,
       uploadError: false,
       rate: 3,
+      orderId: null
     }
   },
   computed: {
@@ -269,9 +184,14 @@ export default {
     },
     totem() {
       return JSON.parse(window.localStorage.getItem('user')).user.totem;
+    },
+
+    typeOrder(){
+      return "Pedidos"
     }
   },
   methods: {
+    ...mapActions(['loading']),
     link(url){
       this.$router.push(`${url}`);
     },
@@ -280,24 +200,26 @@ export default {
       return existe.length
     },
     async getOrder() {
-      this.items = null;
-      const orderType = this.$route.path.split('/')[3];
-      const items = await api.get('/order', {
-        params: {
-          status: orderType ? orderType : ''
-        }
-      });
-      this.items = items.data.data.orders.map(r => {
-        r.checked = false;
-        return r;
-      });
-      this.total = items.data.data.total
+      this.getOrderFilter();
+      // this.items = null;
+      // const orderType = this.$route.path.split('/')[3];
+      // const items = await api.get('/order', {
+      //   params: {
+      //     status: orderType ? orderType : '',
+      //   }
+      // });
+      // this.items = items.data.data.orders.map(r => {
+      //   r.checked = false;
+      //   return r;
+      // });
+      // this.total = items.data.data.total
     },
     getInfoOrder(index) {
       this.order = this.items[index]
       console.log(index)
     },
     async getOrderFilter() {
+      this.loading(true);
       this.processing = true;
       const orderType = this.filter.status ? this.filter.status : this.$route.path.split('/')[3];
       let params = this.filter;
@@ -305,7 +227,17 @@ export default {
       const items = await api.get('/order', {
         params
       });
-      this.items = items.data.data.orders
+
+      this.loading(false);
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      })
+
+      this.items = items.data.data.orders;
+      this.perPage = items.data.data.perPage;
+      this.total = items.data.data.total;
       this.processing = false;
     },
     async swalsendOrder(id) {

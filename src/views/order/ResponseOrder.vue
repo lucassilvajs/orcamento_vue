@@ -76,6 +76,17 @@
                 <td>
                   <span v-for="(item, itIndex) in ord.attributes.lens" :key="itIndex">
                     -{{item.name}}<br /></span>
+
+                  <div v-if="ord.acessorio">
+                    <small><b>Acessórios: </b></small>
+                    <div v-for="(acess, iAcess) in JSON.parse(ord.acessorio)" :key="iAcess">
+                      <span>{{acess.qty}} - {{acess.name}} {{ acess.attributes.map(r => r.value).join(' ') }} -   {{parseFloat(acess.qty) * parseFloat(acess.price) | numeroPreco}}</span>
+                    </div>
+                  </div>
+
+
+                </td>
+                <td>
                 </td>
                 <td></td>
               </tr>

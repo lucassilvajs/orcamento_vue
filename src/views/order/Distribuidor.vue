@@ -31,7 +31,7 @@ import {
 } from "vuex";
 
 export default {
-  props: ["idCompany"],
+  props: ["idCompany", "not"],
 	data() {
 		return {
       baseURL,
@@ -55,8 +55,9 @@ export default {
 	methods: {
     getProducts: async function()
 		{
-			const products = await api.get(`/distribuicao/${ isNaN(this.idCompany) ? 0 : this.idCompany}`);
-			this.products = products.data.data
+      const products = await api.get(`/distribuicao/${ isNaN(this.idCompany) ? 0 : this.idCompany}`);
+      if(this.not) this.products = products.data.data.filter(r => this.not.indexOf(parseInt(r.type)) < 0 )
+      else this.products = products.data.data
     },
     setItem(item) {
       this.idProduct = item;

@@ -143,11 +143,11 @@
               </tr>
             </tbody>
           </table>
-          <b-pagination v-if="total > 100"
+          <b-pagination v-if="total > 25"
             size="sm"
             align="center"
             :total-rows="total"
-            :per-page="100"
+            :per-page="25"
             @change="(numbe) => {
               filter.page = numbe;
               getOrders();
@@ -417,7 +417,6 @@ export default {
         icon: `${data.status}`,
       });
       this.getOrders();
-
     },
     async changeLen(len){
       const order = this.items[this.index];

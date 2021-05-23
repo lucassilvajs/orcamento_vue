@@ -9,7 +9,7 @@
         </a>
 
         <div v-if="true" class="header-icons d-inline-block align-middle">
-                            <b-modal id="modalbackdrop" ref="modalbackdrop" size="lg" title="Seus pedidos pendentes">
+          <b-modal id="modalbackdrop" ref="modalbackdrop" size="lg" title="Seus pedidos pendentes">
             <table class="table">
               <thead>
                 <tr>
@@ -66,9 +66,6 @@
                     <vue-perfect-scrollbar :settings="{ suppressScrollX: true, wheelPropagation: false }">
                         <div v-if="awaitingOrders.length > 0">
                           <div v-b-modal.modalbackdrop class="d-flex flex-row mb-3 pb-3 border-bottom align-items-center cursor-pointer">
-                              <div>
-                                  <img :src="`https://api.idsafety.com.br/${awaitingOrders[0].attr.image}`" :alt="awaitingOrders[0].attr.lens[0].name" class="img-thumbnail list-thumbnail xsmall border-0 rounded-circle" />
-                              </div>
                               <div class="pl-3 pr-2">
                                   <div>
                                       <p class="font-weight-medium mb-1">Você possui {{awaitingOrders.length == 1 ? '1 proposta' : awaitingOrders.length + ' propostas'}}  aguardando envio</p>

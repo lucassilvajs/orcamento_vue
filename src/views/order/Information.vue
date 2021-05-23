@@ -3,8 +3,8 @@
     <my-breadcrumb />
     <b-row>
         <b-colxx xxs="12">
-            <b-card class="mb-3">
-                <b-row v-if="companiesValue">
+            <b-card class="mb-3"  v-if="companiesValue.length">
+                <b-row>
                     <b-colxx>
                         <b-form-group label="Selecione a empresa">
                             <v-select v-model="setCompany"
