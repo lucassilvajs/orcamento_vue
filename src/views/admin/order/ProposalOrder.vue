@@ -87,7 +87,8 @@
                 <th>CNPJ</th>
                 <th>Colaborador</th>
                 <th>Solicitante</th>
-                <th>Solicitação</th>
+                <th v-if="typeOrder != 'Pedidos'">Solicitação</th>
+                <th v-else>Aprovado</th>
                 <th>Valor</th>
                 <th v-if="typeOrder == 'Pedidos'">NF</th>
                 <th>Status</th>
@@ -106,22 +107,25 @@
                 </td>
                 <td v-else></td>
                 <td>{{item.id}}</td>
-                <td>{{item.empresa}} <span v-if="item.type == 4" class="badge badge-success">ARIBA: Aguardando aprovação interna!</span></td>
+                <td>{{item.empresa}}</td>
                 <td>{{item.cnpj}}</td>
-                <td v-if="item.type = '1' && item.parents.length">{{item.parents.map(r => JSON.parse(r.attr).info.name).join(', ')}}</td>
-                <td v-else> {{item.acessorio}} Itens <span class="badge badge-danger">Distribuição</span> </td>
+                <td v-if="['1','2'].indexOf(item.type) >= 0">{{item.parents.map(r => JSON.parse(r.attr).info.name).join(', ')}}</td>
+                <td v-else-if="item.type == '4'">
+                  <span v-if="item.object.info">{{item.object.info.name}}</span>
+                  <span v-else><b>Nome não cadastrado</b></span>
+                  <span class="d-inline-block badge badge-danger">Ariba</span>
+                </td>
+                <td v-else>{{item.acessorio}} Itens <span class="badge badge-danger">Distribuição</span> </td>
                 <td>{{item.solicitante}}</td>
                 <td>{{item.date}}</td>
                 <td>{{item.value | numeroPreco}}</td>
                 <td v-if="typeOrder == 'Pedidos'">{{item.bling}}</td>
-                <td>{{item.multiple == 'pending' ? 'Proposta agendada' : item.status}}</td>
+                <td>{{item.multiple == 'pending' ? 'Proposta agendada' : item.status}} <span v-if="item.len" class="badge badge-success">Lentes solicitdas</span> </td>
                 <td>
                   <button @click="orderId = item.id" v-b-modal.viewOrder class="btn btn-outline-success">
                     <div class="simple-icon-doc"/>
                   </button>
-
-                  <button class="btn btn-outline-danger" @click="deleteOrder(item.id)"><div class="simple-icon-trash"/></button>
-
+                  
                   <div v-if="$route.path.indexOf('app') >= 0">
 
 

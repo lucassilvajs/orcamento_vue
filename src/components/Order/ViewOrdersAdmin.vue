@@ -18,7 +18,7 @@
               <hr>
               <h3>Informações do pedido</h3>
 
-              <b-row v-if="order.order[0].type == '1'" >
+              <b-row v-if="['1', '2', '4'].indexOf(order.order[0].type) >= '0'" >
                 <b-colxx md="8">
                   <p class="mb-1"><b>Empresa: </b> {{order.order[0].name}}</p>
                   <p class="mb-1"><b>CNPJ: </b> {{order.order[0].cnpj}}</p>
@@ -26,8 +26,8 @@
                   <p class="mb-1"><b>Valor: </b> {{order.order[0].value | numeroPreco}}</p>
                   <hr>
 
-                  <div v-if="order.order[0].type == '1'" style="max-height:65vh; overflow: auto;">
-                    <div v-for="(item, iItem) in order.order.filter(r => r.type == 1)" :key="iItem">
+                  <div style="max-height:65vh; overflow: auto;">
+                    <div v-for="(item, iItem) in order.order.filter(r => ['1', '2', '4'].indexOf(r.type) >= '0')" :key="iItem">
 
                       <h5>#{{item.id}}</h5>
                       <p class="mb-0" v-for="(info, iInfo) in JSON.parse(item.attributes).info" :key="iInfo"><b>{{iInfo == 'name' ? 'Nome' : iInfo}}: </b> {{info}}</p>
@@ -56,7 +56,7 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="(itemA, index) in JSON.parse(item.acessorio)" :key="index">
+                          <tr v-for="(itemA, index) in getAcessorios(item.acessorio)" :key="index">
                             <td>{{itemA.name + ' ' + itemA.attributes.map(r => r.value).join(' ') }}</td>
                             <td>{{itemA.qty}}</td>
                             <td>{{itemA.price | numeroPreco}}</td>
@@ -101,17 +101,19 @@
 
                   <div v-if="orderSelected">
                     #{{orderSelected.id}}
-                    <div class="d-flex flex-column flex-start">
+                    <div v-if="orderSelected.face" class="d-flex flex-column flex-start">
                       <h6 class="m-0">Face</h6>
                       <single-lightbox v-if="orderSelected.face.indexOf('.pdf') < 0" :thumb="baseURL + orderSelected.face" :large="baseURL + orderSelected.face" class-name="w-100 mx-auto d-block p-2" />
                       <a v-else target="_blank" :href="baseURL + orderSelected.face" class="btn btn-info">Ver pedido</a>
                     </div>
-                    <div class="d-flex flex-column flex-start">
+                    <div v-if="orderSelected.recipe" class="d-flex flex-column flex-start">
                       <h6 class="m-0">Receita</h6>
                       <single-lightbox v-if="orderSelected.recipe.indexOf('.pdf') < 0" :thumb="baseURL + orderSelected.recipe" :large="baseURL + orderSelected.recipe" class-name="w-100 mx-auto d-block p-2" />
                       <a v-else target="_blank" :href="baseURL + orderSelected.recipe" class="btn btn-info">Ver pedido</a>
-
                     </div>
+                    <b-alert v-else show variant="danger" class="rounded">O anexo não foi inserido</b-alert>
+                    
+                    
                   </div>
 
                 </b-colxx>
@@ -281,6 +283,14 @@ export default {
           this.getOrder();
         });
       },
+      getAcessorios(acessorios){
+        acessorios = JSON.parse(acessorios);
+        for(let i in acessorios){
+          if(isNaN(i)) delete acessorios[i];
+        }
+
+        return acessorios;
+      }
     },
     created(){
     },
