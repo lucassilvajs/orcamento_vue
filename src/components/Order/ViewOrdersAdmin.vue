@@ -18,7 +18,7 @@
               <hr>
               <h3>Informações do pedido</h3>
 
-              <b-row v-if="['1', '2', '4'].indexOf(order.order[0].type) >= '0'" >
+              <b-row v-if="['1', '2', '4'].indexOf(order.order[0].type) >= '0' && order.order[0].id >= '17304'" >
                 <b-colxx md="8">
                   <p class="mb-1"><b>Empresa: </b> {{order.order[0].name}}</p>
                   <p class="mb-1"><b>CNPJ: </b> {{order.order[0].cnpj}}</p>
@@ -117,6 +117,77 @@
                   </div>
 
                 </b-colxx>
+              </b-row>
+
+              <b-row v-if="['1', '2', '4'].indexOf(order.order[0].type) >= '0' && order.order[0].id < '17304'">
+                <b-colxx md="8">
+                  <p class="mb-1"><b>Empresa: </b> {{order.order[0].name}}</p>
+                  <p class="mb-1"><b>CNPJ: </b> {{order.order[0].cnpj}}</p>
+                  <p class="mb-1"><b>Solicitante: </b> {{order.order[0].vendedor}}</p>
+                  <p class="mb-1"><b>Valor: </b> {{order.order[0].value | numeroPreco}}</p>
+                  <hr>
+
+                  <div style="max-height:65vh; overflow: auto;">
+                    <div v-for="(item, iItem) in order.order.filter(r => ['1', '2', '4'].indexOf(r.type) >= '0')" :key="iItem">
+
+                      <h5>#{{item.id}}</h5>
+                      <div v-if="JSON.parse(item.attributes).measure">
+                        <span class="badge badge-success">DP: {{JSON.parse(item.attributes).measure.pupillary_distance}} /
+                        ALT: {{JSON.parse(item.attributes).measure.pupillary_height}} </span>
+                      </div>
+                      <p class="mb-0" v-for="len in JSON.parse(item.attributes).lens" :key="len.code">
+                        <b>{{len.type}}</b> {{len.name}} <span v-if="len.type == 'Óculos'">{{ JSON.parse(item.attributes).product.size }} {{JSON.parse(item.attributes).product.color}}</span>
+                      </p>
+                      <div class="mt-4" v-if="JSON.parse(item.attributes).pc">
+                        <b>Pedido de compra: </b>
+                        <hr class="my-1">
+                        <a target="_blank" v-if="JSON.parse(item.attributes).pc.file" :href="baseURL+JSON.parse(item.attributes).pc.file" class="btn btn-outline-success btn-xs">Ver pedido <i class="simple-icon-book-open" /></a>
+                        <p v-if="JSON.parse(item.attributes).pc.number"><b>Numero: </b> {{JSON.parse(item.attributes).pc.number}} </p>
+                      </div>
+                      
+                      <div class="mt-2">
+                        <button @click="orderSelected = item" class="btn btn-xs btn-outline-info">Visualizar <i class="simple-icon-eye" /></button>
+
+                        <router-link :to="`/admin/proposal/edit/${item.id}`" class="btn btn-xs btn-info">Editar <i class="simple-icon-pencil" /></router-link>
+
+                        <button v-if="['approved'].indexOf(order.order[0].status) >= 0 && item.len == '0'"  @click="alertActionOnly(item.id, 'len', 'Deseja realmente confirmar a solicitação de lente? ')" class="btn btn-xs btn-outline-success">Solicitar lente <i class="simple-icon-magic-wand" /></button>
+
+                        <button v-if="['approved'].indexOf(order.order[0].status) >= 0 && item.len == '1'" class="btn btn-xs btn-success">Lente já solicitada <i class="simple-icon-magic-wand" /></button>
+
+                        <router-link v-if="['approved'].indexOf(order.order[0].status) >= 0" :to="`/admin/order/measure/${item.id}`" class="btn btn-warning btn-xs mr-2">Medição <i class="simple-icon-eye" /></router-link>
+
+                        <button @click="alertActionOnly(item.id, 'deleted', 'Deseja realmente deletar essa proposta? ')" class="btn btn-outline-danger btn-xs mr-2">Deletar <i class="simple-icon-trash" /></button>
+
+                      </div>
+                      <hr>
+                    </div>
+                  </div>
+
+                </b-colxx>
+                <b-colxx md="4">
+                  <div v-if="!orderSelected" class="d-flex align-itens-center justify-content-center h-100 text-center" style="align-items: center;">
+                    Clique no pedido ao lado para visualizar anexos (Face e Receita)
+                  </div>
+
+                  <div v-if="orderSelected">
+                    #{{orderSelected.id}}
+                    <div v-if="orderSelected.face" class="d-flex flex-column flex-start">
+                      <h6 class="m-0">Face</h6>
+                      <single-lightbox v-if="orderSelected.face.indexOf('.pdf') < 0" :thumb="baseURL + orderSelected.face" :large="baseURL + orderSelected.face" class-name="w-100 mx-auto d-block p-2" />
+                      <a v-else target="_blank" :href="baseURL + orderSelected.face" class="btn btn-info">Ver pedido</a>
+                    </div>
+                    <div v-if="orderSelected.recipe" class="d-flex flex-column flex-start">
+                      <h6 class="m-0">Receita</h6>
+                      <single-lightbox v-if="orderSelected.recipe.indexOf('.pdf') < 0" :thumb="baseURL + orderSelected.recipe" :large="baseURL + orderSelected.recipe" class-name="w-100 mx-auto d-block p-2" />
+                      <a v-else target="_blank" :href="baseURL + orderSelected.recipe" class="btn btn-info">Ver pedido</a>
+                    </div>
+                    <b-alert v-else show variant="danger" class="rounded">O anexo não foi inserido</b-alert>
+                    
+                    
+                  </div>
+
+                </b-colxx>
+
               </b-row>
 
               <b-row v-if="order.order[0].type == '3'">

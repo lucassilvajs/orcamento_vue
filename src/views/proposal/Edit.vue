@@ -30,16 +30,10 @@
                 </b-colxx>
               </b-row>
               <hr>
-                {{order.order_attributes.lens}}
               <b-row v-for="(item, itemIndex) in order.order_attributes.lens" :key="itemIndex">
                 <b-colxx md="4" lg="3" v-for="(itemLen, lenIndex) in item" :key="lenIndex" >
                   <b-form-group :label="{code: 'Código', name: 'Nome', price: 'Preço', type: 'Tipo'}[lenIndex]" class="has-float-label mb-4">
-                      <b-form-input v-if="lenIndex != 'price'" type="text" placeholder="Nome" v-model="orders[index].order_attributes.lens[itemIndex][lenIndex]" />
-                      <v-select v-else-if="lenIndex == 'name'" v-model="orders[index].order_attributes.lens[itemIndex][lenIndex]" :options="[
-                        {code: 'EPI ID 101 A', label: 'EPI ID 101 A'},
-                        {code: 'EPI ID 101 B', label: 'EPI ID 101 B'},
-                        {code: 'EPI ID 101 R', label: 'EPI ID 101 R'}
-                      ]" dir="ltr" />
+                      <b-form-input v-if="lenIndex != 'price'" disabled="true" type="text" placeholder="Nome" v-model="orders[index].order_attributes.lens[itemIndex][lenIndex]" />
                       <Money v-else class="form-control" :disabled="1" v-model="orders[index].order_attributes.lens[itemIndex][lenIndex]" v-bind="{ decimal: ',',thousands: '.',prefix: 'R$ ',suffix: '',precision: 2,masked: true,}"/>
                   </b-form-group>
                 </b-colxx>

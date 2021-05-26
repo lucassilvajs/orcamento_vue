@@ -120,7 +120,7 @@
                 <td>{{item.date}}</td>
                 <td>{{item.value | numeroPreco}}</td>
                 <td v-if="typeOrder == 'Pedidos'">{{item.bling}}</td>
-                <td>{{item.multiple == 'pending' ? 'Proposta agendada' : item.status}} <span v-if="item.len" class="badge badge-success">Lentes solicitdas</span> </td>
+                <td>{{item.multiple == 'pending' ? 'Proposta agendada' : item.status}} <span v-if="item.len" class="badge badge-success">Lentes solicitdas</span> <span v-if="item.sap" class="badge badge-info">PC: {{item.sap}}</span> </td>
                 <td>
                   <button @click="orderId = item.id" v-b-modal.viewOrder class="btn btn-outline-success">
                     <div class="simple-icon-doc"/>

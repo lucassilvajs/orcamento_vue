@@ -54,12 +54,11 @@
                       </table>
                       <div class="mt-2">
                         <button @click="orderSelected = item" class="btn btn-xs btn-outline-info">Visualizar <i class="simple-icon-eye" /></button>
+                        <router-link v-if="isConsultor" :to="`/app/order/edit/${item.id}`" class="btn btn-xs btn-info">Editar <i class="simple-icon-pencil" /></router-link>
                       </div>
                       <hr>
                     </div>
                   </div>
-
-
                 </b-colxx>
                 <b-colxx md="4">
                   <div v-if="!orderSelected" class="d-flex align-itens-center justify-content-center h-100 text-center" style="align-items: center;">
@@ -144,7 +143,12 @@ export default {
     components: {
       "single-lightbox": SingleLightbox,
     },
-    computed:{},
+    computed:{
+      ...mapGetters(['currentUser']),
+      isConsultor(){
+        return this.currentUser.user.colaborador
+      }
+    },
     data(){
       return {
         baseURL: 'https://api.idsafety.com.br/',
