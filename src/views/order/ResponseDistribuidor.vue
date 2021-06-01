@@ -9,7 +9,13 @@
   </b-row>
   <b-row>
     <b-colxx xxs="12" class="mb-3">
-        <h3>Informações do pedido</h3>
+        <h3>Informações do pedido 
+          <div class="d-inline" v-if="orderInfo">
+            -
+            <span v-if="orderInfo.order_status == 'approved'" class="text-success font-weight-bold">Aprovado</span>
+            <span v-if="orderInfo.order_status == 'reproved'" class="text-danger font-weight-bold">Reprovado</span>
+          </div>
+        </h3>
     </b-colxx>
   </b-row>
   <b-row v-if="order" class="mb-4">
@@ -68,7 +74,8 @@ export default {
       return {
         baseURL,
         order: null,
-        orderId: null
+        orderId: null,
+        orderInfo: null,
       }
     },
     methods: {
@@ -77,6 +84,7 @@ export default {
         const data = await api.get(`distribuidor/${this.$route.params.hash}/${this.$route.params.response}`);
         this.order = JSON.parse(data.data.data.items);
         this.orderId = JSON.parse(data.data.data.orderId);
+        this.orderInfo = data.data.data.order;
 
         this.$notify(data.data.status, data.data.status != 'success' ? 'Opsss...' : 'Sucesso', data.data.message, {
             duration: 10000,

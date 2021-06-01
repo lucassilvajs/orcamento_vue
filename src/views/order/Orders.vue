@@ -97,7 +97,7 @@
                   <td>{{item.id}}</td>
                   <td v-if="consultor">{{item.empresa}} <span v-if="item.type == 4" class="badge badge-success">ARIBA: Aguardando aprovação interna!</span></td>
                   <td v-if="consultor">{{item.cnpj}}</td>
-                  <td v-if="item.type = '1' && item.parents.length">{{item.parents.map(r => JSON.parse(r.attr).info.name).join(', ')}}</td>
+                  <td v-if="item.type = '1'">{{item.name}}</td>
                   <td v-else> {{item.acessorio}} Itens <span class="badge badge-danger">Distribuição</span> </td>
                   <td>{{item.solicitante}}</td>
                   <td>{{item.date}}</td>
