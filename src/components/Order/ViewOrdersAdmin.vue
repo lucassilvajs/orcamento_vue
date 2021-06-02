@@ -35,7 +35,7 @@
                         <span class="badge badge-success">DP: {{JSON.parse(item.attributes).measure.pupillary_distance}} /
                         ALT: {{JSON.parse(item.attributes).measure.pupillary_height}} </span>
                       </div>
-                      <div v-if="item.id >= 17304">
+                      <div v-if="item.id >= 17304 && item.id != 209603">
                         <p class="mb-0" v-for="(len, iInfo) in JSON.parse(item.attributes).lens" :key="iInfo"><b>{{len.type}}: </b> {{len.name}} <span v-if="len.type == 'Óculos'">{{JSON.parse(item.attributes).product.filter(r => r.name).map(r => r.value).join(' ')}}</span></p>
                       </div>
                       <div v-else>
