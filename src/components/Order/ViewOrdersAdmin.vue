@@ -18,7 +18,7 @@
               <hr>
               <h3>Informações do pedido</h3>
 
-              <b-row v-if="['1', '2', '4'].indexOf(order.order[0].type) >= '0' && order.order[0].id >= '17304'" >
+              <b-row v-if="order.order[0].type != '3'">
                 <b-colxx md="8">
                   <p class="mb-1"><b>Empresa: </b> {{order.order[0].name}}</p>
                   <p class="mb-1"><b>CNPJ: </b> {{order.order[0].cnpj}}</p>
@@ -35,9 +35,14 @@
                         <span class="badge badge-success">DP: {{JSON.parse(item.attributes).measure.pupillary_distance}} /
                         ALT: {{JSON.parse(item.attributes).measure.pupillary_height}} </span>
                       </div>
-                      <p class="mb-0" v-for="len in JSON.parse(item.attributes).lens" :key="len.code">
-                        <b>{{len.type}}</b> {{len.name}} <span v-if="len.type == 'Óculos'">{{JSON.parse(item.attributes).product.filter(r => r.name).map(r => r.value).join(' ')}}</span>
-                      </p>
+                      <div v-if="item.id >= 17304">
+                        <p class="mb-0" v-for="(len, iInfo) in JSON.parse(item.attributes).lens" :key="iInfo"><b>{{len.type}}: </b> {{len.name}} <span v-if="len.type == 'Óculos'">{{JSON.parse(item.attributes).product.filter(r => r.name).map(r => r.value).join(' ')}}</span></p>
+                      </div>
+                      <div v-else>
+                        <p class="mb-0" v-for="len in JSON.parse(item.attributes).lens" :key="len.code">
+                          <b>{{len.type}}</b> {{len.name}} <span v-if="len.type == 'Óculos'">{{ JSON.parse(item.attributes).product.size }} {{JSON.parse(item.attributes).product.color}}</span>
+                        </p>
+                      </div>
                       <div class="mt-4" v-if="JSON.parse(item.attributes).pc">
                         <b>Pedido de compra: </b>
                         <hr class="my-1">
@@ -119,7 +124,7 @@
                 </b-colxx>
               </b-row>
 
-              <b-row v-if="['1', '2', '4'].indexOf(order.order[0].type) >= '0' && order.order[0].id < '17304'">
+              <!-- <b-row v-if="['1', '2', '4'].indexOf(order.order[0].type) >= '0' && order.order[0].id < '17304'">
                 <b-colxx md="8">
                   <p class="mb-1"><b>Empresa: </b> {{order.order[0].name}}</p>
                   <p class="mb-1"><b>CNPJ: </b> {{order.order[0].cnpj}}</p>
@@ -135,9 +140,14 @@
                         <span class="badge badge-success">DP: {{JSON.parse(item.attributes).measure.pupillary_distance}} /
                         ALT: {{JSON.parse(item.attributes).measure.pupillary_height}} </span>
                       </div>
-                      <p class="mb-0" v-for="len in JSON.parse(item.attributes).lens" :key="len.code">
-                        <b>{{len.type}}</b> {{len.name}} <span v-if="len.type == 'Óculos'">{{ JSON.parse(item.attributes).product.size }} {{JSON.parse(item.attributes).product.color}}</span>
-                      </p>
+                      <div v-if="item.id >= 17304">
+                        <p class="mb-0" v-for="(len, iInfo) in JSON.parse(item.attributes).lens" :key="iInfo"><b>{{len.type}}: </b> {{len.name}} <span v-if="len.type == 'Óculos'">{{JSON.parse(item.attributes).product.filter(r => r.name).map(r => r.value).join(' ')}}</span></p>
+                      </div>
+                      <div v-else>
+                        <p class="mb-0" v-for="len in JSON.parse(item.attributes).lens" :key="len.code">
+                          <b>{{len.type}}</b> {{len.name}} <span v-if="len.type == 'Óculos'">{{ JSON.parse(item.attributes).product.size }} {{JSON.parse(item.attributes).product.color}}</span>
+                        </p>
+                      </div>
                       <div class="mt-4" v-if="JSON.parse(item.attributes).pc">
                         <b>Pedido de compra: </b>
                         <hr class="my-1">
@@ -188,7 +198,7 @@
 
                 </b-colxx>
 
-              </b-row>
+              </b-row> -->
 
               <b-row v-if="order.order[0].type == '3'">
                 <b-colxx md="12">

@@ -18,7 +18,7 @@
               <hr>
               <h3>Informações do pedido</h3>
 
-              <b-row v-if="order.order[0].type == '1' && order.order[0].id >= '17304'">
+              <b-row v-if="order.order[0].type != '3'">
                 <b-colxx md="8">
                   <p class="mb-1"><b>Empresa: </b> {{order.order[0].name}}</p>
                   <p class="mb-1"><b>CNPJ: </b> {{order.order[0].cnpj}}</p>
@@ -26,32 +26,49 @@
                   <p class="mb-1"><b>Valor: </b> {{order.order[0].value | numeroPreco}}</p>
                   <hr>
 
-                  <div v-if="order.order[0].type == '1'" style="max-height:65vh; overflow: auto;">
+                  <div style="max-height:65vh; overflow: auto;">
                     <div v-for="(item, iItem) in order.order.filter(r => r.type == 1)" :key="iItem">
                       <h5>#{{item.id}}</h5>
+                      <div v-if="JSON.parse(item.attributes).measure">
+                        <span class="badge badge-success">DP: {{JSON.parse(item.attributes).measure.pupillary_distance}} /
+                        ALT: {{JSON.parse(item.attributes).measure.pupillary_height}} </span>
+                      </div>
+                      <div class="mt-4" v-if="JSON.parse(item.attributes).pc">
+                        <b>Pedido de compra: </b>
+                        <hr class="my-1">
+                        <a target="_blank" v-if="JSON.parse(item.attributes).pc.file" :href="baseURL+JSON.parse(item.attributes).pc.file" class="btn btn-outline-success btn-xs">Ver pedido <i class="simple-icon-book-open" /></a>
+                        <p v-if="JSON.parse(item.attributes).pc.number"><b>Numero: </b> {{JSON.parse(item.attributes).pc.number}} </p>
+                      </div>
                       <p class="mb-0" v-for="(info, iInfo) in JSON.parse(item.attributes).info" :key="iInfo"><b>{{iInfo == 'name' ? 'Nome' : iInfo}}: </b> {{info}}</p>
 
-                      <p class="mb-0" v-for="(len, iInfo) in JSON.parse(item.attributes).lens" :key="iInfo"><b>{{len.type}}: </b> {{len.name}} <span v-if="len.type == 'Óculos'">{{JSON.parse(item.attributes).product.filter(r => r.name).map(r => r.value).join(' ')}}</span></p>
+                      <div v-if="item.id >= 17304">
+                        <p class="mb-0" v-for="(len, iInfo) in JSON.parse(item.attributes).lens" :key="iInfo"><b>{{len.type}}: </b> {{len.name}} <span v-if="len.type == 'Óculos'">{{JSON.parse(item.attributes).product.filter(r => r.name).map(r => r.value).join(' ')}}</span></p>
+                      </div>
+                      <div v-else>
+                        <p class="mb-0" v-for="len in JSON.parse(item.attributes).lens" :key="len.code">
+                          <b>{{len.type}}</b> {{len.name}} <span v-if="len.type == 'Óculos'">{{ JSON.parse(item.attributes).product.size }} {{JSON.parse(item.attributes).product.color}}</span>
+                        </p>
+                      </div>
 
-                      <p class="mb-0 mt-2" v-if="item.acessorio"><b>Acessórios:</b></p>
-                      <table class="table table-striped" v-if="item.acessorio">
-                        <thead>
-                          <tr>
-                            <th>Nome</th>
-                            <th>QTD</th>
-                            <th>Unitário </th>
-                            <th>Preço </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr v-for="(itemA, index) in JSON.parse(item.acessorio)" :key="index">
-                            <td>{{itemA.name + ' ' + itemA.attributes.map(r => r.value).join(' ') }}</td>
-                            <td>{{itemA.qty}}</td>
-                            <td>{{itemA.price | numeroPreco}}</td>
-                            <td> {{itemA.qty * itemA.price | numeroPreco}} </td>
-                          </tr>
-                        </tbody>
-                      </table>
+                        <p class="mb-0 mt-2" v-if="item.acessorio"><b>Acessórios:</b></p>
+                        <table class="table table-striped" v-if="item.acessorio">
+                          <thead>
+                            <tr>
+                              <th>Nome</th>
+                              <th>QTD</th>
+                              <th>Unitário </th>
+                              <th>Preço </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="(itemA, index) in JSON.parse(item.acessorio)" :key="index">
+                              <td>{{itemA.name + ' ' + itemA.attributes.map(r => r.value).join(' ') }}</td>
+                              <td>{{itemA.qty}}</td>
+                              <td>{{itemA.price | numeroPreco}}</td>
+                              <td> {{itemA.qty * itemA.price | numeroPreco}} </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       <div class="mt-2">
                         <button @click="orderSelected = item" class="btn btn-xs btn-outline-info">Visualizar <i class="simple-icon-eye" /></button>
                         <router-link v-if="isConsultor" :to="`/app/order/edit/${item.id}`" class="btn btn-xs btn-info">Editar <i class="simple-icon-pencil" /></router-link>
@@ -81,7 +98,7 @@
                 </b-colxx>
               </b-row>
 
-              <b-row v-if="['1', '2', '4'].indexOf(order.order[0].type) >= '0' && order.order[0].id < '17304'">
+              <b-row v-if="false && ['1', '2', '4'].indexOf(order.order[0].type) >= '0' && order.order[0].id < '17304'">
                 <b-colxx md="8">
                   <p class="mb-1"><b>Empresa: </b> {{order.order[0].name}}</p>
                   <p class="mb-1"><b>CNPJ: </b> {{order.order[0].cnpj}}</p>
