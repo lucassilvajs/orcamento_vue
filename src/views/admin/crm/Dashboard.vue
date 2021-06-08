@@ -14,7 +14,11 @@
                     <b-form-select v-model="filter.consultor" :options="['TODOS',...consultores]" plain />
                 </b-form-group>
             </b-colxx>
-            <b-colxx xl="3" xs="12"></b-colxx>
+            <b-colxx xs="12" lg="3">
+                <b-form-group label="Atribuidos pelo SDR" class="has-float-label mb-4">
+                    <b-form-select v-model="filter.sdr" :options="[{value: 0, text: 'Não'}, {value: 1, text: 'Sim'}]" plain />
+                </b-form-group>
+            </b-colxx>
             <b-colxx xl="3" xs="12">
               <b-button @click="getPipe()" class="float-right" variant="success">Buscar</b-button>
             </b-colxx>
