@@ -2,14 +2,14 @@
 <div>
     <b-row class="mb-3" v-if="pipe.length">
       <b-colxx>
-        <b-card>
+        <b-card title="Pesquisa">
           <b-row>
             <b-colxx xs="12" lg="3">
               <b-form-group label="Nome" class="has-float-label mb-2">
                 <b-form-input type="text" v-model="filter.name" />
               </b-form-group>
             </b-colxx>
-            <b-colxx xs="12" lg="3">
+            <b-colxx xs="12" lg="3" v-if="false">
                 <b-form-group label="Consultor" class="has-float-label mb-4">
                     <b-form-select v-model="filter.consultor" :options="['TODOS',...consultores]" plain />
                 </b-form-group>
@@ -22,6 +22,7 @@
         </b-card>
       </b-colxx>
     </b-row>
+
     <b-card class="mb-4 py-0">
       <b-button v-b-modal.modalPipe class="float-right" variant="outline-success">Criar contato <i class="glyph-icon simple-icon-plus"/> </b-button>
     </b-card>
@@ -104,13 +105,13 @@
                 </b-form-checkbox-group>
               </b-form-group>
             </b-colxx>
-            <b-colxx md="12" lg="12">
+            <b-colxx md="12" lg="12" v-if="false">
               <span class="title col-form-label">Consultor responsável</span>
               <b-input-group class="mb-3">
-                <b-form-select v-if="consultores" v-model="cardValue['consult']" :options="consultores"></b-form-select>
-                <!-- <b-input-group-append>
+                <b-form-select v-if="consultores" v-model="aux.consult" :options="consultores"></b-form-select>
+                <b-input-group-append>
                     <b-button @click="addConsultMultiple" variant="outline-success"> + </b-button>
-                </b-input-group-append> -->
+                </b-input-group-append>
               </b-input-group>
               <span v-for="(c, i) in aux.arrConsult" :key="c" href="#" class="tag-label">{{consultores.filter(r => r.value == c)[0].text}} <button @click="aux.arrConsult.splice(i,1)" >X</button> </span>
             </b-colxx>

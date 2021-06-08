@@ -1,7 +1,6 @@
 <template>
   <div>
     <div class="my-modal-card" :class="{ativo}">
-    {{ativo}}
       <div class="my-modal-content" v-if="card">
         <div class="my-modal-header d-flex justify-content-between align-items-center pb-4">
           <div class="card-info text-secondary">ID - #{{card}}</div>
