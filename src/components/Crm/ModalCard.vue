@@ -11,7 +11,9 @@
               </div>
               <div class="d-block d-md-inline-block pt-1">
                 <b-dropdown id="ddown1" text='Configurações' variant="outline-dark" class="mr-1 float-md-left btn-group " size="xs">
-                    <b-dropdown-item @click="deleteCard">Excluir</b-dropdown-item>
+                    <b-dropdown-item @click="deleteCard">Excluir </b-dropdown-item>
+                    <b-dropdown-item v-if="info.card.idSrd" @click="removeSDR">Remover SDR</b-dropdown-item>
+                    <b-dropdown-item v-else @click="atribuiSDR">Atríbuir ao SDR</b-dropdown-item>
                 </b-dropdown>
               </div>
             <button class="close" @click="ativo = !ativo">X</button>
@@ -180,6 +182,62 @@ export default {
         showLoaderOnConfirm: true,
         preConfirm: async (login) => {
           const response = await api.delete(`/crm/${this.card}`);
+          this.$notify(response.data.status, response.data.status == 'error' ? 'Opsss' : 'Sucesso', response.data.message, {
+            duration: 3000,
+            permanent: false
+          });
+
+          if(response.data.status == 'success') {
+            this.ativo = false;
+          }
+
+          return response.data.status;
+        },
+        allowOutsideClick: () => !this.$swal.isLoading()
+      }).then((result) => {
+
+      })
+    },    
+    async atribuiSDR(){
+      this.$swal.fire({
+        title: "Você está certo disso?",
+        text: 'Você deseja atribuir ao SDR esse card',
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: 'Continuar',
+        confirmButtonColor: '#3d3',
+        cancelButtonText: "Cancelar",
+        showLoaderOnConfirm: true,
+        preConfirm: async (login) => {
+          const response = await api.put(`/crm/sdr/${this.card}/add`);
+          this.$notify(response.data.status, response.data.status == 'error' ? 'Opsss' : 'Sucesso', response.data.message, {
+            duration: 3000,
+            permanent: false
+          });
+
+          if(response.data.status == 'success') {
+            this.ativo = false;
+          }
+
+          return response.data.status;
+        },
+        allowOutsideClick: () => !this.$swal.isLoading()
+      }).then((result) => {
+
+      })
+    },
+    async removeSDR(){
+      this.$swal.fire({
+        title: "Você está certo disso?",
+        text: 'Você deseja remover o SDR esse card',
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: 'Continuar',
+        confirmButtonColor: '#3d3',
+        cancelButtonText: "Cancelar",
+        showLoaderOnConfirm: true,
+        preConfirm: async (login) => {
+          const response = await api.put(`/crm/sdr/${this.card}/remove`);
           this.$notify(response.data.status, response.data.status == 'error' ? 'Opsss' : 'Sucesso', response.data.message, {
             duration: 3000,
             permanent: false
