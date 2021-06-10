@@ -43,10 +43,10 @@
           <b-card-body class="p-1 pr-0 card-area position-relative">
             <draggable :animation="100" :list="p.cards" :group="{ name: 'cards'}" style="height:100%;" @change="MoveCard">
 
-              <div v-for="(c, cIndex) in p.cards" :key="cIndex" @click="getCard(c.id)">
+              <div v-for="(c, cIndex) in p.cards" :key="cIndex" v-b-modal.cardCrm @click="getCard(c.id)">
                 <Card class="mt-2 mb-3 p-3 mr-2" :pipe="c" />
               </div>
-
+<!-- @click="getCard(c.id)" -->
               <div v-if="p.cards.length < p.total && p.cards.length > 0" class="text-center">
                 <b-button variant="info" :disabled="processing" :class="{'btn-block text-white mb-3 btn-multiple-state btn-shadow': true,
                   'show-spinner': processing}" @click="buscarMais(p.id, p.cards.length, indexPipe)">
@@ -125,7 +125,7 @@
           </template>
       </b-modal>
 
-      <modal-card :card="card" @modal="modalClose" />
+      <modal-card :card="card"/>
 
 
 </div>

@@ -22,7 +22,7 @@
               <div class="type-img mb-4" v-if="p.type == 'img'">
                 <p class="mb-1"><b>{{p.name}}: </b> {{p.selected.value}}</p>
                 <div class="d-flex align-items-start flex-direct-row">
-                  <div class="w-100px" :class="{active: p.selected.value == item.value}" v-for="item in p.items" :key="item.value" @click="() => {product.img = item.img; p.selected = item}">
+                  <div class="w-100px" :class="{active: p.selected.value == item.value}" v-for="item in p.items.filter(r => !r.no)" :key="item.value" @click="() => {product.img = item.img; p.selected = item}">
                     <img class="w-100" :src="baseURL+item.img" alt="">
                   </div>
                 </div>
@@ -30,7 +30,7 @@
               <div class="type-circle mb-4" v-if="p.type == 'circle'">
                 <p class="mb-1"><b>{{p.name}}: </b> {{p.selected.value}}</p>
                 <div class="d-flex align-items-start flex-direct-row">
-                  <div class="circle-item" :class="{active: item.value == p.selected.value}" v-for="(item, itemIndex) in p.items" :key="itemIndex" @click="p.selected = item">
+                  <div class="circle-item" :class="{active: item.value == p.selected.value}" v-for="(item, itemIndex) in p.items.filter(r => !r.no)" :key="itemIndex" @click="p.selected = item">
                     {{item.value}}
                   </div>
                 </div>

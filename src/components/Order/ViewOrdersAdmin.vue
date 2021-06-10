@@ -344,6 +344,11 @@ export default {
                 break;
                 case 'deleted':
                   response = await api.put('/admin/order/multidelete', {id});
+                  this.hideModal('viewOrder');
+                  this.$notify('success', 'Sucesso', "Pedido excluído com sucesso", {
+                    duration: 3000,
+                    permanent: false
+                  });
                 break;
                 case 'len':
                   response = await api.put(`/admin/order/${id}`, {
@@ -371,7 +376,15 @@ export default {
         }
 
         return acessorios;
-      }
+      },
+      hideModal (refname) {
+        this.$refs[refname].hide()
+        console.log('hide modal:: ' + refname)
+
+        if (refname === 'modalnestedinline') {
+          this.$refs['modalnested'].show()
+        }
+      },
     },
     created(){
     },

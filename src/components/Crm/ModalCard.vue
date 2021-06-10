@@ -1,70 +1,73 @@
 <template>
-  <div>
-    <div class="my-modal-card" :class="{ativo}">
-      <div class="my-modal-content" v-if="card">
-        <div class="my-modal-header d-flex justify-content-between align-items-center pb-4">
-          <div class="card-info text-secondary">ID - #{{card}}</div>
-          <div class="card-settings d-flex align-items-center flex-end" v-if="info">
-              <div v-if="[4,5,6,7,8].indexOf(parseInt(info.card.idStage)) >= 0">
-                <router-link v-if="info.card.idCompany" :to="`/app/company/edit/${info.card.idCompany}`" class="btn btn-success btn-xs mr-3 text-white">Cadastrar empresa <i class="glyph-icon simple-icon-plus"/> </router-link>
-                <router-link v-else :to="`/app/company/card/${card}`" class="btn btn-success btn-xs mr-3 text-white">Cadastrar empresa <i class="glyph-icon simple-icon-plus"/> </router-link>
-              </div>
-              <div class="d-block d-md-inline-block pt-1">
-                <b-dropdown id="ddown1" text='Configurações' variant="outline-dark" class="mr-1 float-md-left btn-group " size="xs">
-                    <b-dropdown-item @click="deleteCard">Excluir </b-dropdown-item>
-                    <b-dropdown-item v-if="info.card.idSrd" @click="removeSDR">Remover SDR</b-dropdown-item>
-                    <b-dropdown-item v-else @click="atribuiSDR">Atríbuir ao SDR</b-dropdown-item>
-                </b-dropdown>
-              </div>
-            <button class="close" @click="ativo = !ativo">X</button>
-          </div>
-          <button v-else class="close" @click="ativo = !ativo">X</button>
-        </div>
-        <div class="modal-card-body d-flex justify-content-between" v-if="info">
-          <div class="form-area w-50 px-2">
-            <h1 class="card-title mb-0 pb-0">{{info.card.title}}</h1>
-            <h5 class="form-creator mb-3">Criado por {{info.card.consult}} - há {{info.card.date | timeSince}}</h5>
-            <div class="control my-3">
-              <button @click="areaActive = 1" :class="{'active' : (areaActive == 1)}"> <i class="glyph-icon iconsminds-filter-2"></i> Oportunidade </button>
-              <button v-if="false" @click="areaActive = 2" :class="{'active' : (areaActive == 2)}"> <i class="simple-icon-paper-clip"></i> Anexos </button>
-              <button @click="areaActive = 3" :class="{'active' : (areaActive == 3)}"> <i class="glyph-icon simple-icon-calendar"></i> Retorno </button>
-              <button @click="areaActive = 4" :class="{'active' : (areaActive == 4)}"> <i class="glyph-icon iconsminds-speach-bubble-6"></i> Comentários </button>
-              <button @click="areaActive = 5" :class="{'active' : (areaActive == 5)}"> <i class="glyph-icon simple-icon-clock"></i> Histórico </button>
+  <b-modal id="cardCrm" ref="cardCrm" :title="`Card #${card}`" size="xl" hide-footer>
+    <div class="my-modal-content" v-if="card">
+      <div class="my-modal-header d-flex justify-content-between align-items-center pb-4">
+        <div class="card-settings d-flex align-items-center flex-end" v-if="info">
+            <div v-if="[4,5,6,7,8].indexOf(parseInt(info.card.idStage)) >= 0">
+              <router-link v-if="info.card.idCompany" :to="`/app/company/edit/${info.card.idCompany}`" class="btn btn-success btn-xs mr-3 text-white">Cadastrar empresa <i class="glyph-icon simple-icon-plus"/> </router-link>
+              <router-link v-else :to="`/app/company/card/${card}`" class="btn btn-success btn-xs mr-3 text-white">Cadastrar empresa <i class="glyph-icon simple-icon-plus"/> </router-link>
             </div>
-
-            <Oportunidade v-if="areaActive == 1 && info" :fields="filterFields(0)" :id="card"/>
-
-            <Anexos v-if="areaActive == 2" />
-
-            <Retorno v-if="areaActive == 3" :id="card"/>
-
-            <Comentarios v-if="areaActive == 4" :id="card"/>
-
-            <Historico v-if="areaActive == 5" :id="card"/>
-
-          </div>
-          <div class="atual text-left w-50 px-2">
-            <h3 class="fase-atual">Fase atual</h3>
-            <div class="d-flex justify-content-between">
-              <h2 class="fase-name">{{info.card.stage}}</h2>
-                <div class="d-block d-md-inline-block pt-1">
-                  <b-dropdown id="ddown1" text='Alterar fase' variant="outline-dark" class="mr-1 float-md-left btn-group " size="xs">
-                    <b-dropdown-item v-for="(s, i) in info.fields.map(r => r.stage)" :key="i" @click="changeStatus(s.id)" :disabled="s.id == info.card.idStage">{{s.name}}</b-dropdown-item>
-                  </b-dropdown>
-                </div>
+            <div class="d-block d-md-inline-block pt-1">
             </div>
-            <FormDinamic :fields="filterFields(info.card.idStage)" :id="card" />
-          </div>
-        </div>
-        <div v-else class="d-flex align-items-center justify-content-center h-100">
-          <h3>Buscando informações...</h3>
-        </div>
-        <div class="modal-card-footer d-flex justify-content-end">
-          <h6 v-if="isSave">Salvando...</h6>
         </div>
       </div>
+      <div class="modal-card-body d-flex justify-content-between" v-if="info">
+        <div class="form-area w-50 px-2">
+          <h1 class="card-title mb-0 pb-0">{{info.card.title}}</h1>
+          <h5 class="form-creator mb-3">Atríbuido a
+            
+            <b-dropdown id="ddown2" :text="consultAtrib ? consultAtrib : info.card.consult" variant="link" class="btn-group " size="xs">
+              <b-dropdown-item v-for="consultor in consultores" :key="consultor.user_id" @click="setConsult(consultor.user_id)">{{consultor.user_name}}</b-dropdown-item>
+            </b-dropdown>  - Criado há {{info.card.date | timeSince}}</h5>
+          
+          
+          <b-dropdown id="ddown1" text='Configurações' variant="outline-dark" class="mr-1 float-md-left btn-group " size="xs">
+            <b-dropdown-item @click="deleteCard">Excluir </b-dropdown-item>
+            <b-dropdown-item v-if="info.card.idSrd" @click="removeSDR">Remover SDR</b-dropdown-item>
+            <b-dropdown-item v-else @click="atribuiSDR">Atríbuir ao SDR</b-dropdown-item>
+          </b-dropdown>
+          
+          
+          <div class="d-block control my-3">
+            <button @click="areaActive = 1" :class="{'active' : (areaActive == 1)}"> <i class="glyph-icon iconsminds-filter-2"></i> Oportunidade </button>
+            <button v-if="false" @click="areaActive = 2" :class="{'active' : (areaActive == 2)}"> <i class="simple-icon-paper-clip"></i> Anexos </button>
+            <button @click="areaActive = 3" :class="{'active' : (areaActive == 3)}"> <i class="glyph-icon simple-icon-calendar"></i> Retorno </button>
+            <button @click="areaActive = 4" :class="{'active' : (areaActive == 4)}"> <i class="glyph-icon iconsminds-speach-bubble-6"></i> Comentários </button>
+            <button @click="areaActive = 5" :class="{'active' : (areaActive == 5)}"> <i class="glyph-icon simple-icon-clock"></i> Histórico </button>
+          </div>
+
+          <Oportunidade v-if="areaActive == 1 && info" :fields="filterFields(0)" :id="card"/>
+
+          <Anexos v-if="areaActive == 2" />
+
+          <Retorno v-if="areaActive == 3" :id="card"/>
+
+          <Comentarios v-if="areaActive == 4" :id="card"/>
+
+          <Historico v-if="areaActive == 5" :id="card"/>
+
+        </div>
+        <div class="atual text-left w-50 px-2">
+          <h3 class="fase-atual">Fase atual</h3>
+          <div class="d-flex justify-content-between">
+            <h2 class="fase-name">{{info.card.stage}}</h2>
+              <div class="d-block d-md-inline-block pt-1">
+                <b-dropdown id="ddown1" text='Alterar fase' variant="outline-dark" class="mr-1 float-md-left btn-group " size="xs">
+                  <b-dropdown-item v-for="(s, i) in info.fields.map(r => r.stage)" :key="i" @click="changeStatus(s.id)" :disabled="s.id == info.card.idStage">{{s.name}}</b-dropdown-item>
+                </b-dropdown>
+              </div>
+          </div>
+          <FormDinamic :fields="filterFields(info.card.idStage)" :id="card" />
+        </div>
+      </div>
+      <div v-else class="d-flex align-items-center justify-content-center h-100">
+        <h3>Buscando informações...</h3>
+      </div>
+      <div class="modal-card-footer d-flex justify-content-end">
+        <h6 v-if="isSave">Salvando...</h6>
+      </div>
     </div>
-  </div>
+  </b-modal>
 </template>
 <script>
 
@@ -95,6 +98,7 @@ export default {
   props:['card'],
   data () {
     return {
+      consultAtrib: false,
       ativo: false,
       info: null, // Salva informações
       selectedValueSingle: '',
@@ -153,12 +157,14 @@ export default {
     },
     async getInfo(){
       this.areaActive = 1;
+      this.consultAtrib = false;
       this.ativo = true;
       this.info = null
       if(this.card) {
         const data = await api.get(`crm/info/${this.card}`);
         if(data.data.status == 'success') {
-          this.info = data.data.data
+          this.info = data.data.data.card
+          this.consultores = data.data.data.consultores
         }
       }
     },
@@ -252,7 +258,35 @@ export default {
         allowOutsideClick: () => !this.$swal.isLoading()
       }).then((result) => {
 
-      })
+      });
+    },
+    async setConsult(idConsult){
+      this.$swal.fire({
+        title: "Você está certo disso?",
+        text: 'Você deseja alterar o responsável do card?',
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonText: 'Continuar',
+        confirmButtonColor: '#3d3',
+        cancelButtonText: "Cancelar",
+        showLoaderOnConfirm: true,
+        preConfirm: async (login) => {
+          const response = await api.put(`/crm/sdr/${this.card}/update`, {idConsult});
+          this.$notify(response.data.status, response.data.status == 'error' ? 'Opsss' : 'Sucesso', response.data.message, {
+            duration: 3000,
+            permanent: false
+          });
+
+          if(response.data.status == 'success') {
+            this.ativo = false;
+          }
+
+          return response.data.status;
+        },
+        allowOutsideClick: () => !this.$swal.isLoading()
+      }).then((result) => {
+        this.consultAtrib = this.consultores.filter(r => r.user_id == idConsult)[0].user_name;
+      });
     }
   },
   watch: {
@@ -268,44 +302,6 @@ export default {
 
 
 <style>
-  .my-modal-card:before {
-    content: "";
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100vh;
-    background: rgba(0,0,0,.5);
-    z-index: 10;
-  }
-
-  .my-modal-card {
-    position: fixed;
-    display: flex;
-    flex-direction: column;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    padding: 20px;
-    display: none;
-  }
-
-  .my-modal-card.ativo {
-    display: block;
-  }
-
-  .my-modal-content {
-    border-radius: 4px;
-    position: relative;
-    margin: 80px auto;
-    background: #ffffff;
-    padding: 30px;
-    max-width: 80vw;
-    animation: fadeInDown .3s forwards;
-    z-index: 10;
-    height: 75vh;
-  }
-
   .modal-card-body{
     height: 90%;
   }
@@ -339,11 +335,6 @@ export default {
 
   .oportunidade {
     height: 90%;
-  }
-
-  .form-basic {
-    height: 80%;
-    overflow: auto;
   }
 
   .form-label{
@@ -399,13 +390,6 @@ export default {
     right: 0;
     font-size:.6rem;
     color: #aac;
-  }
-
-
-  /* Retorno */
-  .retorno, .comment, .historic {
-    overflow: auto;
-    height: calc(100% - 100px);
   }
 
 
@@ -510,11 +494,6 @@ span.time {
   align-items: center;
   justify-content: center;
   font-size: 1.3rem;
-}
-
-.comments-area {
-  max-height: 40vh;
-  overflow: scroll;
 }
 
 /* Load */
